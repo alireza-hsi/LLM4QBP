@@ -1,0 +1,191 @@
+First Iteration:
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# 2.1 Glucose Management
+hypoglycemia_correction = gen.activity("Correct hypoglycemia immediately")
+repeat_glucose_measurement = gen.activity("Repeat blood glucose if > 11 mmol/L")
+
+# 2.2 Body Temperature Management
+temperature_evaluation = gen.activity("Evaluate temperature every 4 hours for 48 hours")
+temperature_reduction = gen.activity("Initiate temperature-reducing measures if > 37.5°C")
+infection_investigation = gen.activity("Investigate potential infection")
+therapy_initiation = gen.activity("Initiate antipyretic and antimicrobial therapy as needed")
+
+temperature_management = gen.partial_order(
+    dependencies=[
+        (temperature_evaluation, temperature_reduction),
+        (temperature_reduction, infection_investigation),
+        (infection_investigation, therapy_initiation)
+    ]
+)
+
+# 2.3 Cross-Continuum Prevention
+cross_continuum_prevention = gen.activity("Provide cross-continuum prevention assessments and therapies")
+
+# 2.4 Management of TIA and Minor Stroke
+brain_CT_scan = gen.activity("Perform brain CT scan")
+initiate_antiplatelet_therapy = gen.activity("Initiate antiplatelet therapy")
+stroke_prevention_treatment = gen.activity("Initiate other stroke-prevention treatments")
+specialized_clinic_evaluation = gen.activity("Evaluate at specialized TIA/minor stroke clinic")
+ED_evaluation = gen.activity("Evaluate at appropriately resourced ED if clinic is delayed")
+inpatient_consideration = gen.activity("Consider inpatient evaluation if necessary")
+stroke_clinic_referral = gen.activity("Refer to stroke clinic within 24 hours if > 48h post-symptom onset")
+outpatient_evaluation = gen.activity("Refer to outpatient clinic within 1 month if low-risk TIA")
+
+clinic_or_ED_choice = gen.xor(specialized_clinic_evaluation, ED_evaluation)
+full_initial_evaluation = gen.partial_order(
+    dependencies=[
+        (brain_CT_scan, initiate_antiplatelet_therapy),
+        (initiate_antiplatelet_therapy, stroke_prevention_treatment),
+        (stroke_prevention_treatment, clinic_or_ED_choice),
+        (ED_evaluation, inpatient_consideration)
+    ]
+)
+
+high_risk_path = gen.partial_order(
+    dependencies=[
+        (full_initial_evaluation, stroke_clinic_referral)
+    ]
+)
+
+low_risk_path = gen.partial_order(
+    dependencies=[
+        (brain_CT_scan.copy(), initiate_antiplatelet_therapy.copy()),
+        (initiate_antiplatelet_therapy.copy(), outpatient_evaluation)
+    ]
+)
+
+TIA_management = gen.xor(high_risk_path, low_risk_path)
+
+# 2.4.2 Consider Hospital Admission for Fluctuating Symptoms
+consider_hospital_admission = gen.activity("Consider hospital admission for fluctuating symptoms")
+
+# 2.4.3 Antiplatelet Therapy
+antiplatelet_therapy_asa = gen.activity("ASA 160 mg loading, then maintenance dose")
+antiplatelet_therapy_clopidogrel = gen.activity("Clopidogrel 300 mg loading, then 75 mg daily")
+antiplatelet_therapy_dipyridamole = gen.activity("Extended-release dipyridamole 200 mg/ASA 25 mg BID")
+
+antiplatelet_choice = gen.xor(
+    antiplatelet_therapy_asa,
+    antiplatelet_therapy_clopidogrel,
+    antiplatelet_therapy_dipyridamole
+)
+
+# 2.4.4 Rectal or Gastric ASA if Needed
+rectal_gastric_asa = gen.activity("Offer rectal or gastric ASA if swallowing impaired")
+
+# Full Process Integration
+final_model = gen.partial_order(
+    dependencies=[
+        (hypoglycemia_correction,),
+        (repeat_glucose_measurement,),
+        (temperature_management,),
+        (cross_continuum_prevention,),
+        (TIA_management, consider_hospital_admission),
+        (TIA_management, antiplatelet_choice),
+        (antiplatelet_choice, rectal_gastric_asa)
+    ]
+)
+
+
+
+########################################################################################################################
+
+Second Iteration's Message: 
+Executing your code led to an error! Please update the model to fix the error. Make sure to save the updated final model is the variable 'final_model'. This is the error message: Error occurred at line 39: "full_initial_evaluation = gen.partial_order(" with message: Exception: Ensure that each submodel is used uniquely! Avoid trying to reuse submodels that were used as children of other constructs (xor, loop, or partial_order) before! The error occured when trying to reuse a node of type Activity (Evaluate at appropriately resourced ED if clinic is delayed).
+
+
+Second Iteration Response (Only the code part):
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# 2.1 Glucose Management
+hypoglycemia_correction = gen.activity("Correct hypoglycemia immediately")
+repeat_glucose_measurement = gen.activity("Repeat blood glucose if > 11 mmol/L")
+
+# 2.2 Body Temperature Management
+temperature_evaluation = gen.activity("Evaluate temperature every 4 hours for 48 hours")
+temperature_reduction = gen.activity("Initiate temperature-reducing measures if > 37.5°C")
+infection_investigation = gen.activity("Investigate potential infection")
+therapy_initiation = gen.activity("Initiate antipyretic and antimicrobial therapy as needed")
+
+temperature_management = gen.partial_order(
+    dependencies=[
+        (temperature_evaluation, temperature_reduction),
+        (temperature_reduction, infection_investigation),
+        (infection_investigation, therapy_initiation)
+    ]
+)
+
+# 2.3 Cross-Continuum Prevention
+cross_continuum_prevention = gen.activity("Provide cross-continuum prevention assessments and therapies")
+
+# 2.4 Management of TIA and Minor Stroke
+brain_CT_scan = gen.activity("Perform brain CT scan")
+initiate_antiplatelet_therapy = gen.activity("Initiate antiplatelet therapy")
+stroke_prevention_treatment = gen.activity("Initiate other stroke-prevention treatments")
+specialized_clinic_evaluation = gen.activity("Evaluate at specialized TIA/minor stroke clinic")
+ED_evaluation = gen.activity("Evaluate at appropriately resourced ED if clinic is delayed").copy()
+inpatient_consideration = gen.activity("Consider inpatient evaluation if necessary")
+stroke_clinic_referral = gen.activity("Refer to stroke clinic within 24 hours if > 48h post-symptom onset")
+outpatient_evaluation = gen.activity("Refer to outpatient clinic within 1 month if low-risk TIA")
+
+clinic_or_ED_choice = gen.xor(specialized_clinic_evaluation, ED_evaluation)
+full_initial_evaluation = gen.partial_order(
+    dependencies=[
+        (brain_CT_scan, initiate_antiplatelet_therapy),
+        (initiate_antiplatelet_therapy, stroke_prevention_treatment),
+        (stroke_prevention_treatment, clinic_or_ED_choice),
+        (ED_evaluation.copy(), inpatient_consideration)
+    ]
+)
+
+high_risk_path = gen.partial_order(
+    dependencies=[
+        (full_initial_evaluation, stroke_clinic_referral)
+    ]
+)
+
+low_risk_path = gen.partial_order(
+    dependencies=[
+        (brain_CT_scan.copy(), initiate_antiplatelet_therapy.copy()),
+        (initiate_antiplatelet_therapy.copy(), outpatient_evaluation)
+    ]
+)
+
+TIA_management = gen.xor(high_risk_path, low_risk_path)
+
+# 2.4.2 Consider Hospital Admission for Fluctuating Symptoms
+consider_hospital_admission = gen.activity("Consider hospital admission for fluctuating symptoms")
+
+# 2.4.3 Antiplatelet Therapy
+antiplatelet_therapy_asa = gen.activity("ASA 160 mg loading, then maintenance dose")
+antiplatelet_therapy_clopidogrel = gen.activity("Clopidogrel 300 mg loading, then 75 mg daily")
+antiplatelet_therapy_dipyridamole = gen.activity("Extended-release dipyridamole 200 mg/ASA 25 mg BID")
+
+antiplatelet_choice = gen.xor(
+    antiplatelet_therapy_asa,
+    antiplatelet_therapy_clopidogrel,
+    antiplatelet_therapy_dipyridamole
+)
+
+# 2.4.4 Rectal or Gastric ASA if Needed
+rectal_gastric_asa = gen.activity("Offer rectal or gastric ASA if swallowing impaired")
+
+# Full Process Integration
+final_model = gen.partial_order(
+    dependencies=[
+        (hypoglycemia_correction,),
+        (repeat_glucose_measurement,),
+        (temperature_management,),
+        (cross_continuum_prevention,),
+        (TIA_management, consider_hospital_admission),
+        (TIA_management, antiplatelet_choice),
+        (antiplatelet_choice, rectal_gastric_asa)
+    ]
+)

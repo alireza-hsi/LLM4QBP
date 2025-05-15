@@ -1,0 +1,157 @@
+First Iteration:
+
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# Glucose management
+correct_hypoglycemia = gen.activity("Correct hypoglycemia immediately")
+measure_glucose = gen.activity("Measure blood glucose if > 11 mmol/L")
+glucose_management = gen.partial_order(dependencies=[(correct_hypoglycemia,), (measure_glucose,)])
+
+# Body temperature management
+evaluate_temperature = gen.activity("Evaluate temperature every 4 hours for 48 hours")
+initiate_temp_reduction = gen.activity("Initiate temperature-reducing measures if > 37.5 C")
+investigate_infection = gen.activity("Investigate potential infection")
+initiate_therapy = gen.activity("Initiate antipyretic and antimicrobial therapy as required")
+temperature_management = gen.partial_order(
+    dependencies=[(evaluate_temperature,), (evaluate_temperature, initiate_temp_reduction),
+                  (initiate_temp_reduction, investigate_infection), (investigate_infection, initiate_therapy)]
+)
+
+# Cross-continuum prevention assessment and therapies
+cross_continuum_prevention = gen.activity("Provide cross-continuum prevention assessment and therapies")
+
+# Management of TIA or minor (nondisabling) stroke
+perform_ct_scan = gen.activity("Perform brain CT scan")
+initiate_antiplatelet = gen.activity("Initiate antiplatelet therapy")
+stroke_prevention_treatment = gen.activity("Initiate other stroke-prevention treatments")
+location_of_care_choice = gen.xor(
+    gen.activity("Provide care at specialized TIA/minor stroke clinic"),
+    gen.activity("Evaluate at ED if TIA clinic is not accessible, consider inpatient evaluation")
+)
+late_presentation_evaluation = gen.activity(
+    "Refer for specialized evaluation if presenting after 48 hours from symptom onset"
+)
+
+high_risk_tia_management = gen.partial_order(
+    dependencies=[(perform_ct_scan, initiate_antiplatelet), (initiate_antiplatelet, stroke_prevention_treatment),
+                  (stroke_prevention_treatment, location_of_care_choice)]
+)
+non_high_risk_tia_management = gen.partial_order(
+    dependencies=[(perform_ct_scan, initiate_antiplatelet),
+                  (initiate_antiplatelet, gen.activity("Refer to outpatient stroke-prevention clinic within 1 month"))]
+)
+
+tia_management = gen.xor(high_risk_tia_management, non_high_risk_tia_management, late_presentation_evaluation)
+
+# Hospital admission for specific TIA patients
+admission_evaluation = gen.activity(
+    "Evaluate for hospital admission if fluctuating/crescendo motor weakness, sensory loss, or speech difficulty"
+)
+
+# Immediate antiplatelet therapy
+asa_therapy = gen.activity("Administer ASA 160 mg loading dose, then maintenance dose")
+clopidogrel_therapy = gen.activity("Administer clopidogrel 300 mg loading dose, then 75 mg daily")
+dipyridamole_therapy = gen.activity("Administer extended-release dipyridamole 200 mg/ASA 25 mg bid")
+
+antiplatelet_choice = gen.xor(asa_therapy, clopidogrel_therapy, dipyridamole_therapy)
+
+# Rectal or gastric ASA administration if needed
+rectal_asa = gen.activity("Provide rectal or gastric ASA if swallowing issues present")
+
+# Combining all processes into a structured process model
+final_model = gen.partial_order(
+    dependencies=[
+        (glucose_management,), (temperature_management,), (cross_continuum_prevention,),
+        (tia_management,), (admission_evaluation,), (antiplatelet_choice,), (rectal_asa,)
+    ]
+)
+
+
+
+########################################################################################################################
+
+Second Iteration's Message: 
+Executing your code led to an error! Please update the model to fix the error. Make sure to save the updated final model is the variable 'final_model'. This is the error message: Error occurred at line 41: "non_high_risk_tia_management = gen.partial_order(" with message: Exception: Ensure that each submodel is used uniquely! Avoid trying to reuse submodels that were used as children of other constructs (xor, loop, or partial_order) before! The error occured when trying to reuse a node of type Activity (Perform brain CT scan).
+
+
+Second Iteration Response (Only the code part):
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# Glucose management
+correct_hypoglycemia = gen.activity("Correct hypoglycemia immediately")
+measure_glucose = gen.activity("Measure blood glucose if > 11 mmol/L")
+glucose_management = gen.partial_order(dependencies=[(correct_hypoglycemia,), (measure_glucose,)])
+
+# Body temperature management
+evaluate_temperature = gen.activity("Evaluate temperature every 4 hours for 48 hours")
+initiate_temp_reduction = gen.activity("Initiate temperature-reducing measures if > 37.5 C")
+investigate_infection = gen.activity("Investigate potential infection")
+initiate_therapy = gen.activity("Initiate antipyretic and antimicrobial therapy as required")
+temperature_management = gen.partial_order(
+    dependencies=[(evaluate_temperature,), (evaluate_temperature, initiate_temp_reduction),
+                  (initiate_temp_reduction, investigate_infection), (investigate_infection, initiate_therapy)]
+)
+
+# Cross-continuum prevention assessment and therapies
+cross_continuum_prevention = gen.activity("Provide cross-continuum prevention assessment and therapies")
+
+# Management of TIA or minor (nondisabling) stroke
+perform_ct_scan_high_risk = gen.activity("Perform brain CT scan for high-risk TIA")
+perform_ct_scan_non_high_risk = gen.activity("Perform brain CT scan for non-high-risk TIA")
+
+initiate_antiplatelet_high_risk = gen.activity("Initiate antiplatelet therapy for high-risk TIA")
+initiate_antiplatelet_non_high_risk = gen.activity("Initiate antiplatelet therapy for non-high-risk TIA")
+
+stroke_prevention_treatment = gen.activity("Initiate other stroke-prevention treatments")
+
+location_of_care_choice = gen.xor(
+    gen.activity("Provide care at specialized TIA/minor stroke clinic"),
+    gen.activity("Evaluate at ED if TIA clinic is not accessible, consider inpatient evaluation")
+)
+
+late_presentation_evaluation = gen.activity(
+    "Refer for specialized evaluation if presenting after 48 hours from symptom onset"
+)
+
+high_risk_tia_management = gen.partial_order(
+    dependencies=[(perform_ct_scan_high_risk, initiate_antiplatelet_high_risk),
+                  (initiate_antiplatelet_high_risk, stroke_prevention_treatment),
+                  (stroke_prevention_treatment, location_of_care_choice)]
+)
+
+non_high_risk_tia_management = gen.partial_order(
+    dependencies=[(perform_ct_scan_non_high_risk, initiate_antiplatelet_non_high_risk),
+                  (initiate_antiplatelet_non_high_risk, 
+                   gen.activity("Refer to outpatient stroke-prevention clinic within 1 month"))]
+)
+
+tia_management = gen.xor(high_risk_tia_management, non_high_risk_tia_management, late_presentation_evaluation)
+
+# Hospital admission for specific TIA patients
+admission_evaluation = gen.activity(
+    "Evaluate for hospital admission if fluctuating/crescendo motor weakness, sensory loss, or speech difficulty"
+)
+
+# Immediate antiplatelet therapy
+asa_therapy = gen.activity("Administer ASA 160 mg loading dose, then maintenance dose")
+clopidogrel_therapy = gen.activity("Administer clopidogrel 300 mg loading dose, then 75 mg daily")
+dipyridamole_therapy = gen.activity("Administer extended-release dipyridamole 200 mg/ASA 25 mg bid")
+
+antiplatelet_choice = gen.xor(asa_therapy, clopidogrel_therapy, dipyridamole_therapy)
+
+# Rectal or gastric ASA administration if needed
+rectal_asa = gen.activity("Provide rectal or gastric ASA if swallowing issues present")
+
+# Combining all processes into a structured process model
+final_model = gen.partial_order(
+    dependencies=[
+        (glucose_management,), (temperature_management,), (cross_continuum_prevention,),
+        (tia_management,), (admission_evaluation,), (antiplatelet_choice,), (rectal_asa,)
+    ]
+)

@@ -1,0 +1,440 @@
+First Iteration:
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# 2.1 Glucose Management
+correct_hypoglycemia = gen.activity("Correct hypoglycemia immediately")
+measure_glucose = gen.activity("Measure blood glucose")
+repeat_glucose_if_high = gen.xor(gen.activity("Repeat blood glucose measurement if > 11 mmol/L"), None)
+
+# 2.2 Body Temperature Management
+evaluate_temperature = gen.activity("Evaluate temperature every 4 hours for first 48 hours")
+temperature_above_threshold = gen.xor(
+    gen.partial_order(dependencies=[
+        (gen.activity("Initiate temperature-reducing measures"),),
+        (gen.activity("Investigate potential infection"),),
+        (gen.activity("Initiate antipyretic and antimicrobial therapy as required"),)
+    ]),
+    None
+)
+
+# 2.3 Cross-continuum Prevention Assessment and Therapies
+cross_continuum_prevention = gen.activity("Provide cross-continuum secondary prevention assessments and therapies")
+
+# 2.4 Management of Patients with TIA or Minor Stroke
+brain_ct_scan = gen.activity("Perform brain CT scan")
+initiate_antiplatelet_therapy = gen.activity("Initiate antiplatelet therapy")
+
+# Pathway for high-risk TIA/minor stroke patients
+specialized_clinic_evaluation = gen.activity("Evaluate at specialized TIA/minor stroke clinic")
+ed_evaluation_if_delayed = gen.activity("Evaluate at appropriately resourced ED if delay to specialized clinic")
+consider_inpatient_evaluation = gen.activity("Consider inpatient evaluation for stroke prevention")
+
+# Pathway for non-high-risk TIA patients
+outpatient_clinic_evaluation = gen.activity("Refer to outpatient clinic with stroke-prevention services within 1 month")
+
+# Decision for TIA with high-risk features or minor stroke
+high_risk_tia_path = gen.partial_order(dependencies=[
+    (brain_ct_scan, initiate_antiplatelet_therapy),
+    (initiate_antiplatelet_therapy, gen.xor(specialized_clinic_evaluation, ed_evaluation_if_delayed)),
+    (ed_evaluation_if_delayed, consider_inpatient_evaluation)
+])
+
+# Decision for TIA without high-risk features
+non_high_risk_tia_path = gen.partial_order(dependencies=[
+    (brain_ct_scan, initiate_antiplatelet_therapy),
+    (initiate_antiplatelet_therapy, outpatient_clinic_evaluation)
+])
+
+# Decision to evaluate in ED for fluctuating/crescendo symptoms
+ed_evaluation_for_crescendo_tia = gen.xor(gen.activity("Evaluate in ED for admission consideration"), None)
+
+# 2.4.3 Antiplatelet Therapy
+antiplatelet_options = gen.xor(
+    gen.activity("ASA 160 mg loading dose, then 81–325 mg daily"),
+    gen.activity("Clopidogrel 300 mg loading dose, then 75 mg daily"),
+    gen.activity("Extended-release dipyridamole 200 mg/ASA 25 mg BID (with ASA 160 mg loading dose)")
+)
+
+# 2.4.4 Rectal/Gastric ASA for Swallowing Issues
+rectal_gastric_asa = gen.xor(gen.activity("Offer rectal or gastric ASA if swallowing issues"), None)
+
+# Assemble main pathway
+pathway_decision = gen.xor(high_risk_tia_path, non_high_risk_tia_path)
+complete_tia_management = gen.partial_order(dependencies=[
+    (pathway_decision, ed_evaluation_for_crescendo_tia),
+    (ed_evaluation_for_crescendo_tia, antiplatelet_options),
+    (antiplatelet_options, rectal_gastric_asa)
+])
+
+# Final process model
+final_model = gen.partial_order(dependencies=[
+    (correct_hypoglycemia, measure_glucose),
+    (measure_glucose, repeat_glucose_if_high),
+    (evaluate_temperature, temperature_above_threshold),
+    (cross_continuum_prevention,),
+    (complete_tia_management,)
+])
+
+
+
+########################################################################################################################
+
+Second Iteration's Message: 
+
+Executing your code led to an error! Please update the model to fix the error. Make sure to save the updated final model is the variable 'final_model'. This is the error message: Error occurred at line 38: "high_risk_tia_path = gen.partial_order(dependencies=[" with message: Exception: Ensure that each submodel is used uniquely! Avoid trying to reuse submodels that were used as children of other constructs (xor, loop, or partial_order) before! The error occured when trying to reuse a node of type Activity (Evaluate at appropriately resourced ED if delay to specialized clinic).
+
+
+Second Iteration's response:
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# 2.1 Glucose Management
+correct_hypoglycemia = gen.activity("Correct hypoglycemia immediately")
+measure_glucose = gen.activity("Measure blood glucose")
+repeat_glucose_if_high = gen.xor(gen.activity("Repeat blood glucose measurement if > 11 mmol/L"), None)
+
+# 2.2 Body Temperature Management
+evaluate_temperature = gen.activity("Evaluate temperature every 4 hours for first 48 hours")
+temperature_above_threshold = gen.xor(
+    gen.partial_order(dependencies=[
+        (gen.activity("Initiate temperature-reducing measures"),),
+        (gen.activity("Investigate potential infection"),),
+        (gen.activity("Initiate antipyretic and antimicrobial therapy as required"),)
+    ]),
+    None
+)
+
+# 2.3 Cross-continuum Prevention Assessment and Therapies
+cross_continuum_prevention = gen.activity("Provide cross-continuum secondary prevention assessments and therapies")
+
+# 2.4 Management of Patients with TIA or Minor Stroke
+brain_ct_scan = gen.activity("Perform brain CT scan")
+initiate_antiplatelet_therapy = gen.activity("Initiate antiplatelet therapy")
+
+# Pathway for high-risk TIA/minor stroke patients
+specialized_clinic_evaluation = gen.activity("Evaluate at specialized TIA/minor stroke clinic")
+ed_evaluation_if_delayed = gen.activity("Evaluate at appropriately resourced ED if delay to specialized clinic")
+consider_inpatient_evaluation = gen.activity("Consider inpatient evaluation for stroke prevention")
+
+# Ensure unique instances to prevent reuse error
+ed_evaluation_if_delayed_copy = ed_evaluation_if_delayed.copy()
+consider_inpatient_evaluation_copy = consider_inpatient_evaluation.copy()
+
+# Pathway for non-high-risk TIA patients
+outpatient_clinic_evaluation = gen.activity("Refer to outpatient clinic with stroke-prevention services within 1 month")
+
+# Decision for TIA with high-risk features or minor stroke
+high_risk_tia_path = gen.partial_order(dependencies=[
+    (brain_ct_scan, initiate_antiplatelet_therapy),
+    (initiate_antiplatelet_therapy, gen.xor(specialized_clinic_evaluation, ed_evaluation_if_delayed_copy)),
+    (ed_evaluation_if_delayed_copy, consider_inpatient_evaluation_copy)
+])
+
+# Decision for TIA without high-risk features
+non_high_risk_tia_path = gen.partial_order(dependencies=[
+    (brain_ct_scan, initiate_antiplatelet_therapy.copy()),  # Ensure unique instance
+    (initiate_antiplatelet_therapy.copy(), outpatient_clinic_evaluation)
+])
+
+# Decision to evaluate in ED for fluctuating/crescendo symptoms
+ed_evaluation_for_crescendo_tia = gen.xor(gen.activity("Evaluate in ED for admission consideration"), None)
+
+# 2.4.3 Antiplatelet Therapy
+antiplatelet_options = gen.xor(
+    gen.activity("ASA 160 mg loading dose, then 81–325 mg daily"),
+    gen.activity("Clopidogrel 300 mg loading dose, then 75 mg daily"),
+    gen.activity("Extended-release dipyridamole 200 mg/ASA 25 mg BID (with ASA 160 mg loading dose)")
+)
+
+# 2.4.4 Rectal/Gastric ASA for Swallowing Issues
+rectal_gastric_asa = gen.xor(gen.activity("Offer rectal or gastric ASA if swallowing issues"), None)
+
+# Assemble main pathway
+pathway_decision = gen.xor(high_risk_tia_path, non_high_risk_tia_path)
+complete_tia_management = gen.partial_order(dependencies=[
+    (pathway_decision, ed_evaluation_for_crescendo_tia),
+    (ed_evaluation_for_crescendo_tia, antiplatelet_options),
+    (antiplatelet_options, rectal_gastric_asa)
+])
+
+# Final process model
+final_model = gen.partial_order(dependencies=[
+    (correct_hypoglycemia, measure_glucose),
+    (measure_glucose, repeat_glucose_if_high),
+    (evaluate_temperature, temperature_above_threshold),
+    (cross_continuum_prevention,),
+    (complete_tia_management,)
+])
+
+
+########################################################################################################################
+
+Third Iteration's Message: 
+
+
+Executing your code led to an error! Please update the model to fix the error. Make sure to save the updated final model is the variable 'final_model'. This is the error message: Error occurred at line 42: "high_risk_tia_path = gen.partial_order(dependencies=[" with message: Exception: Ensure that each submodel is used uniquely! Avoid trying to reuse submodels that were used as children of other constructs (xor, loop, or partial_order) before! The error occured when trying to reuse a node of type Activity (Evaluate at appropriately resourced ED if delay to specialized clinic).
+
+Third Iteration's response:
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# 2.1 Glucose Management
+correct_hypoglycemia = gen.activity("Correct hypoglycemia immediately")
+measure_glucose = gen.activity("Measure blood glucose")
+repeat_glucose_if_high = gen.xor(gen.activity("Repeat blood glucose measurement if > 11 mmol/L"), None)
+
+# 2.2 Body Temperature Management
+evaluate_temperature = gen.activity("Evaluate temperature every 4 hours for first 48 hours")
+temperature_above_threshold = gen.xor(
+    gen.partial_order(dependencies=[
+        (gen.activity("Initiate temperature-reducing measures"),),
+        (gen.activity("Investigate potential infection"),),
+        (gen.activity("Initiate antipyretic and antimicrobial therapy as required"),)
+    ]),
+    None
+)
+
+# 2.3 Cross-continuum Prevention Assessment and Therapies
+cross_continuum_prevention = gen.activity("Provide cross-continuum secondary prevention assessments and therapies")
+
+# 2.4 Management of Patients with TIA or Minor Stroke
+brain_ct_scan = gen.activity("Perform brain CT scan")
+initiate_antiplatelet_therapy = gen.activity("Initiate antiplatelet therapy")
+
+# Ensure unique instances to prevent reuse error
+specialized_clinic_evaluation = gen.activity("Evaluate at specialized TIA/minor stroke clinic")
+ed_evaluation_if_delayed = gen.activity("Evaluate at appropriately resourced ED if delay to specialized clinic")
+consider_inpatient_evaluation = gen.activity("Consider inpatient evaluation for stroke prevention")
+outpatient_clinic_evaluation = gen.activity("Refer to outpatient clinic with stroke-prevention services within 1 month")
+
+ed_evaluation_if_delayed_1 = ed_evaluation_if_delayed.copy()
+ed_evaluation_if_delayed_2 = ed_evaluation_if_delayed.copy()
+consider_inpatient_evaluation_1 = consider_inpatient_evaluation.copy()
+consider_inpatient_evaluation_2 = consider_inpatient_evaluation.copy()
+
+# Pathway for high-risk TIA/minor stroke patients
+high_risk_tia_path = gen.partial_order(dependencies=[
+    (brain_ct_scan, initiate_antiplatelet_therapy),
+    (initiate_antiplatelet_therapy, gen.xor(specialized_clinic_evaluation, ed_evaluation_if_delayed_1)),
+    (ed_evaluation_if_delayed_1, consider_inpatient_evaluation_1)
+])
+
+# Pathway for non-high-risk TIA patients
+non_high_risk_tia_path = gen.partial_order(dependencies=[
+    (brain_ct_scan.copy(), initiate_antiplatelet_therapy.copy()),
+    (initiate_antiplatelet_therapy.copy(), outpatient_clinic_evaluation)
+])
+
+# Decision to evaluate in ED for fluctuating/crescendo symptoms
+ed_evaluation_for_crescendo_tia = gen.xor(gen.activity("Evaluate in ED for admission consideration"), None)
+
+# 2.4.3 Antiplatelet Therapy
+antiplatelet_options = gen.xor(
+    gen.activity("ASA 160 mg loading dose, then 81–325 mg daily"),
+    gen.activity("Clopidogrel 300 mg loading dose, then 75 mg daily"),
+    gen.activity("Extended-release dipyridamole 200 mg/ASA 25 mg BID (with ASA 160 mg loading dose)")
+)
+
+# 2.4.4 Rectal/Gastric ASA for Swallowing Issues
+rectal_gastric_asa = gen.xor(gen.activity("Offer rectal or gastric ASA if swallowing issues"), None)
+
+# Assemble main pathway
+pathway_decision = gen.xor(high_risk_tia_path, non_high_risk_tia_path)
+complete_tia_management = gen.partial_order(dependencies=[
+    (pathway_decision, ed_evaluation_for_crescendo_tia),
+    (ed_evaluation_for_crescendo_tia, antiplatelet_options),
+    (antiplatelet_options, rectal_gastric_asa)
+])
+
+# Final process model
+final_model = gen.partial_order(dependencies=[
+    (correct_hypoglycemia, measure_glucose),
+    (measure_glucose, repeat_glucose_if_high),
+    (evaluate_temperature, temperature_above_threshold),
+    (cross_continuum_prevention,),
+    (complete_tia_management,)
+])
+
+########################################################################################################################
+
+Fourth Iteration's Message: 
+
+Executing your code led to an error! Please update the model to fix the error. Make sure to save the updated final model is the variable 'final_model'. This is the error message: Error occurred at line 41: "high_risk_tia_path = gen.partial_order(dependencies=[" with message: Exception: Ensure that each submodel is used uniquely! Avoid trying to reuse submodels that were used as children of other constructs (xor, loop, or partial_order) before! The error occured when trying to reuse a node of type Activity (Evaluate at appropriately resourced ED if delay to specialized clinic).
+
+Fourth Iteration's Response: 
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# 2.1 Glucose Management
+correct_hypoglycemia = gen.activity("Correct hypoglycemia immediately")
+measure_glucose = gen.activity("Measure blood glucose")
+repeat_glucose_if_high = gen.xor(gen.activity("Repeat blood glucose measurement if > 11 mmol/L"), None)
+
+# 2.2 Body Temperature Management
+evaluate_temperature = gen.activity("Evaluate temperature every 4 hours for first 48 hours")
+temperature_above_threshold = gen.xor(
+    gen.partial_order(dependencies=[
+        (gen.activity("Initiate temperature-reducing measures"),),
+        (gen.activity("Investigate potential infection"),),
+        (gen.activity("Initiate antipyretic and antimicrobial therapy as required"),)
+    ]),
+    None
+)
+
+# 2.3 Cross-continuum Prevention Assessment and Therapies
+cross_continuum_prevention = gen.activity("Provide cross-continuum secondary prevention assessments and therapies")
+
+# 2.4 Management of Patients with TIA or Minor Stroke
+brain_ct_scan = gen.activity("Perform brain CT scan")
+initiate_antiplatelet_therapy = gen.activity("Initiate antiplatelet therapy")
+
+# Ensure unique instances to prevent reuse error
+specialized_clinic_evaluation = gen.activity("Evaluate at specialized TIA/minor stroke clinic")
+ed_evaluation_if_delayed_1 = gen.activity("Evaluate at appropriately resourced ED if delay to specialized clinic")
+ed_evaluation_if_delayed_2 = ed_evaluation_if_delayed_1.copy()
+consider_inpatient_evaluation = gen.activity("Consider inpatient evaluation for stroke prevention")
+outpatient_clinic_evaluation = gen.activity("Refer to outpatient clinic with stroke-prevention services within 1 month")
+
+# Pathway for high-risk TIA/minor stroke patients
+high_risk_tia_path = gen.partial_order(dependencies=[
+    (brain_ct_scan, initiate_antiplatelet_therapy),
+    (initiate_antiplatelet_therapy, gen.xor(specialized_clinic_evaluation, ed_evaluation_if_delayed_1)),
+    (ed_evaluation_if_delayed_1, consider_inpatient_evaluation)
+])
+
+# Pathway for non-high-risk TIA patients
+non_high_risk_tia_path = gen.partial_order(dependencies=[
+    (brain_ct_scan.copy(), initiate_antiplatelet_therapy.copy()),
+    (initiate_antiplatelet_therapy.copy(), outpatient_clinic_evaluation)
+])
+
+# Decision to evaluate in ED for fluctuating/crescendo symptoms
+ed_evaluation_for_crescendo_tia = gen.xor(gen.activity("Evaluate in ED for admission consideration"), None)
+
+# 2.4.3 Antiplatelet Therapy
+antiplatelet_options = gen.xor(
+    gen.activity("ASA 160 mg loading dose, then 81–325 mg daily"),
+    gen.activity("Clopidogrel 300 mg loading dose, then 75 mg daily"),
+    gen.activity("Extended-release dipyridamole 200 mg/ASA 25 mg BID (with ASA 160 mg loading dose)")
+)
+
+# 2.4.4 Rectal/Gastric ASA for Swallowing Issues
+rectal_gastric_asa = gen.xor(gen.activity("Offer rectal or gastric ASA if swallowing issues"), None)
+
+# Assemble main pathway
+pathway_decision = gen.xor(high_risk_tia_path, non_high_risk_tia_path)
+complete_tia_management = gen.partial_order(dependencies=[
+    (pathway_decision, ed_evaluation_for_crescendo_tia),
+    (ed_evaluation_for_crescendo_tia, antiplatelet_options),
+    (antiplatelet_options, rectal_gastric_asa)
+])
+
+# Final process model
+final_model = gen.partial_order(dependencies=[
+    (correct_hypoglycemia, measure_glucose),
+    (measure_glucose, repeat_glucose_if_high),
+    (evaluate_temperature, temperature_above_threshold),
+    (cross_continuum_prevention,),
+    (complete_tia_management,)
+])
+
+########################################################################################################################
+
+Fifth Iteration's Message: 
+
+Executing your code led to an error! Please update the model to fix the error. Make sure to save the updated final model is the variable 'final_model'. This is the error message: Error occurred at line 37: "high_risk_tia_path = gen.partial_order(dependencies=[" with message: Exception: Ensure that each submodel is used uniquely! Avoid trying to reuse submodels that were used as children of other constructs (xor, loop, or partial_order) before! The error occured when trying to reuse a node of type Activity (Evaluate at appropriately resourced ED if delay to specialized clinic).
+
+Fifth Iteration's Response: 
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# 2.1 Glucose Management
+correct_hypoglycemia = gen.activity("Correct hypoglycemia immediately")
+measure_glucose = gen.activity("Measure blood glucose")
+repeat_glucose_if_high = gen.xor(gen.activity("Repeat blood glucose measurement if > 11 mmol/L"), None)
+
+# 2.2 Body Temperature Management
+evaluate_temperature = gen.activity("Evaluate temperature every 4 hours for first 48 hours")
+temperature_above_threshold = gen.xor(
+    gen.partial_order(dependencies=[
+        (gen.activity("Initiate temperature-reducing measures"),),
+        (gen.activity("Investigate potential infection"),),
+        (gen.activity("Initiate antipyretic and antimicrobial therapy as required"),)
+    ]),
+    None
+)
+
+# 2.3 Cross-continuum Prevention Assessment and Therapies
+cross_continuum_prevention = gen.activity("Provide cross-continuum secondary prevention assessments and therapies")
+
+# 2.4 Management of Patients with TIA or Minor Stroke
+brain_ct_scan = gen.activity("Perform brain CT scan")
+initiate_antiplatelet_therapy = gen.activity("Initiate antiplatelet therapy")
+
+# Ensure unique instances to prevent reuse error
+specialized_clinic_evaluation = gen.activity("Evaluate at specialized TIA/minor stroke clinic")
+ed_evaluation_if_delayed = gen.activity("Evaluate at appropriately resourced ED if delay to specialized clinic")
+consider_inpatient_evaluation = gen.activity("Consider inpatient evaluation for stroke prevention")
+outpatient_clinic_evaluation = gen.activity("Refer to outpatient clinic with stroke-prevention services within 1 month")
+
+# Creating copies for reuse
+ed_evaluation_if_delayed_1 = ed_evaluation_if_delayed.copy()
+consider_inpatient_evaluation_1 = consider_inpatient_evaluation.copy()
+
+# Pathway for high-risk TIA/minor stroke patients
+high_risk_tia_path = gen.partial_order(dependencies=[
+    (brain_ct_scan, initiate_antiplatelet_therapy),
+    (initiate_antiplatelet_therapy, gen.xor(specialized_clinic_evaluation, ed_evaluation_if_delayed_1)),
+    (ed_evaluation_if_delayed_1, consider_inpatient_evaluation_1)
+])
+
+# Pathway for non-high-risk TIA patients
+non_high_risk_tia_path = gen.partial_order(dependencies=[
+    (brain_ct_scan.copy(), initiate_antiplatelet_therapy.copy()),
+    (initiate_antiplatelet_therapy.copy(), outpatient_clinic_evaluation)
+])
+
+# Decision to evaluate in ED for fluctuating/crescendo symptoms
+ed_evaluation_for_crescendo_tia = gen.xor(gen.activity("Evaluate in ED for admission consideration"), None)
+
+# 2.4.3 Antiplatelet Therapy
+antiplatelet_options = gen.xor(
+    gen.activity("ASA 160 mg loading dose, then 81–325 mg daily"),
+    gen.activity("Clopidogrel 300 mg loading dose, then 75 mg daily"),
+    gen.activity("Extended-release dipyridamole 200 mg/ASA 25 mg BID (with ASA 160 mg loading dose)")
+)
+
+# 2.4.4 Rectal/Gastric ASA for Swallowing Issues
+rectal_gastric_asa = gen.xor(gen.activity("Offer rectal or gastric ASA if swallowing issues"), None)
+
+# Assemble main pathway
+pathway_decision = gen.xor(high_risk_tia_path, non_high_risk_tia_path)
+complete_tia_management = gen.partial_order(dependencies=[
+    (pathway_decision, ed_evaluation_for_crescendo_tia),
+    (ed_evaluation_for_crescendo_tia, antiplatelet_options),
+    (antiplatelet_options, rectal_gastric_asa)
+])
+
+# Final process model
+final_model = gen.partial_order(dependencies=[
+    (correct_hypoglycemia, measure_glucose),
+    (measure_glucose, repeat_glucose_if_high),
+    (evaluate_temperature, temperature_above_threshold),
+    (cross_continuum_prevention,),
+    (complete_tia_management,)
+])
+
+########################################################################################################################
+
+Same error occured. Failed due to reaching 5 iterations limit.

@@ -1,0 +1,102 @@
+First Iteration:
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# Initial evaluation
+airway_breathing_circulation = gen.activity("Rapid initial evaluation (airway, breathing, circulation)")
+
+# Initial examinations
+neurological_exam = gen.activity("Neurological examination (NIHSS/CNS)")
+endovascular_therapy_consideration = gen.activity("Consider endovascular therapy if criteria met")
+brain_imaging = gen.activity("Brain imaging (CT/MRI, CTA) within 25 min")
+advanced_ct = gen.activity("Advanced CT imaging for eligible stroke patients")
+immediate_brain_image_interpretation = gen.activity("Immediate brain image interpretation")
+ecg = gen.activity("ECG for atrial fibrillation and arrhythmias (should not delay treatment)")
+chest_xray = gen.activity("Chest x-ray (should not delay thrombolysis assessment)")
+blood_work = gen.activity("Blood work: CBC, electrolytes, creatinine, glucose, INR, PTT, troponin if indicated")
+
+initial_exams_poset = gen.partial_order(
+    dependencies=[
+        (neurological_exam, brain_imaging),
+        (brain_imaging, advanced_ct),
+        (brain_imaging, immediate_brain_image_interpretation),
+        (advanced_ct, immediate_brain_image_interpretation),
+        (immediate_brain_image_interpretation, endovascular_therapy_consideration),
+        (ecg,),
+        (chest_xray,),
+        (blood_work,)
+    ]
+)
+
+# Assessment and early management of dysphagia
+npo_status = gen.activity("Make patient NPO initially")
+swallow_screening = gen.activity("Screen swallowing ability before oral intake")
+monitor_non_alert_patients = gen.activity("Monitor non-alert patients for swallowing screening")
+full_swallow_assessment = gen.activity("Full swallowing assessment by speech-language pathologist if dysphagia suspected")
+
+dysphagia_assessment_poset = gen.partial_order(
+    dependencies=[
+        (npo_status, swallow_screening),
+        (monitor_non_alert_patients, swallow_screening),
+        (swallow_screening, full_swallow_assessment)
+    ]
+)
+
+# Cross-continuum prevention assessment and therapies
+cross_continuum_assessment = gen.activity("Cross-continuum secondary prevention assessment and therapy")
+
+# Initial examinations for ischemic stroke
+vascular_imaging = gen.activity("Vascular imaging of brain and neck arteries for TIA/ischemic stroke patients (if >48h)")
+
+# Initial examinations for ICH
+immediate_ICH_eval = gen.activity("Immediate evaluation of ICH by stroke expert")
+anticoagulation_status = gen.activity("Assess anticoagulant therapy, platelet count, PTT, INR")
+cta_mra = gen.activity("CTA/MRA for select ICH patients")
+
+ICH_exams_poset = gen.partial_order(
+    dependencies=[
+        (immediate_ICH_eval, anticoagulation_status),
+        (anticoagulation_status, cta_mra)
+    ]
+)
+
+# Implementation considerations (modeled as optional parallel dependencies)
+ED_protocols = gen.activity("Develop/update ED acute stroke protocols")
+regional_planning = gen.activity("Regional planning for EVT access")
+EMS_processes = gen.activity("Develop EMS pre-notification and transport protocols")
+stroke_team_alerts = gen.activity("Ensure acute stroke team notification upon EMS pre-notification")
+stroke_expert_access = gen.activity("Increase access to stroke experts/radiologists for urgent imaging interpretation")
+capacity_planning = gen.activity("Capacity planning for human resources and diagnostic imaging")
+public_awareness = gen.activity("Enhance public awareness on stroke symptoms and 911 contact")
+
+implementation_considerations = gen.partial_order(
+    dependencies=[
+        (ED_protocols,), (regional_planning,), (EMS_processes,), (stroke_team_alerts,),
+        (stroke_expert_access,), (capacity_planning,), (public_awareness,)
+    ]
+)
+
+# Combine all steps in a partial order
+final_model = gen.partial_order(
+    dependencies=[
+        (airway_breathing_circulation, initial_exams_poset),
+        (initial_exams_poset, dysphagia_assessment_poset),
+        (dysphagia_assessment_poset, cross_continuum_assessment),
+        (cross_continuum_assessment, vascular_imaging),
+        (vascular_imaging, ICH_exams_poset),
+        (implementation_considerations,)
+    ]
+)
+
+
+
+########################################################################################################################
+
+Second Iteration's Message: 
+
+
+
+Second Iteration Response (Only the code part):
+

@@ -1,0 +1,78 @@
+First Iteration:
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# Admission and Stroke Unit Care
+admit_patient = gen.activity('Admit patient to specialized stroke unit')
+stroke_unit_team = gen.activity('Ensure stroke unit team with stroke expertise')
+team_education = gen.activity('Ensure team members receive ongoing stroke education')
+seven_day_access = gen.activity('Ensure access to stroke team 7 days a week')
+team_assessment = gen.activity('Perform physiotherapy, speech-language pathology, and occupational therapy assessment within 48 hours')
+
+# Early Mobilization
+early_mobilization = gen.activity('Mobilize patient within 24-48 hours unless contraindicated')
+
+# Assessment
+stroke_assessment = gen.activity('Perform standardized stroke impairment and functional assessment')
+alphafim_assessment = gen.activity('Complete AlphaFIM assessment on or by day 3')
+vte_risk_assessment = gen.activity('Assess patient for venous thromboembolism risk')
+hydration_mobilization = gen.activity('Encourage early mobilization and adequate hydration to prevent VTE')
+nutrition_screening = gen.activity('Assess nutrition and hydration status within 48 hours')
+dietitian_referral = gen.activity('Refer to dietitian within 7 days if needed')
+
+# Prevention Assessments and Therapies
+cross_continuum_prevention = gen.activity('Conduct cross-continuum prevention assessments and therapies')
+
+# Implementation Considerations
+standardized_assessment_tools = gen.activity('Ensure standardized, validated assessment tools are used')
+diabetes_screening = gen.activity('Screen for diabetes, dental issues, cognitive impairment, and depression in ED')
+forward_results = gen.activity('Forward screening results to TIA clinic for follow-up')
+ensure_staffing = gen.activity('Ensure adequate stroke unit staffing 7 days per week')
+
+# Structuring the process
+admission_process = gen.partial_order(dependencies=[
+    (admit_patient, stroke_unit_team),
+    (stroke_unit_team, team_education),
+    (stroke_unit_team, seven_day_access),
+    (stroke_unit_team, team_assessment),
+])
+
+assessment_process = gen.partial_order(dependencies=[
+    (stroke_assessment, alphafim_assessment),
+    (stroke_assessment, vte_risk_assessment),
+    (hydration_mobilization, vte_risk_assessment),
+    (nutrition_screening, dietitian_referral),
+])
+
+prevention_process = gen.partial_order(dependencies=[
+    (cross_continuum_prevention,),
+])
+
+implementation_process = gen.partial_order(dependencies=[
+    (standardized_assessment_tools,),
+    (diabetes_screening, forward_results),
+    (ensure_staffing,),
+])
+
+# Combining all components
+final_model = gen.partial_order(dependencies=[
+    (admission_process, early_mobilization),
+    (early_mobilization, assessment_process),
+    (assessment_process, prevention_process),
+    (prevention_process, implementation_process),
+])
+
+
+
+
+
+
+########################################################################################################################
+
+Second Iteration's Message: 
+
+
+
+Second Iteration Response (Only the code part):

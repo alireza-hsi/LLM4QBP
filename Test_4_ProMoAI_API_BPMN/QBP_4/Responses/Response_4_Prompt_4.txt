@@ -1,0 +1,97 @@
+First Iteration:
+
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# 1.1 Initial evaluation
+airway_breathing_circulation = gen.activity('Rapid initial evaluation of airway, breathing, and circulation')
+
+# 1.2 Initial examinations
+neurological_exam = gen.activity('Neurological examination (NIHSS or CNS stroke scale)')
+evaluate_for_evt = gen.activity('Evaluate for endovascular therapy eligibility')
+brain_imaging = gen.activity('Brain imaging (Non-contrast CT/MRI + CTA)')
+advanced_ct = gen.activity('Advanced CT imaging for eligible patients')
+interpret_brain_imaging = gen.activity('Immediate interpretation of brain imaging')
+ecg = gen.activity('ECG for atrial fibrillation and arrhythmias')
+chest_xray = gen.activity('Chest X-ray (should not delay treatment)')
+blood_work = gen.activity('Perform blood tests (CBC, electrolytes, creatinine, glucose, INR, PTT, troponin if indicated)')
+
+# 1.3 Assessment and early management of dysphagia
+npo_status = gen.activity('Make patient NPO and conduct swallowing screening')
+monitor_non_alert_patients = gen.activity('Monitor non-alert patients and screen swallowing when appropriate')
+full_dysphagia_assessment = gen.activity('Full dysphagia assessment by speech-language pathologist')
+
+# 1.4 Cross-continuum prevention assessment and therapies
+cross_continuum_prevention = gen.activity('Provide cross-continuum secondary prevention assessments and therapies')
+
+# 1.6 Initial examinations for ischemic stroke
+vascular_imaging = gen.activity('Vascular imaging for TIA/ischemic stroke patients beyond 48 hours')
+
+# 1.7 Initial examinations for ICH
+evaluate_ich = gen.activity('Immediate evaluation of ICH by stroke expert')
+anticoagulant_assessment = gen.activity('Assess anticoagulant therapy and measure platelet count, PTT, INR')
+cta_mra = gen.activity('CTA/MRA for select ICH patients')
+
+# Implementation Considerations (Relevant)
+establish_stroke_protocols = gen.activity('Ensure rapid triage and assessment for stroke patients')
+ems_prenotification = gen.activity('EMS prenotification of stroke arrival')
+early_stroke_team_alert = gen.activity('Alert acute stroke team upon EMS prenotification')
+access_to_expert_interpretation = gen.activity('Ensure urgent access to stroke experts/radiologists for imaging interpretation')
+optimize_lab_turnaround = gen.activity('Negotiate rapid lab turnaround times for tPA thrombolysis patients')
+
+# Constructing the process model
+# Grouping related assessments
+initial_assessment = gen.partial_order(dependencies=[
+    (airway_breathing_circulation, neurological_exam),
+    (neurological_exam, evaluate_for_evt),
+    (neurological_exam, brain_imaging),
+    (brain_imaging, interpret_brain_imaging),
+    (evaluate_for_evt, advanced_ct),
+    (interpret_brain_imaging, ecg),
+    (interpret_brain_imaging, chest_xray),
+    (interpret_brain_imaging, blood_work)
+])
+
+# Dysphagia management
+dysphagia_assessment = gen.partial_order(dependencies=[
+    (npo_status, monitor_non_alert_patients),
+    (monitor_non_alert_patients, full_dysphagia_assessment)
+])
+
+# Ischemic and ICH examinations
+ischemic_stroke_evaluation = gen.partial_order(dependencies=[(vascular_imaging,)])
+ich_evaluation = gen.partial_order(dependencies=[
+    (evaluate_ich, anticoagulant_assessment),
+    (evaluate_ich, cta_mra)
+])
+
+# Implementation-related activities
+implementation_measures = gen.partial_order(dependencies=[
+    (establish_stroke_protocols,),
+    (ems_prenotification, early_stroke_team_alert),
+    (early_stroke_team_alert, access_to_expert_interpretation),
+    (access_to_expert_interpretation, optimize_lab_turnaround)
+])
+
+# Combine all assessment modules
+final_model = gen.partial_order(dependencies=[
+    (initial_assessment,),
+    (dysphagia_assessment,),
+    (ischemic_stroke_evaluation,),
+    (ich_evaluation,),
+    (cross_continuum_prevention,),
+    (implementation_measures,)
+])
+
+
+
+########################################################################################################################
+
+Second Iteration's Message: 
+
+
+
+Second Iteration Response (Only the code part):
+

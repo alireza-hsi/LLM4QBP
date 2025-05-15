@@ -1,0 +1,79 @@
+First Iteration:
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# Module 1: Early Assessment
+# Activities
+rapid_eval = gen.activity("Rapid initial evaluation (airway, breathing, circulation)")
+neurological_exam = gen.activity("Neurological examination (focal deficits, stroke severity)")
+brain_imaging = gen.activity("Immediate brain imaging (CT/MRI)")
+image_interpretation = gen.activity("Immediate interpretation of imaging")
+ecg = gen.activity("ECG for atrial fibrillation and arrhythmias")
+chest_xray = gen.activity("Chest x-ray (no delay for thrombolysis)")
+blood_work = gen.activity("Blood work (CBC, electrolytes, glucose, etc.)")
+swallow_screening = gen.activity("Initial swallowing screening")
+swallow_full_assessment = gen.activity("Full clinical swallowing assessment")
+cross_continuum_assessment = gen.activity("Cross-continuum secondary prevention assessments")
+triage_tool = gen.activity("Standardized triage tool for TIA")
+vascular_imaging_immediate = gen.activity(
+    "Immediate vascular imaging (if <48 hrs since symptom onset or fluctuating symptoms)"
+)
+vascular_imaging_late = gen.activity(
+    "Vascular imaging as soon as possible (if >48 hrs since symptom onset)"
+)
+
+# Dependencies within Module 1
+module_1_dependencies = [
+    (rapid_eval, neurological_exam),
+    (neurological_exam, brain_imaging),
+    (brain_imaging, image_interpretation),
+    (image_interpretation, ecg),
+    (ecg, chest_xray),
+    (chest_xray, blood_work),
+    (blood_work, swallow_screening),
+    (swallow_screening, swallow_full_assessment),
+    (swallow_full_assessment, cross_continuum_assessment),
+    (cross_continuum_assessment, triage_tool),
+    (triage_tool, vascular_imaging_immediate),
+    (triage_tool, vascular_imaging_late),
+]
+
+module_1_poset = gen.partial_order(dependencies=module_1_dependencies)
+
+# Implementation Considerations (General Loop for EMS and Protocols)
+ems_prenotification = gen.activity("EMS prenotification and acute stroke team notification")
+education_ems = gen.activity("Education for EMS crews on stroke recognition")
+regional_stroke_diversion = gen.activity("Regional/district stroke diversion protocols")
+public_awareness = gen.activity("Public awareness campaigns for stroke/TIA symptoms")
+capacity_building = gen.activity("Ensure sufficient diagnostic/treatment resources")
+rapid_access_imaging = gen.activity("Rapid access to diagnostic imaging")
+
+# Combine Implementation Considerations
+implementation_considerations = gen.partial_order(
+    dependencies=[
+        (ems_prenotification, education_ems),
+        (education_ems, regional_stroke_diversion),
+        (regional_stroke_diversion, public_awareness),
+        (public_awareness, capacity_building),
+        (capacity_building, rapid_access_imaging),
+    ]
+)
+
+# Combine Module 1 and Implementation Considerations
+final_model = gen.partial_order(
+    dependencies=[(module_1_poset,), (implementation_considerations,)]
+)
+
+
+
+
+########################################################################################################################
+
+Second Iteration's Message: 
+
+
+
+Second Iteration Response (Only the code part):
+

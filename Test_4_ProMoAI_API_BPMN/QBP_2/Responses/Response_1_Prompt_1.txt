@@ -1,0 +1,150 @@
+First Iteration:
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# Activities
+correct_hypoglycemia = gen.activity('Correct hypoglycemia immediately')
+measure_glucose = gen.activity('Measure blood glucose')
+repeat_glucose = gen.activity('Repeat blood glucose measurement if > 11 mmol/L')
+evaluate_temperature = gen.activity('Evaluate body temperature every 4 hours for 48 hours')
+initiate_temp_measures = gen.activity('Initiate temperature-reducing measures for > 37.5°C')
+investigate_infection = gen.activity('Investigate potential infection')
+initiate_antipyretic = gen.activity('Initiate antipyretic and antimicrobial therapy as required')
+prevention_assessment = gen.activity('Perform cross-continuum prevention assessments and therapies')
+brain_CT_scan = gen.activity('Perform brain CT scan')
+start_antiplatelet = gen.activity('Start antiplatelet therapy')
+urgent_clinic_referral = gen.activity('Refer to TIA/minor stroke clinic')
+outpatient_referral = gen.activity('Refer to outpatient stroke-prevention clinic within 1 month')
+consider_admission = gen.activity('Consider admission for fluctuating/crescendo symptoms')
+administer_rectal_asa = gen.activity('Administer rectal/gastric ASA as necessary')
+prepare_asa = gen.activity('Prepare ASA loading and maintenance doses')
+prepare_clopidogrel = gen.activity('Prepare clopidogrel loading and maintenance doses')
+prepare_dipyridamole = gen.activity('Prepare dipyridamole/ASA combination therapy')
+
+# Subprocesses
+glucose_management = gen.partial_order(dependencies=[
+    (correct_hypoglycemia, measure_glucose),
+    (measure_glucose, repeat_glucose)
+])
+
+temperature_management = gen.partial_order(dependencies=[
+    (evaluate_temperature, initiate_temp_measures),
+    (initiate_temp_measures, investigate_infection),
+    (investigate_infection, initiate_antipyretic)
+])
+
+secondary_prevention = prevention_assessment
+
+brain_scan_and_antiplatelet = gen.partial_order(dependencies=[
+    (brain_CT_scan, start_antiplatelet)
+])
+
+antiplatelet_options = gen.partial_order(dependencies=[
+    (prepare_asa, start_antiplatelet),
+    (prepare_clopidogrel, start_antiplatelet),
+    (prepare_dipyridamole, start_antiplatelet)
+])
+
+referral_options = gen.xor(
+    urgent_clinic_referral,
+    outpatient_referral
+)
+
+complex_referrals = gen.partial_order(dependencies=[
+    (brain_scan_and_antiplatelet, referral_options),
+    (referral_options, consider_admission)
+])
+
+stroke_management = gen.partial_order(dependencies=[
+    (complex_referrals, administer_rectal_asa)
+])
+
+# Main process
+final_model = gen.partial_order(dependencies=[
+    (glucose_management,),
+    (temperature_management,),
+    (secondary_prevention,),
+    (stroke_management,)
+])
+
+
+########################################################################################################################
+
+Second Iteration's Message: 
+
+Executing your code led to an error! Please update the model to fix the error. Make sure to save the updated final model is the variable 'final_model'. This is the error message: Error occurred at line 43: "antiplatelet_options = gen.partial_order(dependencies=[" with message: Exception: Ensure that each submodel is used uniquely! Avoid trying to reuse submodels that were used as children of other constructs (xor, loop, or partial_order) before! The error occured when trying to reuse a node of type Activity (Start antiplatelet therapy).
+
+Second Iteration Response (Only the code part):
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# Activities
+correct_hypoglycemia = gen.activity('Correct hypoglycemia immediately')
+measure_glucose = gen.activity('Measure blood glucose')
+repeat_glucose = gen.activity('Repeat blood glucose measurement if > 11 mmol/L')
+evaluate_temperature = gen.activity('Evaluate body temperature every 4 hours for 48 hours')
+initiate_temp_measures = gen.activity('Initiate temperature-reducing measures for > 37.5°C')
+investigate_infection = gen.activity('Investigate potential infection')
+initiate_antipyretic = gen.activity('Initiate antipyretic and antimicrobial therapy as required')
+prevention_assessment = gen.activity('Perform cross-continuum prevention assessments and therapies')
+brain_CT_scan = gen.activity('Perform brain CT scan')
+start_antiplatelet = gen.activity('Start antiplatelet therapy')
+start_antiplatelet_copy_1 = start_antiplatelet.copy()
+start_antiplatelet_copy_2 = start_antiplatelet.copy()
+urgent_clinic_referral = gen.activity('Refer to TIA/minor stroke clinic')
+outpatient_referral = gen.activity('Refer to outpatient stroke-prevention clinic within 1 month')
+consider_admission = gen.activity('Consider admission for fluctuating/crescendo symptoms')
+administer_rectal_asa = gen.activity('Administer rectal/gastric ASA as necessary')
+prepare_asa = gen.activity('Prepare ASA loading and maintenance doses')
+prepare_clopidogrel = gen.activity('Prepare clopidogrel loading and maintenance doses')
+prepare_dipyridamole = gen.activity('Prepare dipyridamole/ASA combination therapy')
+
+# Subprocesses
+glucose_management = gen.partial_order(dependencies=[
+    (correct_hypoglycemia, measure_glucose),
+    (measure_glucose, repeat_glucose)
+])
+
+temperature_management = gen.partial_order(dependencies=[
+    (evaluate_temperature, initiate_temp_measures),
+    (initiate_temp_measures, investigate_infection),
+    (investigate_infection, initiate_antipyretic)
+])
+
+secondary_prevention = prevention_assessment
+
+brain_scan_and_antiplatelet = gen.partial_order(dependencies=[
+    (brain_CT_scan, start_antiplatelet)
+])
+
+antiplatelet_options = gen.partial_order(dependencies=[
+    (prepare_asa, start_antiplatelet_copy_1),
+    (prepare_clopidogrel, start_antiplatelet_copy_2),
+    (prepare_dipyridamole, start_antiplatelet.copy())
+])
+
+referral_options = gen.xor(
+    urgent_clinic_referral,
+    outpatient_referral
+)
+
+complex_referrals = gen.partial_order(dependencies=[
+    (brain_scan_and_antiplatelet, referral_options),
+    (referral_options, consider_admission)
+])
+
+stroke_management = gen.partial_order(dependencies=[
+    (complex_referrals, administer_rectal_asa)
+])
+
+# Main process
+final_model = gen.partial_order(dependencies=[
+    (glucose_management,),
+    (temperature_management,),
+    (secondary_prevention,),
+    (stroke_management,)
+])

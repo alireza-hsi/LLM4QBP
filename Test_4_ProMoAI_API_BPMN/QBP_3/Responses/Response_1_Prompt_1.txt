@@ -1,0 +1,50 @@
+First Iteration:
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# Activities for Module 3a
+admit_to_stroke_unit = gen.activity('Admit to specialized stroke unit')
+core_team_assessment = gen.activity('Core stroke unit team assessment')
+early_mobilization = gen.activity('Mobilize patient early (24-48 hours post-stroke)')
+standardized_assessment = gen.activity('Perform standardized stroke-related assessments')
+alphaFIM_day3 = gen.activity('Complete AlphaFIM assessment by day 3')
+assess_thrombosis_risk = gen.activity('Assess risk for venous thromboembolism')
+hydration_and_mobilization = gen.activity('Encourage hydration and mobilization to prevent thromboembolism')
+nutrition_hydration_status = gen.activity('Assess nutrition and hydration status within 48 hours')
+refer_to_dietitian = gen.activity('Refer to dietitian within 7 days for nutritional concerns')
+cross_continuum_prevention = gen.activity('Provide cross-continuum prevention assessments and therapies')
+
+# Dependencies for Module 3a processes
+stroke_unit_dependencies = gen.partial_order(
+    dependencies=[
+        (admit_to_stroke_unit, core_team_assessment),
+        (core_team_assessment, early_mobilization),
+        (core_team_assessment, standardized_assessment),
+        (standardized_assessment, alphaFIM_day3),
+        (standardized_assessment, assess_thrombosis_risk),
+        (assess_thrombosis_risk, hydration_and_mobilization),
+        (standardized_assessment, nutrition_hydration_status),
+        (nutrition_hydration_status, refer_to_dietitian)
+    ]
+)
+
+# Cross-continuum prevention modeled as concurrent and separate
+prevention_dependencies = gen.partial_order(
+    dependencies=[(cross_continuum_prevention,)]
+)
+
+# Combine stroke unit care and prevention into the final process model
+final_model = gen.partial_order(
+    dependencies=[
+        (stroke_unit_dependencies, prevention_dependencies)
+    ]
+)
+
+
+
+########################################################################################################################
+
+
+

@@ -1,0 +1,71 @@
+First Iteration:
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# Initial Evaluation
+airway_breathing_circulation = gen.activity('Rapid initial evaluation for airway, breathing, and circulation')
+
+# Initial Examinations
+neurological_exam = gen.activity('Neurological examination (NIHSS or CNS)')
+brain_imaging = gen.activity('Immediate brain imaging (CT or MRI)')
+brain_imaging_interpretation = gen.activity('Immediate interpretation of brain imaging')
+ecg = gen.activity('ECG for atrial fibrillation and arrhythmias')
+chest_xray = gen.activity('Chest X-ray (should not delay thrombolysis)')
+blood_work = gen.activity('Blood work (CBC, electrolytes, creatinine, glucose, INR, PTT, troponin if indicated)')
+
+# Dysphagia Assessment and Early Management
+npo_initially = gen.activity('Make patient NPO initially')
+swallowing_screening = gen.activity('Screen swallowing ability before oral intake')
+monitor_unalert = gen.activity('Monitor unalert patients and assess swallowing when appropriate')
+full_swallowing_assessment = gen.activity('Full clinical swallowing assessment if dysphagia suspected')
+
+# Cross-Continuum Prevention Assessment and Therapies
+secondary_prevention = gen.activity('Cross-continuum secondary prevention assessments and therapies')
+
+# Triage for TIA
+triage_tool = gen.activity('Use standardized triage tool for determining care location')
+
+# Initial Examinations for TIA or Minor Stroke
+vascular_imaging_immediate = gen.activity('Immediate vascular imaging for patients within 48 hours')
+vascular_imaging_asap = gen.activity('Vascular imaging as soon as possible for other patients')
+
+# Structuring Dependencies
+poset_initial_examinations = gen.partial_order(dependencies=[
+    (neurological_exam, brain_imaging),
+    (brain_imaging, brain_imaging_interpretation),
+    (brain_imaging_interpretation, ecg),
+    (ecg, chest_xray),
+    (chest_xray, blood_work)
+])
+
+poset_dysphagia_assessment = gen.partial_order(dependencies=[
+    (npo_initially, swallowing_screening),
+    (swallowing_screening, monitor_unalert),
+    (monitor_unalert, full_swallowing_assessment)
+])
+
+poset_vascular_imaging = gen.xor(vascular_imaging_immediate, vascular_imaging_asap)
+
+poset_assessments = gen.partial_order(dependencies=[
+    (airway_breathing_circulation, poset_initial_examinations),
+    (poset_initial_examinations, poset_dysphagia_assessment),
+    (poset_dysphagia_assessment, secondary_prevention),
+    (secondary_prevention, triage_tool),
+    (triage_tool, poset_vascular_imaging)
+])
+
+# Skippable Loop for Modular Process Execution
+final_model = gen.loop(do=None, redo=poset_assessments)
+
+
+
+########################################################################################################################
+
+Second Iteration's Message: 
+
+
+
+Second Iteration Response (Only the code part):
+

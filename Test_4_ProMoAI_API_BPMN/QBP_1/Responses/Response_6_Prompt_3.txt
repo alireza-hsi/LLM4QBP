@@ -1,0 +1,108 @@
+First Iteration:
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# Initial evaluation
+rapid_initial_evaluation = gen.activity("Rapid initial evaluation (airway, breathing, circulation)")
+
+# Initial examinations
+neurological_exam = gen.activity("Neurological examination (NIHSS or CNS for stroke)")
+brain_imaging = gen.activity("Immediate brain imaging (CT or MRI)")
+interpret_imaging = gen.activity("Immediate interpretation of brain imaging")
+ecg_exam = gen.activity("ECG for atrial fibrillation and acute arrhythmias")
+chest_xray = gen.activity("Chest X-ray (should not delay thrombolysis assessment)")
+blood_tests = gen.activity("Blood tests (CBC, electrolytes, creatinine, glucose, INR, PTT, troponin if indicated)")
+
+initial_examinations = gen.partial_order(
+    dependencies=[
+        (neurological_exam,),
+        (brain_imaging, interpret_imaging),
+        (ecg_exam,),
+        (chest_xray,),
+        (blood_tests,)
+    ]
+)
+
+# Assessment and early management of dysphagia
+make_npo = gen.activity("Make patient NPO initially")
+screen_swallowing = gen.activity("Screen swallowing ability using bedside protocol")
+monitor_unalert_patients = gen.activity("Monitor unalert patients and screen swallowing when appropriate")
+full_assessment = gen.activity("Full clinical swallowing assessment for dysphagia or aspiration risk")
+
+dysphagia_management = gen.partial_order(
+    dependencies=[
+        (make_npo, screen_swallowing),
+        (monitor_unalert_patients,),
+        (full_assessment,)
+    ]
+)
+
+# Cross-continuum prevention assessment and therapies
+secondary_prevention = gen.activity("Cross-continuum secondary prevention assessments and therapies")
+
+# Triage tool for TIA patients
+triage_tool = gen.activity("Use standardized triage tool for TIA patients")
+
+# Initial examinations for TIA or minor (nondisabling) stroke
+immediate_vascular_imaging = gen.activity("Immediate vascular imaging for TIA/minor stroke within 48 hours")
+delayed_vascular_imaging = gen.activity("Vascular imaging as soon as possible for cases beyond 48 hours")
+
+vascular_imaging = gen.xor(immediate_vascular_imaging, delayed_vascular_imaging)
+
+# EMS and hospital coordination (Implementation Considerations)
+ems_diversion = gen.activity("EMS diversion to stroke centres if suspected stroke/TIA")
+prenotification = gen.activity("EMS prenotification of hospital for incoming stroke/TIA patient")
+collaboration = gen.activity("Collaboration between EMS and stroke services")
+ems_education = gen.activity("EMS education on stroke/TIA recognition and redirect protocols")
+standardized_protocols = gen.activity("Standardized stroke/TIA assessment & treatment protocols in all EDs")
+acute_stroke_team_alert = gen.activity("Hospital alerts acute stroke team upon prenotification")
+staffing_capacity = gen.activity("Ensure sufficient human resources for timely diagnosis & treatment")
+priority_imaging_access = gen.activity("Ensure CTAS I/II access to imaging for early assessment")
+referral_process = gen.activity("Establish referral process for rapid-assessment stroke clinics")
+public_awareness = gen.activity("Public awareness campaigns on stroke/TIA symptoms and 911 activation")
+
+hospital_readiness = gen.partial_order(
+    dependencies=[
+        (ems_diversion,),
+        (prenotification, acute_stroke_team_alert),
+        (collaboration,),
+        (ems_education,),
+        (standardized_protocols,),
+        (staffing_capacity,),
+        (priority_imaging_access,),
+        (referral_process,),
+        (public_awareness,)
+    ]
+)
+
+# Core process flow
+core_process = gen.partial_order(
+    dependencies=[
+        (rapid_initial_evaluation, initial_examinations),
+        (initial_examinations, dysphagia_management),
+        (dysphagia_management, secondary_prevention),
+        (secondary_prevention, triage_tool),
+        (triage_tool, vascular_imaging)
+    ]
+)
+
+# Final Model (including hospital coordination and EMS readiness)
+final_model = gen.partial_order(
+    dependencies=[
+        (hospital_readiness,),
+        (core_process,)
+    ]
+)
+
+
+
+########################################################################################################################
+
+Second Iteration's Message: 
+
+
+
+Second Iteration Response (Only the code part):
+

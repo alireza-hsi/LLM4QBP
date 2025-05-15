@@ -1,0 +1,67 @@
+First Iteration:
+
+from utils.model_generation import ModelGenerator
+
+# Initialize model generator
+gen = ModelGenerator()
+
+# Activities
+rapid_eval = gen.activity('Rapid initial evaluation of airway, breathing, circulation')
+neurological_exam = gen.activity('Neurological examination to assess stroke severity')
+acute_symptoms_eval = gen.activity('Evaluation of acute neurological symptoms for treatment eligibility')
+rapid_brain_imaging = gen.activity('Rapid brain imaging (CT/MRI) and CTA')
+advanced_ct_imaging = gen.activity('Advanced CT imaging for acute ischemic stroke patients')
+immediate_brain_image_interpret = gen.activity('Immediate interpretation of brain imaging by expert')
+ecg_check = gen.activity('ECG to detect atrial fibrillation and arrhythmias')
+chest_xray = gen.activity('Chest x-ray without delaying assessment for thrombolysis')
+blood_tests = gen.activity('Blood work: CBC, electrolytes, creatinine, glucose, INR, PTT, troponin')
+npo_screening = gen.activity('NPO and dysphagia screening using bedside protocol')
+monitor_unalert = gen.activity('Monitor unalert patients and screen swallowing when appropriate')
+swallow_assessment = gen.activity('Full clinical assessment of swallowing for dysphagia patients')
+cross_continuum = gen.activity('Cross-continuum secondary prevention assessments and therapies')
+vascular_imaging = gen.activity('Vascular imaging for patients presenting beyond 48 hours')
+treat_ICH = gen.activity('Emergency treatment of ICH by stroke management experts')
+ICH_evaluation = gen.activity('ICH evaluation including anticoagulant therapy and lab tests')
+ICH_cta = gen.activity('CTA/MRA for select ICH patients')
+
+# Subprocesses
+initial_eval_process = gen.partial_order(dependencies=[(rapid_eval, neurological_exam)])
+acute_stroke_process = gen.partial_order(dependencies=[
+    (acute_symptoms_eval, rapid_brain_imaging),
+    (rapid_brain_imaging, advanced_ct_imaging),
+    (advanced_ct_imaging, immediate_brain_image_interpret)
+])
+initial_assessments = gen.partial_order(dependencies=[
+    (initial_eval_process, acute_stroke_process),
+    (ecg_check, chest_xray),
+    (chest_xray, blood_tests)
+])
+dysphagia_process = gen.partial_order(dependencies=[
+    (npo_screening, monitor_unalert),
+    (monitor_unalert, swallow_assessment)
+])
+stroke_prevention = gen.partial_order(dependencies=[
+    (cross_continuum, vascular_imaging)
+])
+ich_process = gen.partial_order(dependencies=[
+    (treat_ICH, ICH_evaluation),
+    (ICH_evaluation, ICH_cta)
+])
+
+# Combining all subprocesses
+final_model = gen.partial_order(dependencies=[
+    (initial_assessments, dysphagia_process),
+    (dysphagia_process, stroke_prevention),
+    (stroke_prevention, ich_process)
+])
+
+
+
+########################################################################################################################
+
+Second Iteration's Message: 
+
+
+
+Second Iteration Response (Only the code part):
+

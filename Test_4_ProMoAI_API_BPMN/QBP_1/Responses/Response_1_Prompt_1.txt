@@ -1,0 +1,261 @@
+First iteration: 
+
+Code:
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# Module 1 Activities
+rapid_initial_eval = gen.activity('Rapid initial evaluation (airway, breathing, circulation)')
+neurological_exam = gen.activity('Neurological examination (stroke severity)')
+brain_imaging = gen.activity('Brain imaging (CT/MRI)')
+interpret_imaging = gen.activity('Interpret brain imaging')
+ecg = gen.activity('ECG for atrial fibrillation and arrhythmias')
+chest_xray = gen.activity('Chest x-ray (non-delaying thrombolysis)')
+blood_work = gen.activity('Blood work (CBC, electrolytes, etc.)')
+
+# Dysphagia Activities
+screen_dysphagia = gen.activity('Screen swallowing ability (NPO initially)')
+monitor_alertness = gen.activity('Monitor alertness within first 24 hours')
+full_assessment_dysphagia = gen.activity(
+    'Full clinical swallowing assessment (speech-language pathologist)')
+
+# Cross-continuum Prevention
+secondary_prevention = gen.activity('Cross-continuum secondary prevention assessments')
+
+# Triage and Imaging
+standardized_triage_tool = gen.activity('Use standardized triage tool for TIA care location')
+immediate_vascular_imaging = gen.activity(
+    'Immediate vascular imaging for TIA/minor stroke within 48 hours')
+vascular_imaging_asap = gen.activity(
+    'Vascular imaging for TIA/minor stroke beyond 48 hours')
+
+# Combining Acute Episode Activities
+early_assessment = gen.partial_order(
+    dependencies=[
+        (rapid_initial_eval, neurological_exam),
+        (neurological_exam, brain_imaging),
+        (brain_imaging, interpret_imaging),
+        (interpret_imaging, ecg),
+        (ecg, chest_xray),
+        (chest_xray, blood_work)
+    ]
+)
+
+dysphagia_assessment = gen.partial_order(
+    dependencies=[
+        (screen_dysphagia, monitor_alertness),
+        (monitor_alertness, full_assessment_dysphagia)
+    ]
+)
+
+secondary_prevention_order = gen.partial_order(
+    dependencies=[(early_assessment, secondary_prevention)]
+)
+
+imaging_triage = gen.partial_order(
+    dependencies=[
+        (standardized_triage_tool, immediate_vascular_imaging),
+        (immediate_vascular_imaging, vascular_imaging_asap)
+    ]
+)
+
+# Acute Episode Modules
+acute_episode = gen.partial_order(
+    dependencies=[
+        (early_assessment, dysphagia_assessment),
+        (dysphagia_assessment, secondary_prevention_order),
+        (secondary_prevention_order, imaging_triage)
+    ]
+)
+
+# Optional/Repeatable Acute Episode
+skippable_acute_episode = gen.xor(acute_episode, None)
+
+# Final Model
+final_model = gen.loop(do=skippable_acute_episode, redo=None)
+
+#############################################################################################################################################
+Response:
+Executing your code led to an error! Please update the model to fix the error. Make sure to save the updated final model is the variable 'final_model'. This is the error message: Error occurred at line 62: "acute_episode = gen.partial_order(" with message: Exception: Ensure that each submodel is used uniquely! Avoid trying to reuse submodels that were used as children of other constructs (xor, loop, or partial_order) before! The error occured when trying to reuse a node of type PartialOrder.
+
+Second iteration:
+Code:
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# Module 1 Activities
+rapid_initial_eval = gen.activity('Rapid initial evaluation (airway, breathing, circulation)')
+neurological_exam = gen.activity('Neurological examination (stroke severity)')
+brain_imaging = gen.activity('Brain imaging (CT/MRI)')
+interpret_imaging = gen.activity('Interpret brain imaging')
+ecg = gen.activity('ECG for atrial fibrillation and arrhythmias')
+chest_xray = gen.activity('Chest x-ray (non-delaying thrombolysis)')
+blood_work = gen.activity('Blood work (CBC, electrolytes, etc.)')
+
+# Dysphagia Activities
+screen_dysphagia = gen.activity('Screen swallowing ability (NPO initially)')
+monitor_alertness = gen.activity('Monitor alertness within first 24 hours')
+full_assessment_dysphagia = gen.activity(
+    'Full clinical swallowing assessment (speech-language pathologist)')
+
+# Cross-continuum Prevention
+secondary_prevention = gen.activity('Cross-continuum secondary prevention assessments')
+
+# Triage and Imaging
+standardized_triage_tool = gen.activity('Use standardized triage tool for TIA care location')
+immediate_vascular_imaging = gen.activity(
+    'Immediate vascular imaging for TIA/minor stroke within 48 hours')
+vascular_imaging_asap = gen.activity(
+    'Vascular imaging for TIA/minor stroke beyond 48 hours')
+
+# Combining Acute Episode Activities
+early_assessment = gen.partial_order(
+    dependencies=[
+        (rapid_initial_eval, neurological_exam),
+        (neurological_exam, brain_imaging),
+        (brain_imaging, interpret_imaging),
+        (interpret_imaging, ecg),
+        (ecg, chest_xray),
+        (chest_xray, blood_work)
+    ]
+)
+
+dysphagia_assessment = gen.partial_order(
+    dependencies=[
+        (screen_dysphagia, monitor_alertness),
+        (monitor_alertness, full_assessment_dysphagia)
+    ]
+)
+
+# Create unique copies to avoid reuse errors
+secondary_prevention_copy = secondary_prevention.copy()
+secondary_prevention_order = gen.partial_order(
+    dependencies=[(early_assessment, secondary_prevention_copy)]
+)
+
+# Create unique copies to avoid reuse errors
+imaging_triage_copy_1 = standardized_triage_tool.copy()
+imaging_triage_copy_2 = immediate_vascular_imaging.copy()
+imaging_triage = gen.partial_order(
+    dependencies=[
+        (imaging_triage_copy_1, imaging_triage_copy_2),
+        (imaging_triage_copy_2, vascular_imaging_asap)
+    ]
+)
+
+# Acute Episode Modules with unique instances
+acute_episode = gen.partial_order(
+    dependencies=[
+        (early_assessment, dysphagia_assessment.copy()),
+        (dysphagia_assessment.copy(), secondary_prevention_order.copy()),
+        (secondary_prevention_order.copy(), imaging_triage.copy())
+    ]
+)
+
+# Optional/Repeatable Acute Episode
+skippable_acute_episode = gen.xor(acute_episode, None)
+
+# Final Model
+final_model = gen.loop(do=skippable_acute_episode, redo=None)
+
+#####################################################################################################################################################
+Response: 
+
+Executing your code led to an error! Please update the model to fix the error. Make sure to save the updated final model is the variable 'final_model'. This is the error message: Error occurred at line 67: "acute_episode = gen.partial_order(" with message: Exception: Ensure that each submodel is used uniquely! Avoid trying to reuse submodels that were used as children of other constructs (xor, loop, or partial_order) before! The error occured when trying to reuse a node of type PartialOrder.
+
+Third iteration:
+
+Code:
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# Module 1 Activities
+rapid_initial_eval = gen.activity('Rapid initial evaluation (airway, breathing, circulation)')
+neurological_exam = gen.activity('Neurological examination (stroke severity)')
+brain_imaging = gen.activity('Brain imaging (CT/MRI)')
+interpret_imaging = gen.activity('Interpret brain imaging')
+ecg = gen.activity('ECG for atrial fibrillation and arrhythmias')
+chest_xray = gen.activity('Chest x-ray (non-delaying thrombolysis)')
+blood_work = gen.activity('Blood work (CBC, electrolytes, etc.)')
+
+# Dysphagia Activities
+screen_dysphagia = gen.activity('Screen swallowing ability (NPO initially)')
+monitor_alertness = gen.activity('Monitor alertness within first 24 hours')
+full_assessment_dysphagia = gen.activity(
+    'Full clinical swallowing assessment (speech-language pathologist)')
+
+# Cross-continuum Prevention
+secondary_prevention = gen.activity('Cross-continuum secondary prevention assessments')
+
+# Triage and Imaging
+standardized_triage_tool = gen.activity('Use standardized triage tool for TIA care location')
+immediate_vascular_imaging = gen.activity(
+    'Immediate vascular imaging for TIA/minor stroke within 48 hours')
+vascular_imaging_asap = gen.activity(
+    'Vascular imaging for TIA/minor stroke beyond 48 hours')
+
+# Combining Acute Episode Activities
+early_assessment = gen.partial_order(
+    dependencies=[
+        (rapid_initial_eval, neurological_exam),
+        (neurological_exam, brain_imaging),
+        (brain_imaging, interpret_imaging),
+        (interpret_imaging, ecg),
+        (ecg, chest_xray),
+        (chest_xray, blood_work)
+    ]
+)
+
+dysphagia_assessment = gen.partial_order(
+    dependencies=[
+        (screen_dysphagia, monitor_alertness),
+        (monitor_alertness, full_assessment_dysphagia)
+    ]
+)
+
+# Create unique copies to avoid reuse errors
+early_assessment_copy = early_assessment.copy()
+dysphagia_assessment_copy = dysphagia_assessment.copy()
+secondary_prevention_copy = secondary_prevention.copy()
+
+secondary_prevention_order = gen.partial_order(
+    dependencies=[(early_assessment_copy, secondary_prevention_copy)]
+)
+
+# Create unique copies to avoid reuse errors
+standardized_triage_tool_copy = standardized_triage_tool.copy()
+immediate_vascular_imaging_copy = immediate_vascular_imaging.copy()
+imaging_triage = gen.partial_order(
+    dependencies=[
+        (standardized_triage_tool_copy, immediate_vascular_imaging_copy),
+        (immediate_vascular_imaging_copy, vascular_imaging_asap)
+    ]
+)
+
+# Acute Episode Modules with unique instances
+early_assessment_copy_2 = early_assessment.copy()
+dysphagia_assessment_copy_2 = dysphagia_assessment.copy()
+secondary_prevention_order_copy = secondary_prevention_order.copy()
+imaging_triage_copy = imaging_triage.copy()
+
+acute_episode = gen.partial_order(
+    dependencies=[
+        (early_assessment_copy_2, dysphagia_assessment_copy_2),
+        (dysphagia_assessment_copy_2, secondary_prevention_order_copy),
+        (secondary_prevention_order_copy, imaging_triage_copy)
+    ]
+)
+
+# Optional/Repeatable Acute Episode
+skippable_acute_episode = gen.xor(acute_episode, None)
+
+# Final Model
+final_model = gen.loop(do=skippable_acute_episode, redo=None)
+
+
+Response:

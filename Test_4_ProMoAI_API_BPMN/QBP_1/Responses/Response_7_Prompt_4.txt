@@ -1,0 +1,93 @@
+First Iteration:
+
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# 1.1 Initial evaluation
+airway_breathing_circulation = gen.activity('Rapid initial evaluation for airway, breathing, and circulation')
+
+# 1.2 Initial examinations
+neurological_exam = gen.activity('Neurological examination (NIHSS or CNS)')
+brain_imaging = gen.activity('Brain imaging (CT or MRI)')
+interpret_imaging = gen.activity('Interpret brain imaging')
+ecg = gen.activity('ECG to detect arrhythmias')
+blood_tests = gen.activity('Blood tests (CBC, electrolytes, creatinine, glucose, INR, PTT, troponin if indicated)')
+chest_xray = gen.activity('Chest X-ray (should not delay assessment for thrombolysis)')
+
+# Group all initial examinations
+examinations_poset = gen.partial_order(
+    dependencies=[
+        (neurological_exam,), 
+        (brain_imaging, interpret_imaging),
+        (ecg,), 
+        (blood_tests,),
+        (chest_xray,)
+    ]
+)
+
+# 1.3 Assessment and early management of dysphagia
+make_npo = gen.activity('Make patient NPO initially')
+screen_swallowing = gen.activity('Swallowing screening using valid bedside protocol')
+monitor_unalert_patients = gen.activity('Monitor unalert patients for swallowing screening')
+full_swallowing_assessment = gen.activity('Full clinical swallowing assessment for patients with dysphagia')
+
+dysphagia_assessment = gen.partial_order(
+    dependencies=[
+        (make_npo, screen_swallowing),
+        (monitor_unalert_patients,),
+        (full_swallowing_assessment,)
+    ]
+)
+
+# 1.4 Cross-continuum prevention assessment and therapies
+cross_continuum_assessment = gen.activity('Cross-continuum secondary prevention assessments and therapies')
+
+# 1.5 Triage tool for patients with TIA
+triage_tool_tia = gen.activity('Use standardized triage tool for TIA patients')
+
+# 1.6 Initial examinations for TIA or minor stroke
+vascular_imaging_immediate = gen.activity('Immediate vascular imaging for TIA/minor stroke within 48h or fluctuating symptoms')
+vascular_imaging_delayed = gen.activity('Vascular imaging as soon as possible for TIA/minor stroke beyond 48h')
+
+vascular_imaging_choice = gen.xor(vascular_imaging_immediate, vascular_imaging_delayed)
+
+# 1.7 EMS-related considerations (relevant implementation considerations)
+ems_divert_stroke_center = gen.activity('EMS diverts patients to stroke centers if stroke/TIA suspected')
+ems_prenotification = gen.activity('EMS prenotifies hospital of stroke/TIA arrival')
+contact_stroke_team = gen.activity('Hospital contacts stroke team upon EMS prenotification')
+hospital_diagnostic_access = gen.activity('Ensure CTAS I/II access to diagnostic imaging for suspected stroke/TIA')
+stroke_clinic_referral = gen.activity('Referral process for rapid-assessment TIA/minor stroke clinics')
+
+ems_process = gen.partial_order(
+    dependencies=[
+        (ems_divert_stroke_center,),
+        (ems_prenotification, contact_stroke_team),
+        (hospital_diagnostic_access,),
+        (stroke_clinic_referral,)
+    ]
+)
+
+# Final process integration
+final_model = gen.partial_order(
+    dependencies=[
+        (airway_breathing_circulation, examinations_poset),
+        (examinations_poset, dysphagia_assessment),
+        (dysphagia_assessment, cross_continuum_assessment),
+        (cross_continuum_assessment, triage_tool_tia),
+        (triage_tool_tia, vascular_imaging_choice),
+        (vascular_imaging_choice, ems_process)
+    ]
+)
+
+
+
+########################################################################################################################
+
+Second Iteration's Message: 
+
+
+
+Second Iteration Response (Only the code part):
+

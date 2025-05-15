@@ -1,0 +1,73 @@
+First Iteration:
+
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# Initial Evaluation
+airway_breathing_circulation = gen.activity("Rapid initial evaluation: airway, breathing, circulation")
+
+# Initial Examinations
+neurological_exam = gen.activity("Neurological examination (NIHSS or CNS)")
+brain_imaging = gen.activity("Brain imaging (CT or MRI)")
+brain_imaging_interpretation = gen.activity("Interpret brain imaging")
+ecg = gen.activity("ECG for atrial fibrillation and arrhythmias")
+chest_xray = gen.activity("Chest x-ray (should not delay thrombolysis assessment)")
+blood_work = gen.activity("Blood work: CBC, electrolytes, creatinine, glucose, INR, PTT, troponin if indicated")
+
+# Partial order for initial examinations
+initial_exams = gen.partial_order(dependencies=[
+    (neurological_exam,),
+    (brain_imaging, brain_imaging_interpretation),
+    (ecg,),
+    (chest_xray,),
+    (blood_work,)
+])
+
+# Dysphagia Assessment and Management
+npo_status = gen.activity("Make patient NPO initially")
+swallow_screening = gen.activity("Screen swallowing ability before oral intake")
+monitor_unalert_patients = gen.activity("Monitor unalert patients closely; screen when appropriate")
+full_swallow_assessment = gen.activity("Full clinical swallow assessment for patients with dysphagia")
+
+dysphagia_management = gen.partial_order(dependencies=[
+    (npo_status, swallow_screening),
+    (monitor_unalert_patients,),
+    (swallow_screening, full_swallow_assessment)
+])
+
+# Cross-Continuum Prevention
+secondary_prevention = gen.activity("Provide cross-continuum secondary prevention assessments and therapies")
+
+# Triage for TIA
+triage_tia = gen.activity("Use standardized triage tool for TIA care location determination")
+
+# Imaging for TIA and Minor Stroke
+vascular_imaging_immediate = gen.activity("Immediate vascular imaging for TIA/minor stroke within 48h or fluctuating symptoms")
+vascular_imaging_delayed = gen.activity("Vascular imaging ASAP for TIA/stroke beyond 48h")
+
+vascular_imaging = gen.xor(vascular_imaging_immediate, vascular_imaging_delayed)
+
+# Overall process flow
+early_assessment_process = gen.partial_order(dependencies=[
+    (airway_breathing_circulation, initial_exams),
+    (initial_exams, dysphagia_management),
+    (dysphagia_management, secondary_prevention),
+    (secondary_prevention, triage_tia),
+    (triage_tia, vascular_imaging)
+])
+
+# Implementing process-level optionality and potential looping for iterative assessments
+final_model = gen.loop(do=None, redo=early_assessment_process)
+
+
+
+########################################################################################################################
+
+Second Iteration's Message: 
+
+
+
+Second Iteration Response (Only the code part):
+

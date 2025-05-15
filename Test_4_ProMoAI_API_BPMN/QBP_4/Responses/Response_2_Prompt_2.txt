@@ -1,0 +1,74 @@
+First Iteration:
+
+from utils.model_generation import ModelGenerator
+
+gen = ModelGenerator()
+
+# Initial Evaluation
+rapid_evaluation = gen.activity("Rapid initial evaluation (airway, breathing, circulation)")
+
+# Initial Examinations
+neurological_exam = gen.activity("Neurological examination (NIHSS or CNS for stroke)")
+endovascular_therapy_evaluation = gen.activity("Consider EVT eligibility (based on clinical and imaging criteria)")
+brain_imaging = gen.activity("Rapid brain imaging (CT/MRI and CTA within 25 minutes)")
+advanced_ct = gen.activity("Advanced CT imaging for ischemic stroke patients")
+brain_imaging_interpretation = gen.activity("Immediate interpretation of brain imaging by expert")
+ecg = gen.activity("ECG to detect atrial fibrillation and other arrhythmias")
+chest_xray = gen.activity("Chest X-ray (should not delay thrombolysis assessment)")
+blood_tests = gen.activity("Blood tests: CBC, electrolytes, creatinine, glucose, INR, PTT, troponin (if indicated)")
+
+# Partial order dependencies for Initial Examinations
+initial_examinations = gen.partial_order(dependencies=[
+    (neurological_exam, brain_imaging),
+    (brain_imaging, brain_imaging_interpretation),
+    (brain_imaging_interpretation, advanced_ct),
+    (brain_imaging_interpretation, endovascular_therapy_evaluation),
+    (brain_imaging_interpretation, ecg),
+    (brain_imaging_interpretation, chest_xray),
+    (brain_imaging_interpretation, blood_tests),
+])
+
+# Dysphagia Assessment and Early Management
+npo_status = gen.activity("Make patient NPO and screen swallowing ability")
+monitoring_dysphagia = gen.activity("Monitor unalert patients and reassess swallowing when appropriate")
+clinical_assessment_dysphagia = gen.activity("Full clinical swallowing assessment by specialist if dysphagia suspected")
+
+dysphagia_assessment = gen.partial_order(dependencies=[
+    (npo_status, monitoring_dysphagia),
+    (monitoring_dysphagia, clinical_assessment_dysphagia),
+])
+
+# Cross-Continuum Prevention Assessment and Therapies
+secondary_prevention = gen.activity("Provide secondary prevention assessments and therapies")
+
+# Initial Examinations for Ischemic Stroke
+vascular_imaging = gen.activity("Vascular imaging for TIA/ischemic stroke (beyond 48 hours)")
+
+# Initial Examinations for ICH
+ich_emergency_evaluation = gen.activity("Emergency evaluation of ICH by stroke specialist")
+anticoagulant_assessment = gen.activity("Assess anticoagulant therapy, platelet count, PTT, INR")
+cta_mra = gen.activity("CTA/MRA for select ICH patients")
+
+ich_assessment = gen.partial_order(dependencies=[
+    (ich_emergency_evaluation, anticoagulant_assessment),
+    (anticoagulant_assessment, cta_mra),
+])
+
+# Combining all major steps in parallel with dependencies where needed
+final_model = gen.partial_order(dependencies=[
+    (rapid_evaluation, initial_examinations),
+    (initial_examinations, dysphagia_assessment),
+    (initial_examinations, secondary_prevention),
+    (initial_examinations, vascular_imaging),
+    (initial_examinations, ich_assessment),
+])
+
+
+########################################################################################################################
+
+Second Iteration's Message: 
+
+
+
+Second Iteration Response (Only the code part):
+
