@@ -3,12 +3,16 @@ import sys
 import subprocess
 import os
 import tempfile
+import shutil
+
+conda_path = shutil.which("conda")
+print("Using conda at:", conda_path)
 
 st.title("Process Model Pipeline Runner")
 
 framework = st.selectbox(
     "Framework",
-    ["ProMoAI", "MAO-v1", "MAO-v2", "MAO-v2.1", "MAO-v2.2", "MAO-v2.3"]
+    ["ProMoAI", "MAO-v2.2"]
 )
 
 task_file = st.file_uploader(
@@ -47,7 +51,7 @@ model = st.text_input(
 
 results_db = st.text_input(
     "SQLite DB path",
-    value="experiment_results.sqlite"
+    value="15_runs_results.sqlite"
 )
 
 CONDA_ENV = "MAO_conda_env"

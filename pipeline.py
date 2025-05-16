@@ -11,7 +11,7 @@ import subprocess
 import sqlite3
 
 # Ensure your MAO helpers are on PYTHONPATH
-MAO_HELPER = os.path.join("Ex-3-MAO", "MAO-custom-versions", "Version-2.2", "Code", "Helper")
+MAO_HELPER = os.path.join("Version-2.2", "Code", "Helper")
 sys.path.insert(0, MAO_HELPER)
 
 from automatedActivityMapping import extract_activity_names, get_alignment, get_revision, update_activity_names
@@ -20,7 +20,7 @@ from bpmn_compare_similarity import CompareBPMN
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--framework",
-                   choices=["MAO-v1","MAO-v2","MAO-v2.1","MAO-v2.2","MAO-v2.3","ProMoAI"],
+                   choices=["MAO-v2.2","ProMoAI"],
                    required=True)
     p.add_argument("--task-file",   required=True)
     p.add_argument("--gold-bpmn",   required=True)
@@ -31,7 +31,7 @@ def parse_args():
     p.add_argument("--model",  default="GPT_4o1",
                    help="Always use GPT_4o1 for analytics")
     p.add_argument("--mapped-output", default=None)
-    p.add_argument("--results-db",    default="experiment_results.sqlite")
+    p.add_argument("--results-db",    default="15_runs_results.sqlite")
     p.add_argument("--gold-bpmn-filename", default=None)
     return p.parse_args()
 
@@ -79,14 +79,14 @@ def run_mao(task_file, config, org, name, model, code_root):
 def run_promoai(task_file, model, code_root, project_name):
     script = "test4.py"
     cmd = [
-            "conda", "run", "-n", "base", "python",
-            script,
-            "--task-file",    task_file,
-            "--model",        model,
-            "--output-dir",   "WareHouse",
-            "--project-name", project_name]
+        "conda", "run", "-n", "base", "python",
+        script,
+        "--task-file",    task_file,
+        "--model",        model,
+        "--output-dir",   "WareHouse",
+        "--project-name", project_name
+    ]
     result = subprocess.run(cmd, cwd=code_root, check=True, capture_output=True, text=True)
-    # Parse PROMOAI_RETRIES from stdout
     lines = result.stdout.strip().splitlines()
     promoai_retries = None
     bpmn_path = None
@@ -95,6 +95,9 @@ def run_promoai(task_file, model, code_root, project_name):
             promoai_retries = line.split("PROMOAI_RETRIES:", 1)[1].strip()
         elif line.endswith(".bpmn"):
             bpmn_path = line
+    # Fix: Join with code_root if path is relative
+    if bpmn_path and not os.path.isabs(bpmn_path):
+        bpmn_path = os.path.join(code_root, bpmn_path)
     return bpmn_path, promoai_retries
 
 def extract_python_lists(text):
@@ -139,12 +142,10 @@ def process_run(args, run_idx):
     try:
         if args.framework.startswith("MAO-v"):
             suffix    = args.framework.split("MAO-v",1)[1]
-            code_root = os.path.join("Ex-3-MAO","MAO-custom-versions",f"Version-{suffix}","Code")
+            code_root = os.path.join(f"Version-{suffix}","Code")
             gen_bpmn  = run_mao(args.task_file, args.config, args.org, run_name, args.model, code_root)
         else:
             code_root = os.path.join(
-                "Ex-2-Paper6-ProMoAI",
-                "Experiment implementaitons using ChatGPT",
                 "Test_4_ProMoAI_API_BPMN"
             )
             gen_bpmn, promoai_retries = run_promoai(args.task_file, args.model, code_root, run_name)

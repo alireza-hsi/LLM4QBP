@@ -6,7 +6,7 @@ import altair as alt
 st.title("Experiment Results Dashboard")
 
 # Load data
-conn = sqlite3.connect("experiment_results.sqlite")
+conn = sqlite3.connect("15_runs_results.sqlite")
 df = pd.read_sql("SELECT * FROM experiment_results", conn)
 conn.close()
 
