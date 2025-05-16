@@ -31,7 +31,7 @@ def parse_args():
     p.add_argument("--model",  default="GPT_4o1",
                    help="Always use GPT_4o1 for analytics")
     p.add_argument("--mapped-output", default=None)
-    p.add_argument("--results-db",    default="15_runs_results.sqlite")
+    p.add_argument("--results-db",    default="resultsDb.sqlite")
     p.add_argument("--gold-bpmn-filename", default=None)
     return p.parse_args()
 

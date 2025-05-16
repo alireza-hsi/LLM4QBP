@@ -51,7 +51,7 @@ model = st.text_input(
 
 results_db = st.text_input(
     "SQLite DB path",
-    value="15_runs_results.sqlite"
+    value="resultsDb.sqlite"
 )
 
 CONDA_ENV = "MAO_conda_env"

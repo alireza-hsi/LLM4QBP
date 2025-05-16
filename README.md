@@ -18,7 +18,7 @@ It supports activity mapping, BPMN similarity comparison, and experiment result 
 ├── streamlit_runner.py        # Streamlit web UI for running the pipeline
 ├── dashboard.py               # (Optional) Dashboard for results visualization
 ├── db_modifications.py        # Utility scripts for modifying the results database
-├── 15_runs_results.sqlite     # Example SQLite results database
+├── resultsDb.sqlite     # Example SQLite results database
 ├── ProMoAI/   # ProMoAI code and output directory
 │   ├── test4.py               # ProMoAI main script
 │   └── WareHouse/             # ProMoAI output BPMN files
@@ -93,7 +93,7 @@ Visualize and analyze your experiment results with the dashboard:
 streamlit run dashboard.py
 ```
 
-- This app reads your results database (e.g., `15_runs_results.sqlite`) and provides interactive tables and plots for:
+- This app reads your results database (e.g., `resultsDb.sqlite`) and provides interactive tables and plots for:
   - Node/structure similarity
   - Graph edit distance
   - Framework/model comparisons
@@ -104,7 +104,7 @@ streamlit run dashboard.py
 - **Generated BPMN files** are saved in:
   - `ProMoAI/WareHouse/` (for ProMoAI)
   - `MAO/Code/WareHouse/` (for MAO)
-- **Experiment results** are logged in the specified SQLite database (default: `15_runs_results.sqlite`).
+- **Experiment results** are logged in the specified SQLite database (default: `resultsDb.sqlite`).
 
 Each run logs:
 - Timestamps

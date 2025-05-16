@@ -1,6 +1,6 @@
 import sqlite3
 
-db_path = "15_runs_results.sqlite"
+db_path = "resultsDb.sqlite"
 table = "experiment_results"
 rows_to_delete = 6
 
