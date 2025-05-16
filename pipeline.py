@@ -11,7 +11,7 @@ import subprocess
 import sqlite3
 
 # Ensure your MAO helpers are on PYTHONPATH
-MAO_HELPER = os.path.join("Version-2.2", "Code", "Helper")
+MAO_HELPER = os.path.join("MAO", "Code", "Helper")
 sys.path.insert(0, MAO_HELPER)
 
 from automatedActivityMapping import extract_activity_names, get_alignment, get_revision, update_activity_names
@@ -72,7 +72,13 @@ def run_mao(task_file, config, org, name, model, code_root):
            "--name",      name]
     if model:
         cmd += ["--model", model]
-    result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+    try:
+        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+    except subprocess.CalledProcessError as e:
+        print("Error running MAO run.py:", e)
+        print("STDOUT:", e.stdout)
+        print("STDERR:", e.stderr)
+        raise
     bpmn_path = result.stdout.strip().splitlines()[-1]
     return bpmn_path
 
@@ -141,12 +147,12 @@ def process_run(args, run_idx):
     # 1) Generate BPMN
     try:
         if args.framework.startswith("MAO-v"):
-            suffix    = args.framework.split("MAO-v",1)[1]
-            code_root = os.path.join(f"Version-{suffix}","Code")
+            #suffix    = args.framework.split("MAO-v",1)[1]
+            code_root = os.path.join("MAO","Code")
             gen_bpmn  = run_mao(args.task_file, args.config, args.org, run_name, args.model, code_root)
         else:
             code_root = os.path.join(
-                "Test_4_ProMoAI_API_BPMN"
+                "ProMoAI"
             )
             gen_bpmn, promoai_retries = run_promoai(args.task_file, args.model, code_root, run_name)
     except subprocess.CalledProcessError:

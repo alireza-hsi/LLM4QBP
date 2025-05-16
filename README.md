@@ -3,7 +3,7 @@ Repository for the paper LLM4QBP which contains codes, prompt, experiment result
 
 
 This repository provides a unified pipeline for generating, mapping, and evaluating BPMN process models using two frameworks:
-- **MAO-v2.2**
+- **MAO**
 - **ProMoAI**
 
 It supports activity mapping, BPMN similarity comparison, and experiment result logging, and is designed for reproducible, multi-run experiments.
@@ -19,10 +19,10 @@ It supports activity mapping, BPMN similarity comparison, and experiment result 
 ├── dashboard.py               # (Optional) Dashboard for results visualization
 ├── db_modifications.py        # Utility scripts for modifying the results database
 ├── 15_runs_results.sqlite     # Example SQLite results database
-├── Test_4_ProMoAI_API_BPMN/   # ProMoAI code and output directory
+├── ProMoAI/   # ProMoAI code and output directory
 │   ├── test4.py               # ProMoAI main script
 │   └── WareHouse/             # ProMoAI output BPMN files
-├── Version-2.2/               # MAO-v2.2 code and output directory
+├── MAO/               # MAO code and output directory
 │   └── Code/
 │       ├── run.py             # MAO main script
 │       ├── Helper/            # MAO helper modules
@@ -40,8 +40,8 @@ It supports activity mapping, BPMN similarity comparison, and experiment result 
 - [Anaconda/Miniconda](https://docs.conda.io/en/latest/)
 - The following conda environments:
   - `base` (for ProMoAI)
-  - `MAO_conda_env` (for MAO-v2.2)
-- All dependencies listed in `Version-2.2/Code/requirements.txt` and `Test_4_ProMoAI_API_BPMN/requirements.txt` (if present)
+  - `MAO_conda_env` (for MAO)
+- All dependencies listed in `MAO/Code/requirements.txt` and `ProMoAI/requirements.txt` (if present)
 
 ---
 
@@ -62,7 +62,7 @@ conda run -n base python pipeline.py \
   --results-db my_results.sqlite \
   --model GPT_4o1
 
-# For MAO-v2.2
+# For MAO
 conda run -n MAO_conda_env python pipeline.py \
   --framework MAO-v2.2 \
   --task-file <input_task.txt> \
@@ -102,8 +102,8 @@ streamlit run dashboard.py
 ## Output
 
 - **Generated BPMN files** are saved in:
-  - `Test_4_ProMoAI_API_BPMN/WareHouse/` (for ProMoAI)
-  - `Version-2.2/Code/WareHouse/` (for MAO-v2.2)
+  - `ProMoAI/WareHouse/` (for ProMoAI)
+  - `MAO/Code/WareHouse/` (for MAO)
 - **Experiment results** are logged in the specified SQLite database (default: `15_runs_results.sqlite`).
 
 Each run logs:
@@ -142,7 +142,9 @@ Each run logs:
 ## Acknowledgements
 
 - MAO and ProMoAI frameworks
-- OpenAI GPT models for analytics
+- OpenAI GPT models and APIs
+- This project uses [bpmn-auto-layout](https://github.com/bpmn-io/bpmn-auto-layout) for automatic BPMN diagram layout.
+
 
 ---
 
