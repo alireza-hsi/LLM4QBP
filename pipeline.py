@@ -83,7 +83,7 @@ def run_mao(task_file, config, org, name, model, code_root):
     return bpmn_path
 
 def run_promoai(task_file, model, code_root, project_name):
-    script = "test4.py"
+    script = "ProMoAI_API.py"
     cmd = [
         "conda", "run", "-n", "base", "python",
         script,

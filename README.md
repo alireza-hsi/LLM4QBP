@@ -17,10 +17,10 @@ It supports activity mapping, BPMN similarity comparison, and experiment result 
 ├── pipeline.py                # Main pipeline script for running experiments
 ├── streamlit_runner.py        # Streamlit web UI for running the pipeline
 ├── dashboard.py               # (Optional) Dashboard for results visualization
-├── db_modifications.py        # Utility scripts for modifying the results database
+├── dbmModifier.py        # Utility scripts for modifying the results database
 ├── resultsDb.sqlite     # Example SQLite results database
 ├── ProMoAI/   # ProMoAI code and output directory
-│   ├── test4.py               # ProMoAI main script
+│   ├── ProMoAI_API.py               # ProMoAI main script
 │   └── WareHouse/             # ProMoAI output BPMN files
 ├── MAO/               # MAO code and output directory
 │   └── Code/
