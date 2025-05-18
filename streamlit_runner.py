@@ -5,10 +5,19 @@ import os
 import tempfile
 import shutil
 
+# Locate conda
 conda_path = shutil.which("conda")
 print("Using conda at:", conda_path)
 
+# Streamlit UI
 st.title("Process Model Pipeline Runner")
+
+# let the user enter their OpenAI key ————————————————
+api_key = st.text_input(
+    "OpenAI API Key",
+    type="password",
+    help="Enter your OpenAI API key (it will not be displayed)."
+)
 
 framework = st.selectbox(
     "Framework",
@@ -57,9 +66,17 @@ results_db = st.text_input(
 CONDA_ENV = "MAO_conda_env"
 
 if st.button("Run Pipeline"):
-    if not task_file or not gold_bpmn_file:
+    # Validate inputs
+    if not api_key:
+        st.error("Please enter your OpenAI API Key.")
+    elif not task_file or not gold_bpmn_file:
         st.error("Please upload both a task file and a gold BPMN file.")
     else:
+        # Prepare environment with API key for subprocess
+        env = os.environ.copy()
+        env["OPENAI_API_KEY"] = api_key
+
+        # Save uploaded files to a temp directory
         tmpdir = tempfile.mkdtemp()
         task_path = os.path.join(tmpdir, task_file.name)
         with open(task_path, "wb") as f:
@@ -68,47 +85,54 @@ if st.button("Run Pipeline"):
         with open(gold_path, "wb") as f:
             f.write(gold_bpmn_file.read())
 
-        # pick the right Python interpreter
+        # Choose the right Python interpreter based on framework
         if framework.startswith("MAO-"):
-            prefix = ["conda", "run", "-n", "MAO_conda_env", "python", "-u"]
+            prefix = ["conda", "run", "-n", CONDA_ENV, "python", "-u"]
         else:
             prefix = ["conda", "run", "-n", "base", "python", "-u"]
 
+        # Build the command
         cmd = prefix + [
             "pipeline.py",
-            "--framework",  framework,
-            "--task-file",  task_path,
-            "--gold-bpmn",  gold_path,
-            "--runs",       str(runs),
-            "--name",       name,
+            "--framework", framework,
+            "--task-file", task_path,
+            "--gold-bpmn", gold_path,
+            "--runs", str(runs),
+            "--name", name,
             "--results-db", results_db,
-            "--model",      model,
+            "--model", model,
             "--gold-bpmn-filename", gold_bpmn_file.name
         ]
-        
+
         if framework.startswith("MAO-v"):
             cmd += [
-                '--config', config,
-                '--org', org,
-                '--model', model
+                "--config", config,
+                "--org", org,
+                "--model", model
             ]
         else:
-            cmd += ['--model', model]
+            # For ProMoAI, only model flag is needed (already added above)
+            pass
 
-        st.write("Running: %s" % ' '.join(cmd))
+        st.write("Running: `%s`" % " ".join(cmd))
 
         # Real-time log streaming
         log_placeholder = st.empty()
         error_placeholder = st.empty()
-        with subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1) as process:
+        with subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            bufsize=1,
+            env=env
+        ) as process:
             logs = ""
             for line in process.stdout:
                 logs += line
                 log_placeholder.text(logs)
             process.wait()
-            # Show any errors
             errors = process.stderr.read()
             if errors:
                 error_placeholder.subheader("Errors")
                 error_placeholder.text(errors)
-
