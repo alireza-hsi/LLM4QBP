@@ -15,7 +15,7 @@ class LLMProcessModelGenerator(object):
                                                                    #openai_model=self.__openai_model,
                                                                    #api_url=self.__api_url)
 
-    powl = 
+    powl = ""
 
     def __to_petri_net(self):
         from pm4py.objects.conversion.powl.converter import apply as powl_to_pn

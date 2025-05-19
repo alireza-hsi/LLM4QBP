@@ -33,6 +33,9 @@ def parse_args():
     p.add_argument("--mapped-output", default=None)
     p.add_argument("--results-db",    default="resultsDb.sqlite")
     p.add_argument("--gold-bpmn-filename", default=None)
+    p.add_argument("--mapping-model",
+                   default="gpt-4.1",
+                   help="GPT model to use for activity mapping")
     return p.parse_args()
 
 def log_results(db, qbp, framework, node_sim, struct_sim, ged, gold, gen, model, promoai_retries=None):
@@ -92,7 +95,15 @@ def run_promoai(task_file, model, code_root, project_name):
         "--output-dir",   "WareHouse",
         "--project-name", project_name
     ]
-    result = subprocess.run(cmd, cwd=code_root, check=True, capture_output=True, text=True)
+    try:
+        result = subprocess.run(cmd, cwd=code_root,
+                                check=True,
+                                capture_output=True,
+                                text=True)
+    except subprocess.CalledProcessError as e:
+        print("▶ ProMoAI_API.py stdout:\n", e.stdout, flush=True)
+        print("▶ ProMoAI_API.py stderr:\n", e.stderr, flush=True)
+        raise
     lines = result.stdout.strip().splitlines()
     promoai_retries = None
     bpmn_path = None
@@ -120,11 +131,12 @@ def extract_python_lists(text):
                 pass
     return set_a, set_c
 
-def map_activities(generated, gold, mapped_out):
+def map_activities(generated, gold, mapped_out, mapping_model):
     a = extract_activity_names(generated)
     b = extract_activity_names(gold)
-    mapping, set_c, table = get_alignment(a, b)
-    rev_a, rev_c = extract_python_lists(get_revision(a, b, table))
+    mapping, set_c, table = get_alignment(a, b, model=mapping_model)
+    revision_raw = get_revision(a, b, table, model=mapping_model)
+    rev_code = extract_python_lists(revision_raw)
     if rev_a is None: rev_a = a
     if rev_c is None: rev_c = set_c
     final_map = {
@@ -171,7 +183,10 @@ def process_run(args, run_idx):
     # 2) Map activity names
     mapped = args.mapped_output or gen_bpmn.replace(".bpmn", "_mapped.bpmn")
     os.makedirs(os.path.dirname(mapped), exist_ok=True)
-    map_activities(gen_bpmn, args.gold_bpmn, mapped)
+    map_activities(gen_bpmn,
+                   args.gold_bpmn,
+                   mapped,
+                   args.mapping_model)
     print("✔ Mapped  BPMN:", mapped, flush=True)
 
     # 3) Compare structure

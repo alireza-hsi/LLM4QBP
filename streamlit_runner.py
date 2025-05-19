@@ -55,7 +55,14 @@ name = st.text_input(
 
 model = st.text_input(
     "Model name (e.g., GPT_4o1)",
-    value="GPT_4o1"
+    value="GPT_4o1",
+    help="Which GPT model to use for the process generation step. 4o1 is 4.1 here."
+)
+
+mapping_model = st.text_input(
+    "Mapping model",
+    value="gpt-4.1",
+    help="Which GPT model to use for the activity-mapping step"
 )
 
 results_db = st.text_input(
@@ -101,6 +108,7 @@ if st.button("Run Pipeline"):
             "--name", name,
             "--results-db", results_db,
             "--model", model,
+            "--mapping-model", mapping_model,
             "--gold-bpmn-filename", gold_bpmn_file.name
         ]
 

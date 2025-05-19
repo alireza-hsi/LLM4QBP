@@ -2,7 +2,7 @@ import sqlite3
 
 db_path = "resultsDb.sqlite"
 table = "experiment_results"
-rows_to_delete = 6
+rows_to_delete = 5
 
 conn = sqlite3.connect(db_path)
 cur = conn.cursor()

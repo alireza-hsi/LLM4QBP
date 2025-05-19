@@ -49,6 +49,7 @@ class ModelType(Enum):
     GPT_4_32k = "gpt-4-32k"
     GPT_4o = "gpt-4o"
     GPT_4o1 = "gpt-4.1"
+    GPT_4o1_nano = "gpt-4.1-nano-2025-04-14"
     STUB = "stub"
 
     @property
@@ -57,7 +58,7 @@ class ModelType(Enum):
             return "gpt-3.5-turbo-16k"
         elif self.name == "GPT_4o":
             return "gpt-4"  # Use GPT-4's tokenizer for GPT_4o
-        elif self.name == "GPT_4o1":
+        elif self.name == "GPT_4o1" or "GPT_4o1_nano":
             return "gpt-4"  # Use GPT-4's tokenizer for GPT_4o
         else:
             return self.value
