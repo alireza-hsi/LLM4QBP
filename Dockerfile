@@ -27,4 +27,6 @@ RUN conda run -n base pip install -e ./libs/bpmn_python \
 
 EXPOSE 8501
 
-CMD ["streamlit", "run", "streamlit_runner.py", "--server.port=8501", "--server.enableCORS=false"]
+ENV STREAMLIT_WATCHDOG_MODE=none
+
+CMD ["streamlit", "run", "streamlit_runner.py", "--server.port=8501", "--server.enableCORS=false", "--server.runOnSave=false"]
