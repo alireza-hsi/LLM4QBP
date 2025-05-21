@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  id="Definitions_1"
+                  targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:process id="Process_1" name="Stroke Process" isExecutable="true">
+    <!-- Start Event -->
+    <bpmn:startEvent id="StartEvent_1" name="Start">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <!-- Activity 1 -->
+    <bpmn:task id="Task_activity1" 
+               name="Conduct rapid initial evaluation (Role: medical staff; Objects: airway, breathing, circulation)">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_activity1"/>
+    <bpmn:sequenceFlow id="Flow_2" sourceRef="Task_activity1" targetRef="ParallelGateway1"/>
+
+    <!-- Parallel Gateway 1 (Diverge) -->
+    <bpmn:parallelGateway id="ParallelGateway1" name="Parallel Gateway 1">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+      <bpmn:outgoing>Flow_6</bpmn:outgoing>
+      <bpmn:outgoing>Flow_7</bpmn:outgoing>
+    </bpmn:parallelGateway>
+
+    <!-- Branch 1 -->
+    <bpmn:task id="Task_activity2" 
+               name="Perform neurological examination (Role: medical staff; Objects: standardized stroke scale (NIHSS or CNS))">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_8</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="ParallelGateway1" targetRef="Task_activity2"/>
+    <bpmn:sequenceFlow id="Flow_8" sourceRef="Task_activity2" targetRef="ParallelGateway1Join"/>
+
+    <!-- Branch 2 -->
+    <bpmn:task id="Task_activity3-1" 
+               name="Prepare patient for imaging (Role: medical staff)">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_9</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="ParallelGateway1" targetRef="Task_activity3-1"/>
+    <bpmn:task id="Task_activity3-2" 
+               name="Perform CT or MRI scan (Role: medical staff)">
+      <bpmn:incoming>Flow_9</bpmn:incoming>
+      <bpmn:outgoing>Flow_10</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_9" sourceRef="Task_activity3-1" targetRef="Task_activity3-2"/>
+    <bpmn:task id="Task_activity4" 
+               name="Interpret brain imaging (Role: health care provider; Objects: CT or MRI results)">
+      <bpmn:incoming>Flow_10</bpmn:incoming>
+      <bpmn:outgoing>Flow_11</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Task_activity3-2" targetRef="Task_activity4"/>
+    <bpmn:sequenceFlow id="Flow_11" sourceRef="Task_activity4" targetRef="ParallelGateway1Join"/>
+
+    <!-- Branch 3 -->
+    <bpmn:task id="Task_activity5" 
+               name="Perform ECG (Role: medical staff; Objects: detect atrial fibrillation and acute arrhythmias)">
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_12</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="ParallelGateway1" targetRef="Task_activity5"/>
+    <bpmn:sequenceFlow id="Flow_12" sourceRef="Task_activity5" targetRef="ParallelGateway1Join"/>
+
+    <!-- Branch 4 -->
+    <bpmn:task id="Task_activity6-1" 
+               name="Collect blood samples (Role: medical staff; Objects: CBC, electrolytes, creatinine, glucose, INR, partial thromboplastin time, troponin test)">
+      <bpmn:incoming>Flow_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_13</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="ParallelGateway1" targetRef="Task_activity6-1"/>
+    <bpmn:task id="Task_activity6-2" 
+               name="Analyze blood samples (Role: medical staff; Objects: CBC, electrolytes, creatinine, glucose, INR, partial thromboplastin time, troponin test)">
+      <bpmn:incoming>Flow_13</bpmn:incoming>
+      <bpmn:outgoing>Flow_14</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Task_activity6-1" targetRef="Task_activity6-2"/>
+    <bpmn:sequenceFlow id="Flow_14" sourceRef="Task_activity6-2" targetRef="ParallelGateway1Join"/>
+
+    <!-- Branch 5 -->
+    <bpmn:task id="Task_activity7" 
+               name="Ensure chest x-ray does not delay thrombolysis assessment (Role: medical staff)">
+      <bpmn:incoming>Flow_7</bpmn:incoming>
+      <bpmn:outgoing>Flow_15</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="ParallelGateway1" targetRef="Task_activity7"/>
+    <bpmn:sequenceFlow id="Flow_15" sourceRef="Task_activity7" targetRef="ParallelGateway1Join"/>
+
+    <!-- Merge Parallel Gateway 1 -->
+    <bpmn:parallelGateway id="ParallelGateway1Join" name="Parallel Merge 1">
+      <bpmn:incoming>Flow_8</bpmn:incoming>
+      <bpmn:incoming>Flow_11</bpmn:incoming>
+      <bpmn:incoming>Flow_12</bpmn:incoming>
+      <bpmn:incoming>Flow_14</bpmn:incoming>
+      <bpmn:incoming>Flow_15</bpmn:incoming>
+      <bpmn:outgoing>Flow_16</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_16" sourceRef="ParallelGateway1Join" targetRef="ParallelGateway2"/>
+
+    <!-- Parallel Gateway 2 (Diverge) -->
+    <bpmn:parallelGateway id="ParallelGateway2" name="Parallel Gateway 2">
+      <bpmn:incoming>Flow_16</bpmn:incoming>
+      <bpmn:outgoing>Flow_17</bpmn:outgoing>
+      <bpmn:outgoing>Flow_18</bpmn:outgoing>
+      <bpmn:outgoing>Flow_19</bpmn:outgoing>
+    </bpmn:parallelGateway>
+
+    <!-- Branch 6 -->
+    <bpmn:task id="Task_activity8" 
+               name="Make patients NPO and screen swallowing ability (Role: medical staff; Objects: bedside testing protocol)">
+      <bpmn:incoming>Flow_17</bpmn:incoming>
+      <bpmn:outgoing>Flow_20</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_17" sourceRef="ParallelGateway2" targetRef="Task_activity8"/>
+    <bpmn:sequenceFlow id="Flow_20" sourceRef="Task_activity8" targetRef="ParallelGateway2Join"/>
+
+    <!-- Branch 7 -->
+    <bpmn:task id="Task_activity9" 
+               name="Monitor patients not alert within 24 hours (Role: medical staff; Objects: swallowing ability)">
+      <bpmn:incoming>Flow_18</bpmn:incoming>
+      <bpmn:outgoing>Flow_21</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_18" sourceRef="ParallelGateway2" targetRef="Task_activity9"/>
+    <bpmn:sequenceFlow id="Flow_21" sourceRef="Task_activity9" targetRef="ParallelGateway2Join"/>
+
+    <!-- Branch 8 -->
+    <bpmn:task id="Task_activity10" 
+               name="Assess swallowing ability (Role: speech-language pathologist; Objects: patients with dysphagia or pulmonary aspiration)">
+      <bpmn:incoming>Flow_19</bpmn:incoming>
+      <bpmn:outgoing>Flow_22</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_19" sourceRef="ParallelGateway2" targetRef="Task_activity10"/>
+    <bpmn:sequenceFlow id="Flow_22" sourceRef="Task_activity10" targetRef="ParallelGateway2Join"/>
+
+    <!-- Merge Parallel Gateway 2 -->
+    <bpmn:parallelGateway id="ParallelGateway2Join" name="Parallel Merge 2">
+      <bpmn:incoming>Flow_20</bpmn:incoming>
+      <bpmn:incoming>Flow_21</bpmn:incoming>
+      <bpmn:incoming>Flow_22</bpmn:incoming>
+      <bpmn:outgoing>Flow_23</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_23" sourceRef="ParallelGateway2Join" targetRef="Task_activity11"/>
+
+    <!-- Sequential Activities -->
+    <bpmn:task id="Task_activity11" 
+               name="Provide cross-continuum secondary prevention assessments and therapies (Role: medical staff; Objects: Modules 5 and 10)">
+      <bpmn:incoming>Flow_23</bpmn:incoming>
+      <bpmn:outgoing>Flow_24</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_24" sourceRef="Task_activity11" targetRef="Task_activity12"/>
+
+    <bpmn:task id="Task_activity12" 
+               name="Use standardized triage tool (Role: medical staff; Objects: determine care location for TIA patients)">
+      <bpmn:incoming>Flow_24</bpmn:incoming>
+      <bpmn:outgoing>Flow_25</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_25" sourceRef="Task_activity12" targetRef="ExclusiveGateway1"/>
+
+    <!-- Exclusive Gateway (Diverge) -->
+    <bpmn:exclusiveGateway id="ExclusiveGateway1" name="Exclusive Gateway 1">
+      <bpmn:incoming>Flow_25</bpmn:incoming>
+      <bpmn:outgoing>Flow_26</bpmn:outgoing>
+      <bpmn:outgoing>Flow_27</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <!-- Branch 9 (Exclusive) -->
+    <bpmn:task id="Task_activity13-1" 
+               name="Prepare patient for vascular imaging (Role: medical staff)">
+      <bpmn:incoming>Flow_26</bpmn:incoming>
+      <bpmn:outgoing>Flow_28</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_26" sourceRef="ExclusiveGateway1" targetRef="Task_activity13-1">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">within 48 hours of symptom onset or fluctuating symptoms</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:task id="Task_activity13-2" 
+               name="Perform carotid ultrasound, CTA, or MRA (Role: medical staff)">
+      <bpmn:incoming>Flow_28</bpmn:incoming>
+      <bpmn:outgoing>Flow_29</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_28" sourceRef="Task_activity13-1" targetRef="Task_activity13-2"/>
+    <bpmn:sequenceFlow id="Flow_29" sourceRef="Task_activity13-2" targetRef="ExclusiveGateway1Join"/>
+
+    <!-- Branch 10 (Exclusive) -->
+    <bpmn:task id="Task_activity14" 
+               name="Conduct vascular imaging of brain and neck arteries (Role: medical staff; Objects: as soon as possible)">
+      <bpmn:incoming>Flow_27</bpmn:incoming>
+      <bpmn:outgoing>Flow_30</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_27" sourceRef="ExclusiveGateway1" targetRef="Task_activity14">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">beyond 48 hours of symptom onset</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_30" sourceRef="Task_activity14" targetRef="ExclusiveGateway1Join"/>
+
+    <!-- Exclusive Gateway (Merge) -->
+    <bpmn:exclusiveGateway id="ExclusiveGateway1Join" name="Exclusive Merge 1">
+      <bpmn:incoming>Flow_29</bpmn:incoming>
+      <bpmn:incoming>Flow_30</bpmn:incoming>
+      <bpmn:outgoing>Flow_31</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_31" sourceRef="ExclusiveGateway1Join" targetRef="EndEvent_1"/>
+
+    <!-- End Event -->
+    <bpmn:endEvent id="EndEvent_1" name="End">
+      <bpmn:incoming>Flow_31</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+</bpmn:definitions>
