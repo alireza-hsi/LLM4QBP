@@ -4,6 +4,7 @@ import subprocess
 import os
 import tempfile
 import shutil
+import time
 
 # Locate conda
 conda_path = shutil.which("conda")
@@ -118,29 +119,65 @@ if st.button("Run Pipeline"):
                 "--org", org,
                 "--model", model
             ]
-        else:
-            # For ProMoAI, only model flag is needed (already added above)
-            pass
 
         st.write("Running: `%s`" % " ".join(cmd))
 
         # Real-time log streaming
         log_placeholder = st.empty()
         error_placeholder = st.empty()
-        with subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            bufsize=1,
-            env=env
-        ) as process:
-            logs = ""
-            for line in process.stdout:
-                logs += line
-                log_placeholder.text(logs)
-            process.wait()
-            errors = process.stderr.read()
-            if errors:
-                error_placeholder.subheader("Errors")
-                error_placeholder.text(errors)
+        result_placeholder = st.empty()
+        logs = ""
+        scores = None
+        output_paths = {}
+        elapsed_time = None
+
+        with st.spinner("Pipeline is running..."):
+            start_time = time.time()
+            with subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                bufsize=1,
+                env=env
+            ) as process:
+                for line in process.stdout:
+                    logs += line
+                    # Try to parse scores and output paths from the log lines
+                    if "NodeSim=" in line and "StructSim=" in line and "GED=" in line:
+                        import re
+                        m = re.search(r"NodeSim=([0-9.]+), StructSim=([0-9.]+), GED=([0-9]+)", line)
+                        if m:
+                            scores = {
+                                "Node Similarity": float(m.group(1)),
+                                "Structure Similarity": float(m.group(2)),
+                                "Graph Edit Distance": int(m.group(3))
+                            }
+                    if "✔ Generated BPMN:" in line:
+                        output_paths["Generated BPMN"] = line.split("✔ Generated BPMN:")[-1].strip()
+                    if "✔ Mapped  BPMN:" in line:
+                        output_paths["Mapped BPMN"] = line.split("✔ Mapped  BPMN:")[-1].strip()
+                    log_placeholder.text_area("Logs", logs, height=400, disabled=True)
+                process.wait()
+                errors = process.stderr.read()
+                if errors:
+                    error_placeholder.subheader("Errors")
+                    error_placeholder.text(errors)
+            elapsed_time = time.time() - start_time
+
+        # Show results in a user-friendly format
+        if scores or output_paths:
+            result_md = "### ✅ Run Complete!\n"
+            if scores:
+                result_md += "**Scores:**\n"
+                result_md += f"- Node Similarity: `{scores['Node Similarity']}`\n"
+                result_md += f"- Structure Similarity: `{scores['Structure Similarity']}`\n"
+                result_md += f"- Graph Edit Distance: `{scores['Graph Edit Distance']}`\n"
+            if output_paths:
+                result_md += "\n**Output Files:**\n"
+                for k, v in output_paths.items():
+                    result_md += f"- {k}: `{v}`\n"
+            if elapsed_time is not None:
+                result_md += f"\n**Elapsed time:** `{elapsed_time:.2f} seconds`"
+            result_md += f"\n\n**Results saved in:** `{results_db}`"
+            result_placeholder.markdown(result_md)
