@@ -69,6 +69,17 @@ Then visit [http://localhost:8501](http://localhost:8501) for the web UI and [ht
 
 ---
 
+## Example Files for Quick Testing
+
+After cloning the repository, you can use these example files to quickly test the Streamlit UI:
+
+- [`QBPs/QBP_1/QBP_1_cleaned.txt`](./QBPs/QBP_1/QBP_1_cleaned.txt) — Example QBP task file
+- [`QBPs/QBP_1/QBP1_v2.bpmn`](./QBPs/QBP_1/QBP1_v2.bpmn) — Example gold-standard BPMN file
+
+**How to use:**
+1. In the Streamlit UI, upload `QBPs/QBP_1/QBP_1_cleaned.txt` as the task file and `QBPs/QBP_1/QBP1_v2.bpmn` as the gold BPMN file.
+2. Click "Run Pipeline" to see the results.
+
 ## Troubleshooting
 
 - **FileNotFoundError:**  
