@@ -20,8 +20,10 @@ RUN conda env update -n base -f environment-base.yml \
 RUN conda run -n base pip install -e ./libs/bpmn_python \
  && conda run -n MAO_conda_env pip install -e ./libs/bpmn_python
 
-# Test the install (optional, but recommended for debugging)
-RUN conda run -n base python -c "import bpmn_python"
+ RUN apt-get update && \
+ apt-get install -y curl && \
+ curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+ apt-get install -y nodejs
 
 EXPOSE 8501
 

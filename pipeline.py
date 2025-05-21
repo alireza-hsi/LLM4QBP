@@ -64,6 +64,7 @@ def log_results(db, qbp, framework, node_sim, struct_sim, ged, gold, gen, model,
       ) VALUES (datetime('now'),?,?,?,?,?,?,?, ?, ?)
     """, (qbp, framework, node_sim, struct_sim, ged, gold, gen, model, promoai_retries))
     conn.commit()
+    print("Logged results to", db)
     conn.close()
 
 def run_mao(task_file, config, org, name, model, code_root):
@@ -136,7 +137,7 @@ def map_activities(generated, gold, mapped_out, mapping_model):
     b = extract_activity_names(gold)
     mapping, set_c, table = get_alignment(a, b, model=mapping_model)
     revision_raw = get_revision(a, b, table, model=mapping_model)
-    rev_code = extract_python_lists(revision_raw)
+    rev_a, rev_c = extract_python_lists(revision_raw)
     if rev_a is None: rev_a = a
     if rev_c is None: rev_c = set_c
     final_map = {
