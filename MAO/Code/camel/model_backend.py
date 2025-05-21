@@ -72,6 +72,7 @@ class OpenAIModel(ModelBackend):
             "gpt-4-32k": 32768,
             "gpt-4o": 16384,
             "gpt-4.1": 30000,
+            "gpt-4.1-nano-2025-04-14" : 30000,
         }
         # TODO: The 'openai.api_base' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(api_base="https://sailaoda.cn/v1")'
         # openai.api_base = "https://sailaoda.cn/v1"
@@ -125,7 +126,7 @@ class ModelFactory:
         # default_model_type = ModelType.GPT_3_5_TURBO
         default_model_type = ModelType.GPT_4
         if model_type in {
-            ModelType.GPT_3_5_TURBO, ModelType.GPT_4, ModelType.GPT_4_32k, ModelType.GPT_4o, ModelType.GPT_4o1,
+            ModelType.GPT_3_5_TURBO, ModelType.GPT_4, ModelType.GPT_4_32k, ModelType.GPT_4o, ModelType.GPT_4o1, ModelType.GPT_4o1_nano,
             None
         }:
             model_class = OpenAIModel

@@ -55,7 +55,7 @@ def extract_activity_names(file_path):
 # ------------------------------------------------------------------
 # 2) Call GPT to align Set A → Set B, keeping original for "No match."
 # ------------------------------------------------------------------
-def get_alignment(set_a, set_b, model="gpt-4"):
+def get_alignment(set_a, set_b, model="gpt-4.1"):
     prompt = f"""
 I have two sets of activity labels from two BPMN process models. I want to align each label from Set A to at most one label in Set B if they mean the same thing. If none of the labels in Set B means the same thing, say 'No match.' Return your answer as a table of three columns: (Label from A), (Best Match in B), and (Explanation). Always use full names. Here are the labels:
 Set A: {set_a}
@@ -97,7 +97,7 @@ After finding the pairings give two python lists. Set A which is just set A. And
 # ------------------------------------------------------------------
 # 3) Call GPT again for revision, but revisions will be post-processed
 # ------------------------------------------------------------------
-def get_revision(set_a, set_b, initial_response, model="gpt-4"):
+def get_revision(set_a, set_b, initial_response, model="gpt-4.1"):
     prompt = f"""
 Below is the original alignment response you gave and the original sets.
 

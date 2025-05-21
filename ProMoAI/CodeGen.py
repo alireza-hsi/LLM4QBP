@@ -5,7 +5,8 @@ import re
 # Map our analytics-friendly model name → real OpenAI model
 MODEL_MAP = {
     "GPT_4o1": "gpt-4.1",
-    "4o1":     "gpt-4.1"
+    "4o1":     "gpt-4.1",
+    "GPT_4o1_nano": "gpt-4.1-nano"
 }
 
 def get_initial_messages(txt_path: str):
