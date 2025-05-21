@@ -10,34 +10,76 @@ It supports activity mapping, BPMN similarity comparison, and experiment result 
 
 ## Quick Start
 
-Welcome to **LLM4QBP**! This repository provides everything you need to generate, map, and evaluate BPMN process models using LLMs. Here’s how to get started:
+Welcome to **LLM4QBP**!  
+You can use all features of this project instantly with our prebuilt Docker image—**no build or setup required**.
 
-### The Fastest Way: Run with Docker
+---
 
-You can now run the entire app using Docker (no need to install conda or Python dependencies manually!)
+## Quick Start: Use the Prebuilt Docker Image
 
-1. **Pull the Docker image**:
-   ```sh
-   docker pull alirezahsi/llm4qbp:latest
-   ```
+### 1. **Pull the Latest Image**
+```sh
+docker pull alirezahsi/llm4qbp:latest
+```
 
-2. **Run the Streamlit web UI:**
-   ```sh
-   docker run --rm -p 8501:8501 -v $(pwd):/app alirezahsi/llm4qbp:latest streamlit run streamlit_runner.py
-   ```
-   - This will open the web UI at [http://localhost:8501](http://localhost:8501).
-   - The `-v $(pwd):/app` option mounts your current directory into the container, so you can access your files and save outputs.
+### 2. **Run the Streamlit Web UI**
+This launches the main web interface for running the pipeline:
+```sh
+docker run --rm -p 8501:8501 -v $(pwd):/app alirezahsi/llm4qbp:latest streamlit run streamlit_runner.py
+```
+- Open [http://localhost:8501](http://localhost:8501) in your browser.
+- The `-v $(pwd):/app` option mounts your current directory into the container, so you can access your files and save outputs.
 
-3. **Run the pipeline or dashboard from the command line:**
-   ```sh
-   # Example: Run the pipeline (replace <args> as needed)
-   docker run --rm -v $(pwd):/app alirezahsi/llm4qbp:latest python pipeline.py <args>
+### 3. **Run the Dashboard (Results Visualization)**
+To launch the interactive dashboard for exploring results:
+```sh
+docker run --rm -p 8501:8501 -v $(pwd):/app alirezahsi/llm4qbp:latest streamlit run dashboard.py
+```
+- Open [http://localhost:8501](http://localhost:8501) in your browser.
+- The dashboard reads your results database (e.g., `resultsDb.sqlite`) and provides interactive tables and plots.
 
-   # Example: Run the dashboard
-   docker run --rm -p 8501:8501 -v $(pwd):/app alirezahsi/llm4qbp:latest streamlit run dashboard.py
-   ```
+### 4. **Run the Pipeline or Any Script from the Command Line**
+You can run any script inside the container, for example:
+```sh
+docker run --rm -v $(pwd):/app alirezahsi/llm4qbp:latest python pipeline.py <args>
+```
+Replace `<args>` with your desired command-line arguments.
 
-> **Tip:** You can use all features (web UI, command-line pipeline, dashboard) inside Docker. No local Python or conda setup required!
+---
+
+## 📝 Notes
+
+- **No build required:** You do **not** need to build the Docker image yourself. Just pull and run!
+- **File access:** All outputs and logs will appear in your current directory, thanks to the `-v $(pwd):/app` volume mount.
+- **Multiple apps:** You can run the web UI and dashboard separately (but not on the same port at the same time).
+
+---
+
+## Example: Running Both Web UI and Dashboard
+
+To run both at once, use different ports:
+```sh
+# Web UI on port 8501
+docker run --rm -p 8501:8501 -v $(pwd):/app alirezahsi/llm4qbp:latest streamlit run streamlit_runner.py
+
+# Dashboard on port 8502
+docker run --rm -p 8502:8501 -v $(pwd):/app alirezahsi/llm4qbp:latest streamlit run dashboard.py --server.port=8501
+```
+Then visit [http://localhost:8501](http://localhost:8501) for the web UI and [http://localhost:8502](http://localhost:8502) for the dashboard.
+
+---
+
+## Troubleshooting
+
+- **FileNotFoundError:**  
+  Ensure your input files are in the current directory and you use the correct paths.
+- **Permission issues:**  
+  If you get permission errors, try running with your user ID:
+  ```sh
+  docker run --rm -u $(id -u):$(id -g) -v $(pwd):/app ...
+  ```
+
+---
 
 ### (Alternative) Run Locally with Conda
 
@@ -118,7 +160,7 @@ You can now run the entire app using Docker (no need to install conda or Python 
 - The following conda environments:
   - `base` (for ProMoAI)
   - `MAO_conda_env` (for MAO)
-- All dependencies listed in `MAO/Code/requirements.txt` and `ProMoAI/requirements.txt` (if present)
+- All dependencies listed in `MAO/Code/requirements.txt` and `ProMoAI/requirements.txt` 
 
 ---
 
