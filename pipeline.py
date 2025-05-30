@@ -178,6 +178,12 @@ def process_run(args, run_idx):
           promoai_retries="failed" if args.framework == "ProMoAI" else None
         )
         return
+    
+    # After generation, adjust BPMN path for MAO
+    if args.framework.startswith("MAO-v"):
+        no_dummy_bpmn = gen_bpmn.replace("process.bpmn", "process_no_dummy.bpmn")
+        if os.path.exists(no_dummy_bpmn):
+            gen_bpmn = no_dummy_bpmn
 
     print("✔ Generated BPMN:", gen_bpmn, flush=True)
 
