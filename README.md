@@ -1,6 +1,19 @@
 # LLM4QBP
 Repository for the paper LLM4QBP which contains codes, prompt, experiment results, etc.
 
+---
+
+## 🚀 Live Demo
+
+You can try the pipeline instantly online:
+
+- **Main Web UI:** [http://notation3.org:8501/](http://notation3.org:8501/)
+- **Results Dashboard:** [http://notation3.org:8502/](http://notation3.org:8502/)
+
+No installation required—just open the links in your browser!
+
+---
+
 
 This repository provides a unified pipeline for generating, mapping, and evaluating BPMN process models using two frameworks:
 - **MAO**
