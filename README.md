@@ -10,7 +10,8 @@ You can try the pipeline instantly online:
 - **Main Web UI:** [http://notation3.org:8501/](http://notation3.org:8501/)
 - **Results Dashboard:** [http://notation3.org:8502/](http://notation3.org:8502/)
 
-No installation required—just open the links in your browser!
+**NOTE**: these links may be inaccessible based on the firewall settings of your network. 
+In that case (e.g., connection timeout), you can try setting up the pipeline yourself.
 
 ---
 
