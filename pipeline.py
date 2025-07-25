@@ -23,7 +23,7 @@ def parse_args():
                    choices=["MAO-v2.2","ProMoAI"],
                    required=True)
     p.add_argument("--task-file",   required=True)
-    p.add_argument("--gold-bpmn",   required=True)
+    p.add_argument("--gold-bpmn",   required=False)
     p.add_argument("--runs",  type=int, default=1)
     p.add_argument("--config", default="Default")
     p.add_argument("--org",    default="DefaultOrganization")
@@ -64,7 +64,6 @@ def log_results(db, qbp, framework, node_sim, struct_sim, ged, gold, gen, model,
       ) VALUES (datetime('now'),?,?,?,?,?,?,?, ?, ?)
     """, (qbp, framework, node_sim, struct_sim, ged, gold, gen, model, promoai_retries))
     conn.commit()
-    print("Logged results to", db)
     conn.close()
 
 def run_mao(task_file, config, org, name, model, code_root):
@@ -105,6 +104,7 @@ def run_promoai(task_file, model, code_root, project_name):
         print("▶ ProMoAI_API.py stdout:\n", e.stdout, flush=True)
         print("▶ ProMoAI_API.py stderr:\n", e.stderr, flush=True)
         raise
+    # Parse PROMOAI_RETRIES from stdout
     lines = result.stdout.strip().splitlines()
     promoai_retries = None
     bpmn_path = None
@@ -113,9 +113,6 @@ def run_promoai(task_file, model, code_root, project_name):
             promoai_retries = line.split("PROMOAI_RETRIES:", 1)[1].strip()
         elif line.endswith(".bpmn"):
             bpmn_path = line
-    # Fix: Join with code_root if path is relative
-    if bpmn_path and not os.path.isabs(bpmn_path):
-        bpmn_path = os.path.join(code_root, bpmn_path)
     return bpmn_path, promoai_retries
 
 def extract_python_lists(text):
@@ -173,7 +170,7 @@ def process_run(args, run_idx):
         log_results(
           args.results_db, base, args.framework,
           None, None, None,
-          args.gold_bpmn_filename or os.path.basename(args.gold_bpmn),
+          args.gold_bpmn_filename or (os.path.basename(args.gold_bpmn) if args.gold_bpmn else None),
           None, args.model,
           promoai_retries="failed" if args.framework == "ProMoAI" else None
         )
@@ -187,27 +184,35 @@ def process_run(args, run_idx):
 
     print("✔ Generated BPMN:", gen_bpmn, flush=True)
 
-    # 2) Map activity names
-    mapped = args.mapped_output or gen_bpmn.replace(".bpmn", "_mapped.bpmn")
-    os.makedirs(os.path.dirname(mapped), exist_ok=True)
-    map_activities(gen_bpmn,
-                   args.gold_bpmn,
-                   mapped,
-                   args.mapping_model)
-    print("✔ Mapped  BPMN:", mapped, flush=True)
+    if args.gold_bpmn:
+        # 2) Map activity names
+        mapped = args.mapped_output or gen_bpmn.replace(".bpmn", "_mapped.bpmn")
+        os.makedirs(os.path.dirname(mapped), exist_ok=True)
+        map_activities(gen_bpmn, args.gold_bpmn, mapped, args.mapping_model)
+        print("✔ Mapped  BPMN:", mapped, flush=True)
 
-    # 3) Compare structure
-    node_sim, struct_sim, ged = compare_bpmn(args.gold_bpmn, mapped)
-    print(f"→ NodeSim={node_sim:.3f}, StructSim={struct_sim:.3f}, GED={ged}", flush=True)
+        # 3) Compare structure
+        node_sim, struct_sim, ged = compare_bpmn(args.gold_bpmn, mapped)
+        print(f"→ NodeSim={node_sim:.3f}, StructSim={struct_sim:.3f}, GED={ged}", flush=True)
 
-    # 4) Log results
-    log_results(
-      args.results_db, base, args.framework,
-      node_sim, struct_sim, ged,
-      args.gold_bpmn_filename or os.path.basename(args.gold_bpmn),
-      gen_bpmn, args.model,
-      promoai_retries=promoai_retries if args.framework == "ProMoAI" else None
-    )
+        # 4) Log results
+        log_results(
+          args.results_db, base, args.framework,
+          node_sim, struct_sim, ged,
+          args.gold_bpmn_filename or os.path.basename(args.gold_bpmn),
+          gen_bpmn, args.model,
+          promoai_retries=promoai_retries if args.framework == "ProMoAI" else None
+        )
+    else:
+        # No gold BPMN: log with nulls for sim fields, but with generated path
+        log_results(
+          args.results_db, base, args.framework,
+          None, None, None,
+          None,  # gold_bpmn_path
+          gen_bpmn, args.model,
+          promoai_retries=promoai_retries if args.framework == "ProMoAI" else None
+        )
+        print("Logged results to", args.results_db)
 
 def main():
     args = parse_args()
