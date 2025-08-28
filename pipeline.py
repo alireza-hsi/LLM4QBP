@@ -10,6 +10,8 @@ import sys
 import subprocess
 import sqlite3
 
+from streamlit_runner import PROMOAI_ENV
+
 # Ensure your MAO helpers are on PYTHONPATH
 MAO_HELPER = os.path.join("MAO", "Code", "Helper")
 sys.path.insert(0, MAO_HELPER)
@@ -88,7 +90,7 @@ def run_mao(task_file, config, org, name, model, code_root):
 def run_promoai(task_file, model, code_root, project_name):
     script = "ProMoAI_API.py"
     cmd = [
-        "conda", "run", "-n", "base", "python",
+        "conda", "run", "-n", PROMOAI_ENV, "python",
         script,
         "--task-file",    task_file,
         "--model",        model,

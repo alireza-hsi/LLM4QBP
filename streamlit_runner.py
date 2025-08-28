@@ -10,8 +10,8 @@ import re
 conda_path = shutil.which("conda")
 print("Using conda at:", conda_path)
 
-CONDA_ENV = "MAO_conda_env"
-BASE_ENV = "base"
+PROMOAI_ENV = "promoai"
+MAO_ENV = "mao"
 
 def clear_logs():
     # Remove any previous run artifacts from session_state
@@ -76,9 +76,9 @@ if run:
 
         # Choose interpreter
         if framework.startswith("MAO-"):
-            prefix = ["conda","run","-n",CONDA_ENV,"python","-u"]
+            prefix = ["conda","run","-n",MAO_ENV,"python","-u"]
         else:
-            prefix = ["conda","run","-n",BASE_ENV,"python","-u"]
+            prefix = ["conda","run","-n",PROMOAI_ENV,"python","-u"]
 
         # Build cmd
         cmd = prefix + [
@@ -138,8 +138,12 @@ if run:
 
         # show errors if any
         if stderr:
-            st.subheader("Errors")
-            st.text(stderr)
+            # temp workaround
+            stderr_filt = "\n".join([ line for line in stderr.split("\n") if "'MainThread': missing ScriptRunContext!" not in line ]).strip()
+            
+            if stderr_filt:
+                st.subheader("Errors")
+                st.text(stderr_filt)
 
         # build markdown summary
         result_md = "### ✅ Run Complete!\n\n"
