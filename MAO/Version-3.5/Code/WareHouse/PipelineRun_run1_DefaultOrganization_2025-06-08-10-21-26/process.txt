@@ -1,0 +1,106 @@
+<process>
+  <activity role='ED/Clinic/Acutecare staff' action='Assess airway' objects='patient' id='activity1-1'/>
+  <activity role='ED/Clinic/Acutecare staff' action='Assess breathing' objects='patient' id='activity1-2'/>
+  <activity role='ED/Clinic/Acutecare staff' action='Assess circulation' objects='patient' id='activity1-3'/>
+  <activity role='ED/Clinic/Acutecare staff' action='Perform neurological examination and assess stroke severity using standardized stroke scale (NIHSS or CNS)' objects='patient' id='activity2'/>
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1-imagingCT'>
+      <activity role='ED/Clinic/Acutecare staff' action='Obtain non-contrast CT or MRI (Door to CT/CTA < 25 minutes)' objects='patient' id='activity5-1'/>
+      <activity role='Stroke imaging expert' action='Interpret brain imaging immediately' objects='CT/MRI results' id='activity5-1-interpret'/>
+    </branch>
+    <branch id='branch2-imagingCTA'>
+      <activity role='ED/Clinic/Acutecare staff' action='Obtain CTA (Door to CT/CTA < 25 minutes)' objects='patient' id='activity5-2'/>
+      <activity role='Stroke imaging expert' action='Interpret CTA immediately' objects='CTA results' id='activity5-2-interpret'/>
+    </branch>
+    <branch id='branch3-ECG'>
+      <activity role='ED/Clinic/Acutecare staff' action='Obtain ECG to detect atrial fibrillation and other acute arrhythmias (do not delay acute treatment)' objects='patient' id='activity9'/>
+    </branch>
+    <branch id='branch4-chestxray'>
+      <activity role='ED/Clinic/Acutecare staff' action='Order chest x-ray (do not delay assessment for thrombolysis)' objects='patient' id='activity10'/>
+    </branch>
+    <branch id='branch5-labs'>
+      <parallelGateway id='parallelgateway2-labs'>
+        <branch id='branch5-1-CBC'>
+          <activity role='ED/Clinic/Acutecare staff' action='Order CBC, electrolytes, creatinine, glucose' objects='patient' id='activity11-1'/>
+        </branch>
+        <branch id='branch5-2-INR'>
+          <activity role='ED/Clinic/Acutecare staff' action='Order INR and partial thromboplastin time' objects='patient' id='activity11-2'/>
+        </branch>
+        <branch id='branch5-3-troponin'>
+          <activity role='ED/Clinic/Acutecare staff' action='Order troponin (if clinically indicated)' objects='patient' id='activity11-3'/>
+        </branch>
+      </parallelGateway>
+    </branch>
+    <branch id='branch6-dysphagia'>
+      <activity role='ED/Clinic/Acutecare staff' action='Make patient NPO' objects='patient' id='activity12-1'/>
+      <activity role='ED/Clinic/Acutecare staff' action='Screen swallowing ability using valid bedside protocol before oral intake' objects='patient' id='activity12-2'/>
+      <exclusiveGateway id='exclusivegateway3-alert'>
+        <branch condition='Patient not alert within first 24 hours' id='branch8-notalert'>
+          <activity role='ED/Clinic/Acutecare staff' action='Monitor closely and screen swallowing ability when clinically appropriate' objects='patient' id='activity13'/>
+        </branch>
+        <branch condition='Patient alert within first 24 hours' id='branch9-alert'>
+          <activity role='ED/Clinic/Acutecare staff' action='Proceed with standard swallowing assessment' objects='patient' id='activity14'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exclusivegateway4-dysphagia'>
+        <branch condition='Patient presents with features indicating dysphagia or pulmonary aspiration' id='branch10-dysphagia'>
+          <activity role='Speech-language pathologist or trained specialist' action='Perform full clinical swallowing assessment and advise on diet/fluid consistency' objects='patient' id='activity15'/>
+        </branch>
+        <branch condition='No features of dysphagia or aspiration' id='branch11-nodysphagia'>
+          <activity role='ED/Clinic/Acutecare staff' action='Continue routine care' objects='patient' id='activity16'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch7-advancedCT'>
+      <exclusiveGateway id='exclusivegateway2-advancedCT'>
+        <branch condition='Patient is clinically eligible for acute ischemic stroke treatments' id='branch4-advancedCT'>
+          <activity role='ED/Clinic/Acutecare staff' action='Consider advanced CT imaging (CT, multiphase CTA, or Perfusion CT)' objects='patient' id='activity6'/>
+          <activity role='Stroke imaging expert' action='Interpret advanced CT imaging immediately' objects='advanced CT results' id='activity8-advanced'/>
+        </branch>
+        <branch condition='Patient is not clinically eligible for acute ischemic stroke treatments' id='branch5-noadvancedCT'>
+          <activity role='ED/Clinic/Acutecare staff' action='No advanced CT imaging required' objects='patient' id='activity8-noadvanced'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch8-EVT'>
+      <exclusiveGateway id='exclusivegateway1-EVT'>
+        <branch condition='Patient presents with potentially disabling, acute neurological symptoms suggestive of acute stroke within 6.0 hours of symptom onset OR may be considered for treatment within 12 hours and meets clinical/imaging criteria' id='branch2-EVT'>
+          <activity role='ED/Clinic/Acutecare staff' action='Consider patient for endovascular therapy (EVT)' objects='patient' id='activity3'/>
+        </branch>
+        <branch condition='Patient does not meet criteria for EVT consideration' id='branch3-noEVT'>
+          <activity role='ED/Clinic/Acutecare staff' action='Proceed with standard acute stroke assessment' objects='patient' id='activity4'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch9-vascular'>
+      <exclusiveGateway id='exclusivegateway5-vascular'>
+        <branch condition='Patient presents beyond 48 hours with TIA or ischemic stroke' id='branch12-vascular'>
+          <activity role='ED/Clinic/Acutecare staff' action='Order vascular imaging of brain and neck arteries as soon as possible' objects='patient' id='activity18'/>
+        </branch>
+        <branch condition='Patient does not meet criteria' id='branch13-novascular'>
+          <activity role='ED/Clinic/Acutecare staff' action='No vascular imaging required at this stage' objects='patient' id='activity19'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch10-ICH'>
+      <exclusiveGateway id='exclusivegateway6-ICH'>
+        <branch condition='Patient has ICH (intracerebral hemorrhage)' id='branch14-ICH'>
+          <activity role='ED/Clinic/Acutecare staff' action='Recognize ICH as medical emergency and ensure immediate evaluation by stroke expert' objects='patient' id='activity20'/>
+          <activity role='ED/Clinic/Acutecare staff' action='Evaluate for anticoagulant therapy, measure platelet count, PTT, and INR' objects='patient' id='activity21'/>
+          <exclusiveGateway id='exclusivegateway7-ICHimaging'>
+            <branch condition='ICH patient selected for further vascular imaging' id='branch15-ICHimaging'>
+              <activity role='ED/Clinic/Acutecare staff' action='Order CTA or MRA as soon as possible' objects='patient' id='activity22'/>
+            </branch>
+            <branch condition='ICH patient not selected for further vascular imaging' id='branch16-noICHimaging'>
+              <activity role='ED/Clinic/Acutecare staff' action='Continue with standard ICH management' objects='patient' id='activity23'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch condition='Patient does not have ICH' id='branch17-noICH'>
+          <activity role='ED/Clinic/Acutecare staff' action='Continue with appropriate stroke pathway' objects='patient' id='activity24'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </parallelGateway>
+  <activity role='ED/Clinic/Acutecare staff' action='Provide cross-continuum secondary prevention assessments and therapies (per Modules 5 and 10) to all patients, whether admitted or discharged' objects='patient' id='activity17'/>
+</process>

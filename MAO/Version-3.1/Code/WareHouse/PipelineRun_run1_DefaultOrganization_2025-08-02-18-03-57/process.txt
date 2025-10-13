@@ -1,0 +1,53 @@
+<process>
+  <activity role='EMS' action='Divert patient to regional/district stroke centre if stroke/TIA suspected and prenotify receiving hospital' objects='suspected TIA/minor stroke patient' id='activity1'/>
+  <activity role='acute stroke team' action='Respond to EMS prenotification and prepare for patient arrival' objects='prenotification details' id='activity2'/>
+  <activity role='ED/clinic/acute care staff' action='Conduct rapid initial evaluation for airway, breathing, and circulation' objects='patient' id='activity3'/>
+  <activity role='ED/clinic/acute care staff' action='Conduct neurological examination and assess stroke severity using NIHSS or CNS' objects='patient' id='activity4'/>
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1'>
+      <activity role='ED/clinic/acute care staff' action='Initiate brain imaging (CT or MRI) immediately' objects='patient' id='activity5'/>
+      <activity role='healthcare provider with imaging expertise' action='Interpret brain imaging immediately' objects='CT/MRI results' id='activity6'/>
+    </branch>
+    <branch id='branch2'>
+      <activity role='ED/clinic/acute care staff' action='Perform ECG to detect atrial fibrillation and other acute arrhythmias' objects='patient' id='activity7'/>
+    </branch>
+    <branch id='branch3'>
+      <activity role='ED/clinic/acute care staff' action='Order standard blood work (CBC, electrolytes, creatinine, glucose, INR, partial thromboplastin time)' objects='patient' id='activity8'/>
+      <activity role='healthcare provider' action='Interpret blood work results immediately upon availability' objects='blood work results' id='activity9'/>
+    </branch>
+    <branch id='branch4'>
+      <activity role='ED/clinic/acute care staff' action='Order chest x-ray if indicated, ensuring it does not delay assessment for thrombolysis' objects='patient' id='activity10'/>
+    </branch>
+  </parallelGateway>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='Troponin test clinically indicated' id='branch5'>
+      <activity role='ED/clinic/acute care staff' action='Order troponin test' objects='patient' id='activity11'/>
+      <activity role='healthcare provider' action='Interpret troponin test result immediately upon availability' objects='troponin test result' id='activity12'/>
+    </branch>
+    <branch condition='Troponin test not clinically indicated' id='branch6'>
+      <activity role='ED/clinic/acute care staff' action='No troponin test ordered' objects='patient' id='activity13'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='ED/clinic/acute care staff' action='Make patient NPO initially' objects='patient' id='activity14'/>
+  <activity role='ED/clinic/acute care staff' action='Screen swallowing ability using bedside protocol before oral intake' objects='patient' id='activity15'/>
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='Patient not alert within first 24 hours' id='branch7'>
+      <activity role='ED/clinic/acute care staff' action='Monitor closely and screen swallowing ability when clinically appropriate' objects='patient' id='activity16'/>
+    </branch>
+    <branch condition='Patient presents with features indicating dysphagia or pulmonary aspiration' id='branch8'>
+      <activity role='speech-language pathologist or trained specialist' action='Conduct full clinical swallowing assessment and advise on diet/fluid consistency' objects='patient' id='activity17'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='ED/clinic/acute care staff' action='Use standardized triage tool to determine appropriate care location for TIA patients' objects='patient' id='activity18'/>
+  <exclusiveGateway id='exclusivegateway3'>
+    <branch condition='Patient presents within 48 hours of symptom onset or with fluctuating motor/speech symptoms' id='branch9'>
+      <activity role='ED/clinic/acute care staff' action='Initiate immediate vascular imaging of neck arteries (carotid ultrasound, CTA, or MRA) unless not a candidate for revascularization' objects='patient' id='activity19'/>
+      <activity role='healthcare provider with imaging expertise' action='Interpret vascular imaging immediately' objects='vascular imaging results' id='activity20'/>
+    </branch>
+    <branch condition='Patient presents beyond 48 hours' id='branch10'>
+      <activity role='ED/clinic/acute care staff' action='Order vascular imaging of brain and neck arteries as soon as possible' objects='patient' id='activity21'/>
+      <activity role='healthcare provider with imaging expertise' action='Interpret vascular imaging results as soon as available' objects='vascular imaging results' id='activity22'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='ED/clinic/acute care staff' action='Provide cross-continuum secondary prevention assessments and therapies (per Modules 5 and 10) before discharge or admission' objects='patient' id='activity23'/>
+</process>

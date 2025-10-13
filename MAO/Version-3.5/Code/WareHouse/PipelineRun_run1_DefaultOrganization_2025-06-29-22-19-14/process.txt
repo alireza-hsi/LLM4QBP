@@ -1,0 +1,42 @@
+<process>
+  <activity role='ED clinician' action='Screen/assess for diabetes, dental issues, cognitive impairment, and depression upon ED presentation' objects='patient, screening tools' id='activity1-1'/>
+  <activity role='ED clinician' action='Forward screening/assessment results to TIA clinic for follow-up' objects='patient, screening results' id='activity1-2'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='Meets criteria for acute inpatient admission (per recommendation 2.4.2)' id='branch1'>
+      <activity role='admitting physician' action='Admit patient to specialized, geographically defined stroke unit (co-located beds, 75% stroke occupancy)' objects='patient, stroke unit' id='activity2'/>
+      <activity role='hospital administration' action='Ensure dedicated interprofessional stroke team with expertise in stroke care (medicine, nursing, OT, PT, SLP, social work, dietitian)' objects='staffing, training records' id='activity3'/>
+      <parallelGateway id='parallelgateway1'>
+        <branch id='branch2'>
+          <activity role='hospital administration' action='Ensure interprofessional stroke team uses standardized, validated assessment tools (preferably electronic and linked to EHR)' objects='assessment tools, EHR' id='activity14'/>
+        </branch>
+        <branch id='branch3'>
+          <activity role='hospital administration' action='Ensure adequate staffing 7 days per week' objects='staffing schedule' id='activity15'/>
+        </branch>
+      </parallelGateway>
+      <activity role='stroke unit team' action='Provide access to specialized interprofessional team 7 days a week' objects='patient, team schedule' id='activity4'/>
+      <activity role='stroke unit clinicians (PT, OT, SLP, dietitian)' action='Conduct comprehensive assessment (risk of venous thromboembolism, early mobilization eligibility, hydration status, nutrition/hydration status, standardized tools, AlphaFIM by day 3), and formulate management plan within 48 hours of admission' objects='patient, assessment tools, AlphaFIM tool, screening tool, assessment results' id='activityMerged1'/>
+      <parallelGateway id='parallelgateway2'>
+        <branch id='branch4'>
+          <exclusiveGateway id='exclusivegateway2'>
+            <branch condition='Nutritional concerns, hydration deficits, dysphagia, or other comorbidities present' id='branch5'>
+              <activity role='stroke unit clinicians' action='Refer patient to dietitian within 7 days of admission for recommendations and consideration of enteral nutrition support' objects='patient, referral form' id='activity12'/>
+            </branch>
+            <branch condition='No nutritional concerns, hydration deficits, dysphagia, or other comorbidities' id='branch6'>
+              <activity role='stroke unit clinicians' action='Continue standard nutrition and hydration care' objects='patient' id='activity13'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch id='branch6'>
+          <activity role='stroke unit clinicians' action='Encourage early mobilization and adequate hydration for all acute stroke patients to help prevent venous thromboembolism' objects='patient' id='activity18'/>
+        </branch>
+      </parallelGateway>
+      <activity role='stroke unit clinicians' action='Conduct cross-continuum secondary prevention assessment' objects='patient, prevention protocols' id='activity16-1'/>
+      <activity role='stroke unit clinicians' action='Initiate appropriate secondary prevention therapies' objects='patient, prevention protocols' id='activity16-2'/>
+    </branch>
+    <branch condition='Does not meet criteria for acute inpatient admission (e.g., TIA or minor nondisabling stroke)' id='branch7'>
+      <activity role='clinician' action='Do not apply acute inpatient stroke unit recommendations; proceed with alternative care pathway as appropriate' objects='patient' id='activity17'/>
+      <activity role='clinician' action='Conduct cross-continuum secondary prevention assessment' objects='patient, prevention protocols' id='activity17-1'/>
+      <activity role='clinician' action='Initiate appropriate secondary prevention therapies' objects='patient, prevention protocols' id='activity17-2'/>
+    </branch>
+  </exclusiveGateway>
+</process>

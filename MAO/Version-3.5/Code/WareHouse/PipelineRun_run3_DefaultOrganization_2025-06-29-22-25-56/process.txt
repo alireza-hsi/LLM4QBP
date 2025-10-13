@@ -1,0 +1,44 @@
+<process>
+  <activity role='ED clinician' action='Screen/assess for diabetes, dental issues, cognitive impairment, and depression upon ED presentation; forward results to TIA clinic for follow-up' objects='patient, screening tools' id='activity1'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='Meets criteria for acute inpatient admission (per recommendation 2.4.2)' id='branch1'>
+      <activity role='admitting physician' action='Assign patient to co-located bed in stroke unit' objects='patient, stroke unit' id='activity2-1'/>
+      <activity role='admitting physician' action='Verify 75% occupancy by stroke patients' objects='stroke unit occupancy records' id='activity2-2'/>
+      <activity role='hospital administration' action='Ensure dedicated interprofessional stroke team with expertise in medicine, nursing, occupational therapy, physiotherapy, speech-language pathology, social work, and clinical nutrition (dietitian)' objects='staffing roster' id='activity3'/>
+      <activity role='hospital administration' action='Ensure interprofessional stroke team available 7 days a week' objects='staffing schedule' id='activity4'/>
+      <activity role='hospital administration' action='Ensure use of standardized, validated assessment tools (preferably electronic, linked to EHR)' objects='assessment tools, EHR' id='activity5'/>
+      <activity role='physiotherapist, occupational therapist, speech-language pathologist, clinical team' action='Conduct required assessments (AlphaFIM by day 3, risk of venous thromboembolism, nutrition/hydration status within 48 hours) and formulate management plan based on assessment results' objects='patient, assessment tools, AlphaFIM tool, risk assessment tool, nutrition/hydration screening tool, assessment results' id='activity6'/>
+      <parallelGateway id='parallelgateway1'>
+        <branch id='branch2'>
+          <activity role='clinical team' action='Mobilize patient early (between 24-48 hours of stroke onset) unless contraindicated; avoid frequent out-of-bed activity within first 24 hours' objects='patient' id='activity7'/>
+        </branch>
+        <branch id='branch3'>
+          <activity role='clinical team' action='Encourage early mobilization and adequate hydration to help prevent venous thromboembolism' objects='patient' id='activity11'/>
+        </branch>
+        <branch id='branch4'>
+          <parallelGateway id='parallelgateway2'>
+            <branch id='branch4-1'>
+              <activity role='clinical team' action='Monitor nutrition status as per management plan' objects='patient' id='activity12-1'/>
+            </branch>
+            <branch id='branch4-2'>
+              <activity role='clinical team' action='Monitor hydration status as per management plan' objects='patient' id='activity12-2'/>
+            </branch>
+          </parallelGateway>
+          <exclusiveGateway id='exclusivegateway2'>
+            <branch condition='Nutritional concerns, hydration deficits, dysphagia, or other comorbidities present' id='branch5'>
+              <activity role='clinical team' action='Refer patient to dietitian within 7 days of admission for recommendations and consideration of enteral nutrition support if unable to meet nutritional/fluid requirements' objects='patient, referral form' id='activity13'/>
+            </branch>
+            <branch condition='No nutritional concerns, hydration deficits, dysphagia, or comorbidities' id='branch6'>
+              <activity role='clinical team' action='Continue standard monitoring' objects='patient' id='activity14'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </parallelGateway>
+      <activity role='clinical team' action='Initiate cross-continuum secondary prevention assessments and therapies (per Modules 5 and 10), regardless of discharge or in-hospital rehabilitation status' objects='patient, prevention protocols' id='activity15'/>
+    </branch>
+    <branch condition='Does not meet criteria for acute inpatient admission (TIA or minor nondisabling stroke)' id='branch7'>
+      <activity role='clinical team' action='Proceed with alternative care pathway; recommendations in Module 3a not applicable' objects='patient' id='activity16'/>
+      <activity role='clinical team' action='Ensure cross-continuum secondary prevention assessments and therapies (per Modules 5 and 10)' objects='patient, prevention protocols' id='activity17'/>
+    </branch>
+  </exclusiveGateway>
+</process>

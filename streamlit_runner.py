@@ -32,7 +32,7 @@ api_key = st.text_input(
     help="Enter your OpenAI API key (it will not be displayed)."
 )
 
-framework = st.selectbox("Framework", ["ProMoAI", "MAO-v2.2"])
+framework = st.selectbox("Framework", ["ProMoAI", "MAO-v2.2", "MAO-v3", "MAO-v3.2", "MAO-v3.3", "MAO-v3.4", "MAO-v3.5", "MAO-v3.6", "MAO-v3.7", "MAO-v3.8"])
 task_file = st.file_uploader("Upload task file (.txt)", type="txt")
 gold_bpmn_file = st.file_uploader("Upload gold BPMN file (.bpmn, .xml) (optional)", type=["bpmn","xml"])
 runs = st.number_input("Number of runs", min_value=1, value=1)

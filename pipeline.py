@@ -9,11 +9,12 @@ import os
 import sys
 import subprocess
 import sqlite3
+import re
 
 from streamlit_runner import PROMOAI_ENV
 
 # Ensure your MAO helpers are on PYTHONPATH
-MAO_HELPER = os.path.join("MAO", "Code", "Helper")
+MAO_HELPER = os.path.join("MAO", "Version-2.2", "Code", "Helper")
 sys.path.insert(0, MAO_HELPER)
 
 from automatedActivityMapping import extract_activity_names, get_alignment, get_revision, update_activity_names
@@ -22,7 +23,7 @@ from bpmn_compare_similarity import CompareBPMN
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--framework",
-                   choices=["MAO-v2.2","ProMoAI"],
+                   choices=["MAO-v2.2","ProMoAI","MAO-v3","MAO-v3.2","MAO-v3.3","MAO-v3.4","MAO-v3.5","MAO-v3.6","MAO-v3.7","MAO-v3.8"],
                    required=True)
     p.add_argument("--task-file",   required=True)
     p.add_argument("--gold-bpmn",   required=False)
@@ -160,8 +161,11 @@ def process_run(args, run_idx):
     try:
         if args.framework.startswith("MAO-v"):
             #suffix    = args.framework.split("MAO-v",1)[1]
-            code_root = os.path.join("MAO","Code")
-            gen_bpmn  = run_mao(args.task_file, args.config, args.org, run_name, args.model, code_root)
+            # Extract version number from framework string, e.g. "MAO-v3.1" -> "3.1"
+            mao_version = re.search(r"MAO-v(.+)", args.framework)
+            ver_str = mao_version.group(1) if mao_version else "2.2"  # default fallback
+            code_root = os.path.join("MAO", f"Version-{ver_str}", "Code")
+            gen_bpmn = run_mao(args.task_file, args.config, args.org, run_name, args.model, code_root)
         else:
             code_root = os.path.join(
                 "ProMoAI"

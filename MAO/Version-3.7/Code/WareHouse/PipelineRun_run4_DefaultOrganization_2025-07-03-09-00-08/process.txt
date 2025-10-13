@@ -1,0 +1,32 @@
+<process>
+  <activity role='hospital administration' action='Ensure interprofessional stroke team uses standardized, validated assessment tools (preferably electronic and linked to EHR)' objects='assessment tools, EHR' id='activity10'/>
+  <activity role='hospital administration' action='Ensure adequate staffing 7 days per week for stroke/TIA care' objects='staffing plan' id='activity11'/>
+  <activity role='ED clinician' action='Screen/assess for diabetes, dental issues, cognitive impairment, and depression upon ED presentation; forward results to TIA clinic for follow-up' objects='patient, screening tools' id='activity1'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='Meets criteria for acute inpatient admission (per recommendation 2.4.2)' id='branch1'>
+      <activity role='hospital administration' action='Ensure stroke unit is established as a specialized, geographically defined unit with co-located beds (75% stroke occupancy), staffed by a dedicated interprofessional team (medicine, nursing, OT, PT, SLP, social work, dietitian) who spend the majority of their time treating stroke patients, regularly complete stroke education, and provide access 7 days a week' objects='stroke unit, staffing plan, education records, staffing schedule' id='activity2_modified'/>
+      <activity role='admitting clinician' action='Admit patient to specialized, geographically defined stroke unit' objects='patient, stroke unit' id='activity3_modified'/>
+      <parallelGateway id='parallelgateway1'>
+        <branch id='branch2'>
+          <activity role='PT, OT, SLP, clinical team' action='Select and use appropriate standardized, valid assessment tools; assess patient within 48 hours of admission for stroke-related impairments, functional status, AlphaFIM (by day 3), venous thromboembolism risk, nutrition and hydration status; and formulate a comprehensive management plan based on all assessment results' objects='patient, assessment tools, AlphaFIM tool, risk assessment tool, nutrition/hydration screening tool, assessment results' id='activity4_modified'/>
+        </branch>
+        <branch id='branch3'>
+          <activity role='clinical team' action='Mobilize patient early (between 24-48 hours of stroke onset) and encourage adequate hydration to help prevent venous thromboembolism, unless contraindicated; avoid frequent out-of-bed activity within first 24 hours unless clinically justified' objects='patient, mobilization protocol, hydration protocol' id='activity5_combined'/>
+        </branch>
+      </parallelGateway>
+      <exclusiveGateway id='exclusivegateway2'>
+        <branch condition='Nutritional concerns, hydration deficits, dysphagia, or other comorbidities present' id='branch4'>
+          <activity role='clinical team' action='Refer patient to dietitian within 7 days of admission for recommendations and consideration of enteral nutrition support if unable to meet requirements' objects='patient, referral form' id='activity6_modified'/>
+        </branch>
+        <branch condition='No nutritional concerns' id='branch5'>
+          <activity role='clinical team' action='Continue standard nutrition and hydration monitoring' objects='patient' id='activity7_modified'/>
+        </branch>
+      </exclusiveGateway>
+      <activity role='clinical team' action='Provide appropriate cross-continuum secondary prevention assessments and therapies (per Modules 5 and 10), regardless of discharge or in-hospital rehabilitation status' objects='patient, prevention protocols' id='activity9_modified_branch1'/>
+    </branch>
+    <branch condition='Does not meet criteria for acute inpatient admission (e.g., TIA or minor nondisabling stroke)' id='branch6'>
+      <activity role='clinical team' action='Do not apply acute inpatient stroke unit recommendations; proceed with alternative care pathway' objects='patient' id='activity8_modified'/>
+      <activity role='clinical team' action='Provide appropriate cross-continuum secondary prevention assessments and therapies (per Modules 5 and 10), regardless of discharge or in-hospital rehabilitation status' objects='patient, prevention protocols' id='activity9_modified_branch2'/>
+    </branch>
+  </exclusiveGateway>
+</process>

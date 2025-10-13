@@ -1,0 +1,35 @@
+<process>
+  <activity role='hospital administration' action='Ensure adequate stroke unit staffing 7 days per week' objects='staffing schedule' id='activity1'/>
+  <activity role='ED clinician' action='Screen/assess for diabetes, dental issues, cognitive impairment, and depression upon ED presentation; forward results to TIA clinic for follow-up' objects='patient, screening tools, EHR' id='activity2'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='Patient meets criteria for acute inpatient admission (per recommendation 2.4.2)' id='branch1'>
+      <activity role='admitting clinician' action='Admit patient to specialized, geographically defined stroke unit (co-located beds, 75% stroke occupancy)' objects='patient, stroke unit' id='activity3'/>
+      <activity role='hospital administration' action='Ensure core stroke unit team consists of medicine, nursing, OT, PT, SLP, social work, and dietitian with stroke expertise' objects='staffing, stroke unit' id='activity4'/>
+      <activity role='hospital administration' action='Ensure interprofessional stroke team available 7 days/week' objects='staffing schedule' id='activity5'/>
+      <activity role='stroke unit team' action='Select appropriate standardized, validated assessment tools' objects='assessment tools' id='activity6'/>
+      <activity role='stroke unit team' action='Document assessment results in EHR' objects='EHR' id='activity7'/>
+      <activity role='PT, OT, SLP, stroke unit team' action='Within 48 hours of admission, perform initial assessments (including AlphaFIM, VTE risk, nutrition/hydration status), and formulate management plan based on assessment results' objects='patient, assessment tools, AlphaFIM tool, risk assessment tool, nutrition/hydration screening tool, assessment results' id='activity8'/>
+      <exclusiveGateway id='exclusivegateway2'>
+        <branch condition='Nutrition concerns, hydration deficits, dysphagia, or other comorbidities present' id='branch2'>
+          <activity role='stroke unit team' action='Refer to dietitian within 7 days of admission for recommendations and consideration of enteral nutrition support' objects='patient, referral' id='activity9'/>
+        </branch>
+        <branch condition='No nutrition/hydration/dysphagia/comorbidity concerns' id='branch3'>
+          <activity role='stroke unit team' action='Continue standard monitoring' objects='patient' id='activity10'/>
+        </branch>
+      </exclusiveGateway>
+      <parallelGateway id='parallelgateway1'>
+        <branch id='branch4'>
+          <activity role='stroke unit team' action='Encourage early mobilization (between 24-48 hours of stroke onset, unless contraindicated)' objects='patient' id='activity11'/>
+        </branch>
+        <branch id='branch5'>
+          <activity role='stroke unit team' action='Encourage adequate hydration for VTE prevention' objects='patient' id='activity12'/>
+        </branch>
+      </parallelGateway>
+      <activity role='stroke unit team' action='Provide appropriate cross-continuum secondary prevention assessments and therapies (per Modules 5 and 10) for all patients, whether admitted to in-hospital rehab or discharged' objects='patient, prevention protocols' id='activity13'/>
+    </branch>
+    <branch condition='Patient does not meet criteria for acute inpatient admission (e.g., TIA or minor nondisabling stroke)' id='branch6'>
+      <activity role='ED clinician' action='Refer to appropriate outpatient follow-up (e.g., TIA clinic)' objects='patient, referral' id='activity14'/>
+      <activity role='ED clinician' action='Provide appropriate cross-continuum secondary prevention assessments and therapies (per Modules 5 and 10)' objects='patient, prevention protocols' id='activity15'/>
+    </branch>
+  </exclusiveGateway>
+</process>

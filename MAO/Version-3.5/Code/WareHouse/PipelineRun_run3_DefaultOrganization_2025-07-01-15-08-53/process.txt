@@ -1,0 +1,41 @@
+<process>
+  <activity role='ED clinician' action='Screen/assess patient for diabetes, dental issues, cognitive impairment, and depression upon ED presentation' objects='patient, screening tools' id='activity1-1'/>
+  <activity role='ED clinician' action='Forward screening/assessment results to TIA clinic for follow-up' objects='patient, screening results' id='activity1-2'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='Meets criteria for acute inpatient admission (as per recommendation 2.4.2)' id='branch1'>
+      <activity role='admitting clinician' action='Admit patient to specialized, geographically defined stroke unit (co-located beds, 75% occupancy by stroke patients)' objects='patient, stroke unit' id='activity2'/>
+      <activity role='hospital administration' action='Ensure stroke unit has dedicated interprofessional team (nursing, physiotherapy, occupational therapy, speech-language pathology, medicine, social work, dietitian)' objects='staffing plan' id='activity3'/>
+      <activity role='stroke unit team' action='Provide access to specialized interprofessional team 7 days a week' objects='patient, team schedule' id='activity4'/>
+      <parallelGateway id='parallelgateway1'>
+        <branch id='branch2'>
+          <activity role='physiotherapist, occupational therapist, speech-language pathologist, clinicians' action='Within 48 hours of admission, perform all required assessments (using standardized, valid assessment tools to evaluate stroke-related impairments and functional status, complete AlphaFIM on or by day 3, assess risk of venous thromboembolism, assess nutrition and hydration status within first 48 hours using valid screening tool), and formulate a management plan based on all completed assessments' objects='patient, assessment tools, AlphaFIM tool, risk assessment tool, screening tool, assessment results' id='activity5-merged-new'/>
+          <exclusiveGateway id='exclusivegateway2'>
+            <branch condition='Nutritional concerns, hydration deficits, dysphagia, or other comorbidities present' id='branch9'>
+              <activity role='clinicians' action='Refer patient to dietitian within 7 days of admission for recommendations and consideration of enteral nutrition support if unable to meet nutritional/fluid requirements' objects='patient, referral form' id='activity12'/>
+            </branch>
+            <branch condition='No nutritional concerns, hydration deficits, dysphagia, or other comorbidities' id='branch10'>
+              <activity role='clinicians' action='Continue standard monitoring' objects='patient' id='activity13'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch id='branch3'>
+          <activity role='stroke unit team' action='Encourage early mobilization between 24-48 hours of stroke onset unless contraindicated; avoid frequent out-of-bed activity within first 24 hours' objects='patient, mobilization protocol' id='activity6'/>
+        </branch>
+        <branch id='branch4'>
+          <activity role='clinicians' action='Encourage early mobilization and adequate hydration for all acute stroke patients to help prevent venous thromboembolism' objects='patient, hydration protocol' id='activity10'/>
+        </branch>
+        <branch id='branch5'>
+          <activity role='hospital administration' action='Ensure adequate staffing 7 days per week' objects='staffing schedule' id='activity14'/>
+        </branch>
+        <branch id='branch6'>
+          <activity role='stroke unit team' action='Use standardized, validated assessment tools in electronic format linked to EHR where possible' objects='EHR, assessment tools' id='activity15'/>
+        </branch>
+      </parallelGateway>
+      <activity role='clinicians' action='Provide appropriate cross-continuum secondary prevention assessments and therapies (Modules 5 and 10) to all patients, whether admitted to in-hospital rehabilitation or discharged' objects='patient, prevention protocols' id='activity16'/>
+    </branch>
+    <branch condition='Does not meet criteria for acute inpatient admission (e.g., TIA or minor nondisabling stroke)' id='branch13'>
+      <activity role='clinicians' action='Do not apply acute inpatient stroke unit recommendations; proceed with alternative management as per guidelines' objects='patient' id='activity17'/>
+      <activity role='clinicians' action='Ensure appropriate cross-continuum secondary prevention assessments and therapies (Modules 5 and 10)' objects='patient, prevention protocols' id='activity18'/>
+    </branch>
+  </exclusiveGateway>
+</process>

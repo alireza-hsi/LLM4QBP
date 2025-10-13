@@ -16,9 +16,10 @@ In that case (e.g., connection timeout), you can try setting up the pipeline you
 ---
 
 
-This repository provides a unified pipeline for generating, mapping, and evaluating BPMN process models using two frameworks:
-- **MAO**
+This repository provides a unified pipeline for generating, mapping, and evaluating BPMN process models using three frameworks:
+- **MAO** (baseline v2.2)
 - **ProMoAI**
+- **Knowledge-enhanced versions of MAO** (v3.0-3.8)
 
 It supports activity mapping, BPMN similarity comparison, and experiment result logging, and is designed for reproducible, multi-run experiments.
 

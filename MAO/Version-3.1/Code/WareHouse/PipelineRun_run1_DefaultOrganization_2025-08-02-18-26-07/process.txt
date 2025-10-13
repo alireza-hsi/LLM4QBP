@@ -1,0 +1,160 @@
+<process>
+  <activity role='ED staff' action='Triage patient using stroke protocol' objects='ED protocol' id='activity1-1'/>
+  <activity role='ED staff' action='Notify ED physician of suspected TIA/minor stroke' objects='communication system' id='activity1-2'/>
+  <activity role='ED physician' action='Determine TIA/minor stroke risk features and timing of presentation' objects='clinical assessment, patient history' id='activity1-3'/>
+  <activity role='ED nurse' action='Check blood glucose on arrival' objects='glucometer' id='activity3-1'/>
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='Hypoglycemia detected' id='branch2-1'>
+      <activity role='ED nurse' action='Correct hypoglycemia immediately' objects='glucose, IV access' id='activity3-2'/>
+    </branch>
+    <branch condition='No hypoglycemia' id='branch2-2'>
+      <activity role='ED nurse' action='Continue with next steps' objects='' id='activity3-3'/>
+    </branch>
+  </exclusiveGateway>
+  <exclusiveGateway id='exclusivegateway3'>
+    <branch condition='First random glucose > 11 mmol/L' id='branch3-1'>
+      <activity role='ED nurse' action='Repeat blood glucose measurement' objects='glucometer' id='activity3-4'/>
+    </branch>
+    <branch condition='First random glucose ≤ 11 mmol/L' id='branch3-2'>
+      <activity role='ED nurse' action='Continue with next steps' objects='' id='activity3-5'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='ED nurse' action='Obtain and record vital signs including temperature every 4 hours for first 48 hours' objects='vital signs chart, thermometer' id='activity2-1'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='Temperature > 37.5°C' id='branch1-1'>
+      <activity role='ED nurse' action='Initiate temperature-reducing measures, investigate infection, and start antipyretic/antimicrobial therapy as required' objects='antipyretics, antimicrobials, infection workup' id='activity2-2'/>
+    </branch>
+    <branch condition='Temperature ≤ 37.5°C' id='branch1-2'>
+      <activity role='ED nurse' action='Continue routine monitoring' objects='vital signs chart' id='activity2-3'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='ED physician' action='Assess for fluctuating/crescendo hemibody motor weakness, sensory loss, or speech difficulty' objects='neurological assessment' id='activity4-1'/>
+  <exclusiveGateway id='exclusivegateway4'>
+    <branch condition='Fluctuating/crescendo symptoms present' id='branch4-1'>
+      <activity role='ED physician' action='Evaluate for hospital admission' objects='admission criteria' id='activity4-2'/>
+    </branch>
+    <branch condition='No fluctuating/crescendo symptoms' id='branch4-2'>
+      <activity role='ED physician' action='Continue with outpatient management pathway' objects='' id='activity4-3'/>
+    </branch>
+  </exclusiveGateway>
+  <exclusiveGateway id='exclusivegateway5'>
+    <branch condition='TIA with high-risk features or minor stroke, presentation ≤ 48 hours' id='branch5-1'>
+      <exclusiveGateway id='exclusivegateway6'>
+        <branch condition='Immediate access to specialized TIA/minor stroke clinic' id='branch6-1'>
+          <activity role='ED physician' action='Refer for immediate care at specialized TIA/minor stroke clinic' objects='referral form, clinic contact' id='activity5-1'/>
+          <activity role='ED physician' action='Order brain CT scan' objects='CT scanner' id='activity5-2'/>
+          <activity role='Radiology technician' action='Perform brain CT scan' objects='CT scanner' id='activity5-3'/>
+          <activity role='ED physician' action='Interpret CT scan results' objects='radiology report' id='activity5-4'/>
+          <exclusiveGateway id='exclusivegateway7'>
+            <branch condition='Intracranial hemorrhage excluded' id='branch7-1'>
+              <exclusiveGateway id='exclusivegateway8'>
+                <branch condition='Patient not on antiplatelet agent' id='branch8-1'>
+                  <inclusiveGateway id='inclusivegateway1'>
+                    <branch condition='Swallowing screen passed' id='branch9-1'>
+                      <activity role='ED physician' action='Start antiplatelet therapy (ASA 160 mg loading, then 81–325 mg daily OR clopidogrel 300 mg loading, then 75 mg daily OR extended-release dipyridamole 200 mg/ASA 25 mg bid)' objects='antiplatelet agents' id='activity5-5'/>
+                    </branch>
+                    <branch condition='Swallowing screen failed' id='branch9-2'>
+                      <activity role='ED physician' action='Offer rectal or gastric ASA as necessary' objects='rectal/gastric ASA' id='activity5-6'/>
+                    </branch>
+                  </inclusiveGateway>
+                </branch>
+                <branch condition='Patient already on antiplatelet agent' id='branch8-2'>
+                  <activity role='ED physician' action='Continue current antiplatelet therapy' objects='current medication' id='activity5-7'/>
+                </branch>
+              </exclusiveGateway>
+            </branch>
+            <branch condition='Intracranial hemorrhage detected' id='branch7-2'>
+              <activity role='ED physician' action='Manage according to hemorrhagic stroke protocol' objects='hemorrhagic stroke protocol' id='activity5-8'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch condition='Delay to specialized clinic poses risk' id='branch6-2'>
+          <activity role='ED physician' action='Perform evaluation in ED and consider inpatient evaluation/management for stroke prevention' objects='ED resources, inpatient criteria' id='activity5-9'/>
+          <activity role='ED physician' action='Order brain CT scan' objects='CT scanner' id='activity5-10'/>
+          <activity role='Radiology technician' action='Perform brain CT scan' objects='CT scanner' id='activity5-11'/>
+          <activity role='ED physician' action='Interpret CT scan results' objects='radiology report' id='activity5-12'/>
+          <exclusiveGateway id='exclusivegateway9'>
+            <branch condition='Intracranial hemorrhage excluded' id='branch9-1'>
+              <exclusiveGateway id='exclusivegateway10'>
+                <branch condition='Patient not on antiplatelet agent' id='branch10-1'>
+                  <inclusiveGateway id='inclusivegateway2'>
+                    <branch condition='Swallowing screen passed' id='branch11-1'>
+                      <activity role='ED physician' action='Start antiplatelet therapy (ASA 160 mg loading, then 81–325 mg daily OR clopidogrel 300 mg loading, then 75 mg daily OR extended-release dipyridamole 200 mg/ASA 25 mg bid)' objects='antiplatelet agents' id='activity5-13'/>
+                    </branch>
+                    <branch condition='Swallowing screen failed' id='branch11-2'>
+                      <activity role='ED physician' action='Offer rectal or gastric ASA as necessary' objects='rectal/gastric ASA' id='activity5-14'/>
+                    </branch>
+                  </inclusiveGateway>
+                </branch>
+                <branch condition='Patient already on antiplatelet agent' id='branch10-2'>
+                  <activity role='ED physician' action='Continue current antiplatelet therapy' objects='current medication' id='activity5-15'/>
+                </branch>
+              </exclusiveGateway>
+            </branch>
+            <branch condition='Intracranial hemorrhage detected' id='branch9-2'>
+              <activity role='ED physician' action='Manage according to hemorrhagic stroke protocol' objects='hemorrhagic stroke protocol' id='activity5-16'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch condition='Medical attention sought > 48 hours from symptom onset' id='branch5-2'>
+      <activity role='ED physician' action='Refer for evaluation at specialized TIA/minor stroke clinic or outpatient clinic with stroke-prevention services within 24 hours' objects='referral form, clinic contact' id='activity5-17'/>
+      <activity role='ED physician' action='Order brain CT scan' objects='CT scanner' id='activity5-18'/>
+      <activity role='Radiology technician' action='Perform brain CT scan' objects='CT scanner' id='activity5-19'/>
+      <activity role='ED physician' action='Interpret CT scan results' objects='radiology report' id='activity5-20'/>
+      <exclusiveGateway id='exclusivegateway11'>
+        <branch condition='Intracranial hemorrhage excluded' id='branch11-1'>
+          <exclusiveGateway id='exclusivegateway12'>
+            <branch condition='Patient not on antiplatelet agent' id='branch12-1'>
+              <inclusiveGateway id='inclusivegateway3'>
+                <branch condition='Swallowing screen passed' id='branch13-1'>
+                  <activity role='ED physician' action='Start antiplatelet therapy (ASA 160 mg loading, then 81–325 mg daily OR clopidogrel 300 mg loading, then 75 mg daily OR extended-release dipyridamole 200 mg/ASA 25 mg bid)' objects='antiplatelet agents' id='activity5-21'/>
+                </branch>
+                <branch condition='Swallowing screen failed' id='branch13-2'>
+                  <activity role='ED physician' action='Offer rectal or gastric ASA as necessary' objects='rectal/gastric ASA' id='activity5-22'/>
+                </branch>
+              </inclusiveGateway>
+            </branch>
+            <branch condition='Patient already on antiplatelet agent' id='branch12-2'>
+              <activity role='ED physician' action='Continue current antiplatelet therapy' objects='current medication' id='activity5-23'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch condition='Intracranial hemorrhage detected' id='branch11-2'>
+          <activity role='ED physician' action='Manage according to hemorrhagic stroke protocol' objects='hemorrhagic stroke protocol' id='activity5-24'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch condition='TIA without high-risk features, presentation ≤ 48 hours' id='branch5-3'>
+      <activity role='ED physician' action='Refer to outpatient clinic with stroke-prevention services for comprehensive evaluation and management within 1 month' objects='referral form, clinic contact' id='activity5-25'/>
+      <activity role='ED physician' action='Order brain CT scan' objects='CT scanner' id='activity5-26'/>
+      <activity role='Radiology technician' action='Perform brain CT scan' objects='CT scanner' id='activity5-27'/>
+      <activity role='ED physician' action='Interpret CT scan results' objects='radiology report' id='activity5-28'/>
+      <exclusiveGateway id='exclusivegateway13'>
+        <branch condition='Intracranial hemorrhage excluded' id='branch13-1'>
+          <exclusiveGateway id='exclusivegateway14'>
+            <branch condition='Patient not on antiplatelet agent' id='branch14-1'>
+              <inclusiveGateway id='inclusivegateway4'>
+                <branch condition='Swallowing screen passed' id='branch15-1'>
+                  <activity role='ED physician' action='Start antiplatelet therapy (ASA 160 mg loading, then 81–325 mg daily OR clopidogrel 300 mg loading, then 75 mg daily OR extended-release dipyridamole 200 mg/ASA 25 mg bid)' objects='antiplatelet agents' id='activity5-29'/>
+                </branch>
+                <branch condition='Swallowing screen failed' id='branch15-2'>
+                  <activity role='ED physician' action='Offer rectal or gastric ASA as necessary' objects='rectal/gastric ASA' id='activity5-30'/>
+                </branch>
+              </inclusiveGateway>
+            </branch>
+            <branch condition='Patient already on antiplatelet agent' id='branch14-2'>
+              <activity role='ED physician' action='Continue current antiplatelet therapy' objects='current medication' id='activity5-31'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch condition='Intracranial hemorrhage detected' id='branch13-2'>
+          <activity role='ED physician' action='Manage according to hemorrhagic stroke protocol' objects='hemorrhagic stroke protocol' id='activity5-32'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </exclusiveGateway>
+  <activity role='ED physician' action='Conduct secondary prevention assessment' objects='secondary prevention protocol' id='activity6-1'/>
+  <activity role='ED physician' action='Initiate secondary prevention therapy' objects='secondary prevention protocol' id='activity6-2'/>
+</process>

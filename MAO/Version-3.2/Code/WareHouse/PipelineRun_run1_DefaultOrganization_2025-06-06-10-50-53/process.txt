@@ -1,0 +1,66 @@
+<process>
+  <activity role='hospital administration' action='Ensure stroke unit team includes medicine, nursing, occupational therapy, physiotherapy, speech-language pathology, social work, and clinical nutrition (dietitian)' objects='stroke unit staffing' id='activity1-admin-staffing'/>
+  <activity role='hospital administration' action='Ensure stroke unit team members spend majority of time treating stroke patients and regularly complete stroke care education' objects='stroke unit team' id='activity2-admin-education'/>
+  <activity role='hospital administration' action='Ensure access to specialized interprofessional stroke team 7 days a week' objects='stroke unit, staffing schedule' id='activity3-admin-access'/>
+  <parallelGateway id='parallelgateway1-ed-screening'>
+    <branch id='branch1-ed-diabetes'>
+      <activity role='clinical team' action='Screen/assess for diabetes upon ED presentation' objects='stroke patient, diabetes screening tool' id='activity4-ed-diabetes'/>
+    </branch>
+    <branch id='branch2-ed-dental'>
+      <activity role='clinical team' action='Screen/assess for dental issues upon ED presentation' objects='stroke patient, dental screening tool' id='activity5-ed-dental'/>
+    </branch>
+    <branch id='branch3-ed-cognitive'>
+      <activity role='clinical team' action='Screen/assess for cognitive impairment upon ED presentation' objects='stroke patient, cognitive screening tool' id='activity6-ed-cognitive'/>
+    </branch>
+    <branch id='branch4-ed-depression'>
+      <activity role='clinical team' action='Screen/assess for depression upon ED presentation' objects='stroke patient, depression screening tool' id='activity7-ed-depression'/>
+    </branch>
+  </parallelGateway>
+  <activity role='clinical team' action='Forward all screening results to TIA clinic for follow-up' objects='screening results, TIA clinic' id='activity8-ed-forward'/>
+  <activity role='admitting physician' action='Verify patient eligibility for stroke unit admission' objects='stroke patient, admission criteria' id='activity9-admission-verify'/>
+  <activity role='admitting physician' action='Assign patient to available co-located stroke unit bed' objects='stroke patient, stroke unit bed' id='activity10-admission-bed'/>
+  <activity role='admitting physician' action='Notify interprofessional stroke team of new admission' objects='stroke patient, stroke team' id='activity11-admission-notify'/>
+  <parallelGateway id='parallelgateway2-inpatient-care'>
+    <branch id='branch1-inpatient-therapy'>
+      <parallelGateway id='parallelgateway3-therapy-assessments'>
+        <branch id='branch1-1-pt'>
+          <activity role='physiotherapist' action='Conduct physiotherapy assessment within 48 hours of admission' objects='stroke patient' id='activity12-pt-assess'/>
+        </branch>
+        <branch id='branch1-2-slp'>
+          <activity role='speech-language pathologist' action='Conduct speech-language pathology assessment within 48 hours of admission' objects='stroke patient' id='activity13-slp-assess'/>
+        </branch>
+        <branch id='branch1-3-ot'>
+          <activity role='occupational therapist' action='Conduct occupational therapy assessment within 48 hours of admission' objects='stroke patient' id='activity14-ot-assess'/>
+        </branch>
+      </parallelGateway>
+      <activity role='interprofessional team' action='Formulate integrated management plan based on assessments' objects='stroke patient, assessment results' id='activity15-mgmt-plan'/>
+    </branch>
+    <branch id='branch2-inpatient-mobilization'>
+      <activity role='clinical team' action='Mobilize stroke patient early (between 24-48 hours of stroke onset) unless contraindicated; avoid frequent out-of-bed activity within first 24 hours' objects='stroke patient' id='activity16-mobilization'/>
+    </branch>
+    <branch id='branch3-inpatient-standardized'>
+      <activity role='clinical team' action='Use standardized, valid assessment tools (preferably electronic and EHR-linked) to evaluate stroke-related impairments and functional status' objects='stroke patient, assessment tools' id='activity17-standardized-assess'/>
+    </branch>
+    <branch id='branch4-inpatient-alphafim'>
+      <activity role='clinical team' action='Complete AlphaFIM assessment on or by day 3 after admission (admission day is day 1)' objects='stroke patient, AlphaFIM tool' id='activity18-alphafim'/>
+    </branch>
+    <branch id='branch5-inpatient-vte-risk'>
+      <activity role='clinical team' action='Assess all stroke patients for risk of developing venous thromboembolism' objects='stroke patient' id='activity19-vte-risk'/>
+    </branch>
+    <branch id='branch6-inpatient-vte-prevention'>
+      <activity role='clinical team' action='Encourage early mobilization and adequate hydration for all acute stroke patients to help prevent venous thromboembolism' objects='stroke patient' id='activity20-vte-prevention'/>
+    </branch>
+    <branch id='branch7-inpatient-nutrition'>
+      <activity role='clinical team' action='Assess nutrition and hydration status within first 48 hours of admission using valid screening tool' objects='stroke patient, screening tool' id='activity21-nutrition-screen'/>
+      <exclusiveGateway id='exclusivegateway1-nutrition'>
+        <branch condition='Nutritional concerns, hydration deficits, dysphagia, or other comorbidities present' id='branch8-nutrition-referral'>
+          <activity role='clinical team' action='Refer patient to dietitian within 7 days of admission for recommendations and consideration of enteral nutrition support if unable to meet requirements' objects='stroke patient, dietitian referral' id='activity22-dietitian-referral'/>
+        </branch>
+        <branch condition='No nutritional concerns, hydration deficits, dysphagia, or other comorbidities' id='branch9-nutrition-monitor'>
+          <activity role='clinical team' action='Continue standard nutrition and hydration monitoring' objects='stroke patient' id='activity23-nutrition-monitor'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </parallelGateway>
+  <activity role='clinical team' action='Provide cross-continuum secondary prevention assessments and therapies (Modules 5 and 10) prior to discharge or transfer' objects='stroke patient, prevention protocols' id='activity24-cross-continuum'/>
+</process>

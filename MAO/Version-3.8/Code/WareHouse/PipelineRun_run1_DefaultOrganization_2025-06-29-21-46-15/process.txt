@@ -1,0 +1,25 @@
+<process>
+  <activity role='ED clinician' action='Screen/assess for diabetes, dental issues, cognitive impairment, and depression upon ED presentation and forward results to TIA clinic for follow-up' objects='patient, assessment tools, assessment results' id='activity1-merged'/>
+  <activity role='admitting clinician' action='Determine eligibility for acute inpatient admission per recommendation 2.4.2' objects='patient, eligibility criteria' id='activity2'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='Eligible for acute inpatient admission' id='branch1'>
+      <activity role='admitting clinician' action='Assign patient to available stroke unit bed' objects='patient, stroke unit beds' id='activity3-1'/>
+      <activity role='admitting clinician' action='Transfer patient to stroke unit' objects='patient, stroke unit' id='activity3-2'/>
+      <activity role='clinical team (including physiotherapist, occupational therapist, speech-language pathologist, dietitian)' action='Conduct all required assessments (stroke-related impairments, functional status using standardized tools, AlphaFIM by day 3, venous thromboembolism risk, nutrition and hydration status within 48 hours) and formulate management plan based on assessment results' objects='patient, assessment tools, AlphaFIM tool, risk assessment tool, nutrition/hydration screening tool' id='activityMerged1'/>
+      <activity role='clinical team' action='Mobilize patient early (between 24-48 hours of stroke onset) unless contraindicated; avoid frequent out-of-bed activity within first 24 hours' objects='patient, mobilization protocol' id='activity8'/>
+      <activity role='clinical team' action='Encourage early mobilization and adequate hydration to prevent venous thromboembolism' objects='patient, hydration protocol' id='activity12'/>
+      <exclusiveGateway id='exclusivegateway2'>
+        <branch condition='Nutritional concerns, hydration deficits, dysphagia, or other comorbidities present' id='branch7'>
+          <activity role='clinical team' action='Refer patient to dietitian within 7 days of admission for recommendations and consideration of enteral nutrition support if unable to meet requirements' objects='patient, referral form' id='activity14'/>
+        </branch>
+        <branch condition='No nutritional concerns, hydration deficits, dysphagia, or other comorbidities' id='branch8'>
+          <activity role='clinical team' action='Continue routine monitoring of nutrition and hydration' objects='patient' id='activity15'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch condition='Not eligible for acute inpatient admission' id='branch9'>
+      <activity role='clinical team' action='Proceed with alternative care pathway (not covered in Module 3)' objects='patient' id='activity17'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='clinical team' action='Provide cross-continuum secondary prevention assessment and therapies (per Modules 5 and 10) regardless of discharge destination' objects='patient, prevention protocols' id='activity16'/>
+</process>

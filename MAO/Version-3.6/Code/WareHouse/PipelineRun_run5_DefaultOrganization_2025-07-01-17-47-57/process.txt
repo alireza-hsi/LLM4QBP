@@ -1,0 +1,79 @@
+<process>
+  <activity role='ED/Clinic/Acuity Care Staff' action='Conduct rapid initial evaluation for airway, breathing, and circulation' objects='patient' id='activity1'/>
+  <activity role='ED/Clinic/Acuity Care Staff' action='Perform neurological examination and assess stroke severity using standardized stroke scale (NIHSS or CNS)' objects='patient' id='activity2'/>
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1'>
+      <activity role='ED/Clinic/Acuity Care Staff' action='Order and perform ECG to detect atrial fibrillation/arrhythmias (do not delay acute treatment)' objects='patient' id='activity3'/>
+    </branch>
+    <branch id='branch2'>
+      <activity role='ED/Clinic/Acuity Care Staff' action='Order chest x-ray (ensure it does not delay assessment for thrombolysis)' objects='patient' id='activity4'/>
+    </branch>
+    <branch id='branch3'>
+      <activity role='ED/Clinic/Acuity Care Staff' action='Order and perform blood work (CBC, electrolytes, creatinine, glucose, INR, partial thromboplastin time, troponin if clinically indicated)' objects='patient' id='activity5'/>
+    </branch>
+  </parallelGateway>
+  <exclusiveGateway id='exclusivegateway1a'>
+    <branch condition='Patient meets criteria for both non-contrast CT/MRI and CTA (e.g., within acute stroke treatment window, potential EVT candidate)' id='branch1a'>
+      <activity role='ED/Clinic/Acuity Care Staff' action='Arrange non-contrast CT or MRI' objects='patient' id='activity6'/>
+      <activity role='ED/Clinic/Acuity Care Staff' action='Arrange CTA' objects='patient' id='activity7'/>
+    </branch>
+    <branch condition='Patient meets criteria for only non-contrast CT/MRI (e.g., not a candidate for CTA)' id='branch2a'>
+      <activity role='ED/Clinic/Acuity Care Staff' action='Arrange non-contrast CT or MRI' objects='patient' id='activity8'/>
+    </branch>
+    <branch condition='Patient meets criteria for only CTA (rare, e.g., follow-up vascular imaging)' id='branch3a'>
+      <activity role='ED/Clinic/Acuity Care Staff' action='Arrange CTA' objects='patient' id='activity9'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='Stroke Physician/Radiologist' action='Interpret brain imaging immediately' objects='CT/CTA/MRI results' id='activity10'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='Imaging confirms ICH (intracerebral hemorrhage)' id='branch4'>
+      <activity role='ED/Clinic/Acuity Care Staff' action='Recognize ICH as medical emergency and arrange immediate evaluation by stroke expert' objects='patient' id='activity11'/>
+      <activity role='ED/Clinic/Acuity Care Staff' action='Evaluate for anticoagulant therapy, measure platelet count, PTT, and INR' objects='patient' id='activity12'/>
+      <exclusiveGateway id='exclusivegateway2'>
+        <branch condition='ICH patient selected for further vascular imaging' id='branch4-1'>
+          <activity role='ED/Clinic/Acuity Care Staff' action='Order CTA or MRA as soon as possible' objects='patient' id='activity13'/>
+        </branch>
+        <branch condition='ICH patient not selected for further vascular imaging' id='branch4-2'>
+          <activity role='ED/Clinic/Acuity Care Staff' action='Continue standard ICH management' objects='patient' id='activity14'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch condition='Imaging confirms ischemic stroke or TIA' id='branch5'>
+      <exclusiveGateway id='exclusivegateway3'>
+        <branch condition='Patient is clinically eligible for acute ischemic stroke treatments' id='branch5-1'>
+          <activity role='ED/Clinic/Acuity Care Staff' action='Order advanced CT imaging (CT + multiphase CTA or Perfusion CT)' objects='patient' id='activity15'/>
+        </branch>
+        <branch condition='Patient not eligible for acute ischemic stroke treatments' id='branch5-2'>
+          <activity role='ED/Clinic/Acuity Care Staff' action='Skip advanced CT imaging' objects='patient' id='activity16'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exclusivegateway4'>
+        <branch condition='Patient presenting beyond 48 hours with TIA or ischemic stroke' id='branch5-3'>
+          <activity role='ED/Clinic/Acuity Care Staff' action='Order vascular imaging of brain and neck arteries as soon as possible' objects='patient' id='activity17'/>
+        </branch>
+        <branch condition='Patient with ischemic stroke, but recommendation not applicable' id='branch5-4'>
+          <activity role='ED/Clinic/Acuity Care Staff' action='No additional initial examination required' objects='patient' id='activity18'/>
+        </branch>
+      </exclusiveGateway>
+      <activity role='ED/Clinic/Acuity Care Staff' action='Make all stroke patients NPO initially' objects='patient' id='activity19'/>
+      <activity role='ED/Clinic/Acuity Care Staff' action='Screen swallowing ability using bedside protocol before oral medication, fluid, or food' objects='patient' id='activity20'/>
+      <exclusiveGateway id='exclusivegateway5'>
+        <branch condition='Patient not alert within first 24 hours' id='branch5-5'>
+          <activity role='ED/Clinic/Acuity Care Staff' action='Monitor closely and screen swallowing ability when clinically appropriate' objects='patient' id='activity21'/>
+        </branch>
+        <branch condition='Patient alert within first 24 hours' id='branch5-6'>
+          <activity role='ED/Clinic/Acuity Care Staff' action='Continue standard monitoring' objects='patient' id='activity22'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exclusivegateway6'>
+        <branch condition='Patient presents with features indicating dysphagia or pulmonary aspiration' id='branch5-7'>
+          <activity role='Speech-language pathologist or trained specialist' action='Conduct full clinical swallowing assessment and advise on diet/fluid consistency' objects='patient' id='activity23'/>
+        </branch>
+        <branch condition='No features of dysphagia or aspiration' id='branch5-8'>
+          <activity role='ED/Clinic/Acuity Care Staff' action='Continue standard care' objects='patient' id='activity24'/>
+        </branch>
+      </exclusiveGateway>
+      <activity role='ED/Clinic/Acuity Care Staff' action='Provide cross-continuum secondary prevention assessments and therapies (per Modules 5 and 10) to all patients, whether admitted or discharged' objects='patient' id='activity25'/>
+    </branch>
+  </exclusiveGateway>
+</process>

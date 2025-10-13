@@ -2,12 +2,12 @@ import sqlite3
 
 db_path = "resultsDb.sqlite"
 table = "experiment_results"
-rows_to_delete = 1
+rows_to_delete = 2
 
 conn = sqlite3.connect(db_path)
 cur = conn.cursor()
 
-# Find the IDs of the last 6 rows
+# Find the IDs of the last 2 rows
 cur.execute(f"SELECT id FROM {table} ORDER BY id DESC LIMIT ?", (rows_to_delete,))
 ids = [row[0] for row in cur.fetchall()]
 

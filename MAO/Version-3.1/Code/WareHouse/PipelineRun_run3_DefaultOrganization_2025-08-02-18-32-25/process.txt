@@ -1,0 +1,97 @@
+<process>
+  <activity role='ED staff' action='Rapid triage of suspected TIA/minor stroke patient' objects='ED triage protocol' id='activity1-1'/>
+  <activity role='ED staff' action='Notify ED stroke response team' objects='communication system' id='activity1-2'/>
+  <activity role='ED physician' action='Perform initial clinical assessment and determine TIA/minor stroke risk features' objects='clinical history, physical exam' id='activity2-1'/>
+  <activity role='ED nurse' action='Assess and correct hypoglycemia immediately if present' objects='blood glucose measurement, glucose administration' id='activity3-1'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='First random glucose value > 11 mmol/L' id='branch1-1'>
+      <activity role='ED nurse' action='Repeat blood glucose measurement' objects='blood glucose meter' id='activity3-2'/>
+    </branch>
+    <branch condition='First random glucose value ≤ 11 mmol/L' id='branch1-2'>
+      <activity role='ED nurse' action='Continue to next step' objects='' id='activity3-3'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='ED nurse' action='Evaluate body temperature as part of routine vital signs every 4 hours for first 48 hours' objects='thermometer, vital signs chart' id='activity3-4'/>
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='Temperature > 37.5°C' id='branch2-1'>
+      <activity role='ED nurse' action='Initiate temperature-reducing measures' objects='cooling devices, antipyretics' id='activity3-5'/>
+      <activity role='ED physician' action='Investigate potential infection' objects='clinical assessment, laboratory tests' id='activity3-6'/>
+      <activity role='ED physician' action='Initiate antipyretic and antimicrobial therapy as required' objects='antipyretics, antimicrobials' id='activity3-7'/>
+    </branch>
+    <branch condition='Temperature ≤ 37.5°C' id='branch2-2'>
+      <activity role='ED nurse' action='Continue routine monitoring' objects='' id='activity3-8'/>
+    </branch>
+  </exclusiveGateway>
+  <exclusiveGateway id='exclusivegateway3'>
+    <branch condition='TIA with high-risk features or minor stroke' id='branch3-1'>
+      <activity role='ED physician' action='Order brain CT scan' objects='CT scanner' id='activity4-1'/>
+      <activity role='ED physician' action='Interpret brain CT scan results' objects='radiology report' id='activity4-2'/>
+      <activity role='ED physician' action='Assess contraindications to antiplatelet therapy' objects='patient history, medication list' id='activity4-3'/>
+      <exclusiveGateway id='exclusivegateway4'>
+        <branch condition='No contraindication to antiplatelet therapy and brain imaging excludes intracranial hemorrhage' id='branch4-1'>
+          <exclusiveGateway id='exclusivegateway5'>
+            <branch condition='Patient can swallow' id='branch5-1'>
+              <activity role='ED physician' action='Start antiplatelet therapy immediately (choose appropriate agent and dose)' objects='ASA, clopidogrel, dipyridamole' id='activity4-4'/>
+            </branch>
+            <branch condition='Patient cannot swallow' id='branch5-2'>
+              <activity role='ED physician' action='Administer rectal or gastric ASA as necessary' objects='rectal ASA, gastric tube' id='activity4-5'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch condition='Contraindication to antiplatelet therapy or intracranial hemorrhage present' id='branch4-2'>
+          <activity role='ED physician' action='Withhold antiplatelet therapy and manage according to clinical guidelines' objects='clinical guidelines' id='activity4-6'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exclusivegateway7'>
+        <branch condition='TIA patient with fluctuating/crescendo hemibody motor weakness, sensory loss, or speech difficulty' id='branch7-1'>
+          <activity role='ED physician' action='Evaluate in ED for possible hospital admission' objects='clinical assessment, admission criteria' id='activity4-11'/>
+        </branch>
+        <branch condition='No fluctuating/crescendo symptoms' id='branch7-2'>
+          <activity role='ED physician' action='Continue with standard management' objects='' id='activity4-12'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exclusivegateway6'>
+        <branch condition='Immediate access to specialized TIA/minor stroke clinic' id='branch6-1'>
+          <activity role='ED physician' action='Refer patient to specialized TIA/minor stroke clinic for rapid evaluation and tailored stroke-prevention treatments' objects='referral documentation' id='activity4-7'/>
+        </branch>
+        <branch condition='Delay to specialized clinic poses risk' id='branch6-2'>
+          <activity role='ED physician' action='Perform evaluation and management in ED' objects='ED resources' id='activity4-8'/>
+          <activity role='ED physician' action='Consider inpatient admission for stroke prevention' objects='admission protocols' id='activity4-9'/>
+        </branch>
+        <branch condition='Medical attention sought >48 hours after symptom onset' id='branch6-3'>
+          <activity role='ED physician' action='Refer for evaluation at specialized TIA/minor stroke clinic or outpatient clinic with stroke-prevention services within 24 hours of initial presentation' objects='referral documentation' id='activity4-10'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch condition='TIA without high-risk features' id='branch3-2'>
+      <activity role='ED physician' action='Order brain CT scan' objects='CT scanner' id='activity5-1'/>
+      <activity role='ED physician' action='Interpret brain CT scan results' objects='radiology report' id='activity5-2'/>
+      <activity role='ED physician' action='Assess contraindications to antiplatelet therapy' objects='patient history, medication list' id='activity5-3'/>
+      <exclusiveGateway id='exclusivegateway8'>
+        <branch condition='No contraindication to antiplatelet therapy and brain imaging excludes intracranial hemorrhage' id='branch8-1'>
+          <exclusiveGateway id='exclusivegateway9'>
+            <branch condition='Patient can swallow' id='branch9-1'>
+              <activity role='ED physician' action='Start antiplatelet therapy immediately (choose appropriate agent and dose)' objects='ASA, clopidogrel, dipyridamole' id='activity5-4'/>
+            </branch>
+            <branch condition='Patient cannot swallow' id='branch9-2'>
+              <activity role='ED physician' action='Administer rectal or gastric ASA as necessary' objects='rectal ASA, gastric tube' id='activity5-5'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch condition='Contraindication to antiplatelet therapy or intracranial hemorrhage present' id='branch8-2'>
+          <activity role='ED physician' action='Withhold antiplatelet therapy and manage according to clinical guidelines' objects='clinical guidelines' id='activity5-6'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exclusivegateway10'>
+        <branch condition='TIA patient with fluctuating/crescendo hemibody motor weakness, sensory loss, or speech difficulty' id='branch10-1'>
+          <activity role='ED physician' action='Evaluate in ED for possible hospital admission' objects='clinical assessment, admission criteria' id='activity5-8'/>
+        </branch>
+        <branch condition='No fluctuating/crescendo symptoms' id='branch10-2'>
+          <activity role='ED physician' action='Continue with standard management' objects='' id='activity5-9'/>
+        </branch>
+      </exclusiveGateway>
+      <activity role='ED physician' action='Refer to outpatient clinic with stroke-prevention services for comprehensive evaluation and management within 1 month of symptom onset' objects='referral documentation' id='activity5-7'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='ED physician' action='Provide cross-continuum secondary prevention assessments and therapies (Modules 5 and 10) to all patients before discharge or admission' objects='secondary prevention protocol' id='activity6-1'/>
+</process>

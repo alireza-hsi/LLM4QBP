@@ -1,0 +1,33 @@
+<process>
+  <activity role='ED clinician' action='Screen/assess for diabetes, dental issues, cognitive impairment, and depression and forward results to TIA clinic for follow-up' objects='patient, screening tools, TIA clinic' id='activity1.1'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='Patient meets criteria for acute inpatient admission (per recommendation 2.4.2)' id='branch1'>
+      <activity role='admitting clinician' action='Admit patient to specialized, geographically defined stroke unit (co-located beds, 75% stroke occupancy)' objects='patient, stroke unit' id='activity2'/>
+      <activity role='hospital administration' action='Ensure dedicated interprofessional stroke team with expertise in stroke care (medicine, nursing, OT, PT, SLP, social work, dietitian)' objects='staffing schedule' id='activity3'/>
+      <activity role='hospital administration' action='Ensure interprofessional stroke team available 7 days a week' objects='staffing schedule' id='activity4'/>
+      <activity role='hospital administration' action='Ensure use of standardized, validated assessment tools (preferably electronic, linked to EHR)' objects='assessment tools, EHR' id='activity5'/>
+      <activity role='PT, OT, SLP, clinical team' action='Within 48 hours of admission: assess stroke patient using standardized, valid assessment tools (including AlphaFIM by day 3), assess for risk of venous thromboembolism, assess nutrition and hydration status, and formulate management plan' objects='patient, assessment tools, AlphaFIM tool, risk assessment tool, nutrition/hydration screening tool, assessment findings' id='activity6_merged'/>
+      <exclusiveGateway id='exclusivegateway_exp2'>
+        <branch condition='Nutritional concerns, hydration deficits, dysphagia, or other comorbidities present' id='branch_exp2_1'>
+          <activity role='clinical team' action='Refer patient to dietitian within 7 days of admission for recommendations and consideration of enteral nutrition support' objects='patient, referral form' id='activity7.1'/>
+        </branch>
+        <branch condition='No nutritional concerns, hydration deficits, dysphagia, or other comorbidities' id='branch_exp2_2'>
+          <activity role='clinical team' action='Continue standard monitoring' objects='patient' id='activity7.2'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exclusivegateway2'>
+        <branch condition='Early mobilization is not contraindicated' id='branch8'>
+          <activity role='clinical team' action='Mobilize patient between 24-48 hours of stroke onset' objects='patient' id='activity8'/>
+        </branch>
+        <branch condition='Early mobilization is contraindicated' id='branch9'>
+          <activity role='clinical team' action='Document reason for withholding mobilization' objects='patient, medical record' id='activity9'/>
+        </branch>
+      </exclusiveGateway>
+      <activity role='clinical team' action='Encourage early mobilization and adequate hydration to help prevent venous thromboembolism' objects='patient' id='activity10'/>
+      <activity role='clinical team' action='Provide cross-continuum secondary prevention assessments and therapies (per Modules 5 and 10), regardless of discharge destination' objects='patient, prevention protocols' id='activity11'/>
+    </branch>
+    <branch condition='Patient does not meet criteria for acute inpatient admission (e.g., TIA or minor nondisabling stroke)' id='branch12'>
+      <activity role='clinical team' action='Do not apply Module 3a recommendations; proceed with alternative care pathway' objects='patient' id='activity12'/>
+    </branch>
+  </exclusiveGateway>
+</process>

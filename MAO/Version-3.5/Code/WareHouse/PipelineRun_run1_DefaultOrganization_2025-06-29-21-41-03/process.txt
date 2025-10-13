@@ -1,0 +1,31 @@
+<process>
+  <activity role='ED clinician' action='Screen/assess patient for diabetes, dental issues, cognitive impairment, and depression upon ED presentation' objects='patient, screening tools' id='activity1-1'/>
+  <activity role='ED clinician' action='Forward screening/assessment results to TIA clinic for follow-up' objects='patient, screening results' id='activity1-2'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='Meets criteria for acute inpatient admission (per recommendation 2.4.2)' id='branch1'>
+      <activity role='admitting clinician' action='Assign patient to co-located stroke unit bed (75% stroke occupancy)' objects='patient, stroke unit' id='activity2-1'/>
+      <activity role='admitting clinician' action='Initiate admission procedures for stroke unit' objects='patient, admission forms' id='activity2-2'/>
+      <activity role='hospital administration' action='Ensure dedicated interprofessional stroke team with expertise in stroke care (minimum: nursing, physiotherapy, occupational therapy, speech-language pathology, medicine, social work, dietitian)' objects='staffing plan' id='activity3'/>
+      <activity role='hospital administration' action='Ensure stroke unit team members spend majority of time treating stroke patients and regularly complete stroke education' objects='staff education records' id='activity4'/>
+      <activity role='hospital administration' action='Ensure access to specialized interprofessional team 7 days a week' objects='staffing schedule' id='activity5'/>
+      <activity role='clinical team' action='Conduct comprehensive assessments (physiotherapy, speech-language pathology, occupational therapy within 48 hours, AlphaFIM by day 3, venous thromboembolism risk, nutrition/hydration status within 48 hours) and formulate management plan based on assessment results' objects='patient, assessment tools, AlphaFIM tool, risk assessment tool, nutrition/hydration screening tool, assessment results' id='activity6-merged'/>
+      <parallelGateway id='parallelgateway1'>
+        <branch id='branch2'>
+          <activity role='clinical team' action='Mobilize patient early (between 24-48 hours of stroke onset), unless contraindicated; avoid frequent out-of-bed activity within first 24 hours, as per management plan' objects='patient, mobilization protocol, management plan' id='activity7'/>
+        </branch>
+        <branch id='branch3'>
+          <activity role='clinical team' action='Encourage early mobilization and adequate hydration for all acute stroke patients to help prevent venous thromboembolism, as per management plan' objects='patient, hydration protocol, management plan' id='activity11'/>
+        </branch>
+        <branch id='branch4'>
+          <activity role='clinical team' action='If nutritional concerns, hydration deficits, dysphagia, or other comorbidities present per management plan, refer patient to dietitian within 7 days of admission for recommendations and consideration of enteral nutrition support if unable to meet requirements; otherwise, continue standard monitoring of nutrition and hydration' objects='patient, referral form, management plan' id='activity13'/>
+        </branch>
+      </parallelGateway>
+      <activity role='clinical team' action='Provide appropriate cross-continuum secondary prevention assessments and therapies (per Modules 5 and 10), regardless of discharge destination' objects='patient, prevention protocol' id='activity15'/>
+    </branch>
+    <branch condition='Does not meet criteria for acute inpatient admission (minor/nondisabling stroke or TIA)' id='branch12'>
+      <activity role='clinical team' action='Do not apply acute inpatient stroke unit recommendations; proceed with alternative care pathway' objects='patient' id='activity16'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='hospital administration' action='Ensure interprofessional stroke team uses standardized, validated assessment tools (preferably electronic and EHR-linked)' objects='assessment tools, EHR' id='activity17'/>
+  <activity role='hospital administration' action='Ensure adequate staffing 7 days per week for stroke/TIA care' objects='staffing plan' id='activity18'/>
+</process>

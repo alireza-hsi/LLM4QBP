@@ -1,0 +1,101 @@
+<process>
+  <activity role='ED staff' action='Establish standardized priority protocol for suspected stroke patients and admit to stroke unit within first few hours' objects='suspected stroke patient' id='activity1'/>
+  <activity role='ED staff' action='Assess blood glucose' objects='patient, glucose meter' id='activity2-1'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='Hypoglycemia detected' id='branch2'>
+      <activity role='ED staff' action='Correct hypoglycemia immediately' objects='patient, glucose correction agents' id='activity3'/>
+      <activity role='ED staff' action='Manage abnormal glucose' objects='patient, glucose correction agents' id='activity2-2'/>
+    </branch>
+    <branch condition='First random glucose > 11 mmol/L' id='branch3'>
+      <activity role='ED staff' action='Repeat blood glucose measurement' objects='patient, glucose meter' id='activity4'/>
+      <activity role='ED staff' action='Manage abnormal glucose' objects='patient, glucose correction agents' id='activity2-3'/>
+    </branch>
+    <branch condition='Normoglycemia' id='branch4'>
+      <activity role='ED staff' action='Continue standard care' objects='patient' id='activity5'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='ED staff' action='Evaluate body temperature as part of routine vital signs every 4 hours for first 48 hours' objects='patient, thermometer' id='activity6'/>
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='Temperature > 37.5°C' id='branch6'>
+      <parallelGateway id='parallelgateway2'>
+        <branch id='branch7'>
+          <activity role='ED staff' action='Initiate temperature-reducing measures' objects='patient, cooling devices/medications' id='activity7'/>
+        </branch>
+        <branch id='branch8'>
+          <activity role='ED staff' action='Order infection workup' objects='patient, infection workup' id='activity8-1'/>
+          <activity role='ED staff' action='Review infection workup results' objects='patient, infection workup results' id='activity8-2'/>
+          <activity role='ED staff' action='Initiate antipyretic and antimicrobial therapy as required' objects='patient, antipyretics, antimicrobials' id='activity9'/>
+        </branch>
+      </parallelGateway>
+    </branch>
+    <branch condition='Temperature ≤ 37.5°C' id='branch10'>
+      <activity role='ED staff' action='Continue standard monitoring' objects='patient' id='activity10'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='ED staff' action='Perform initial clinical assessment for fluctuating or crescendo hemibody motor weakness, sensory loss, speech difficulty, and determine TIA/minor stroke risk features and timing of presentation' objects='patient, clinical assessment' id='activity11-14'/>
+  <exclusiveGateway id='exclusivegateway3'>
+    <branch condition='Symptoms present (fluctuating/crescendo hemibody motor weakness, sensory loss, or speech difficulty)' id='branch12'>
+      <activity role='ED staff' action='Evaluate in ED for possible hospital admission' objects='patient' id='activity12'/>
+    </branch>
+    <branch condition='Symptoms absent' id='branch13'>
+      <exclusiveGateway id='exclusivegateway4'>
+        <branch condition='TIA with high-risk features or minor stroke, presentation ≤ 48h' id='branch15'>
+          <activity role='ED staff' action='Arrange brain CT scan' objects='patient, CT scanner' id='activity15-1'/>
+          <activity role='ED staff' action='Interpret brain CT scan results immediately upon availability' objects='patient, CT scan results' id='activity15-1a'/>
+          <activity role='ED staff' action='Assess if patient is already on antiplatelet therapy at presentation' objects='patient, medication history' id='activity22-1'/>
+          <exclusiveGateway id='exclusivegateway6-1'>
+            <branch condition='Not on antiplatelet agent' id='branch22-1'>
+              <activity role='ED staff' action='Start antiplatelet therapy immediately after brain imaging excludes intracranial hemorrhage' objects='patient, antiplatelet agents' id='activity23-1'/>
+              <exclusiveGateway id='exclusivegateway7-1'>
+                <branch condition='Patient fails swallowing screening' id='branch23-1'>
+                  <activity role='ED staff' action='Offer rectal or gastric ASA as necessary' objects='patient, rectal/gastric ASA' id='activity24-1'/>
+                </branch>
+                <branch condition='Patient passes swallowing screening' id='branch24-1'>
+                  <activity role='ED staff' action='Administer oral antiplatelet therapy' objects='patient, oral antiplatelet agents' id='activity25-1'/>
+                </branch>
+              </exclusiveGateway>
+            </branch>
+            <branch condition='Already on antiplatelet agent' id='branch25-1'>
+              <activity role='ED staff' action='Continue current antiplatelet therapy as appropriate' objects='patient, current medication' id='activity26-1'/>
+            </branch>
+          </exclusiveGateway>
+          <exclusiveGateway id='exclusivegateway5'>
+            <branch condition='Immediate access to specialized TIA/minor stroke clinic' id='branch16'>
+              <activity role='ED staff' action='Provide immediate care at specialized TIA/minor stroke clinic' objects='patient, clinic resources' id='activity16'/>
+            </branch>
+            <branch condition='Delay to specialized clinic poses risk' id='branch17'>
+              <activity role='ED staff' action='Perform evaluation in appropriately resourced ED and consider inpatient evaluation for stroke prevention' objects='patient, ED resources' id='activity17'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch condition='TIA with high-risk features or minor stroke, presentation > 48h' id='branch18'>
+          <activity role='ED staff' action='Refer for evaluation at specialized TIA/minor stroke clinic or outpatient clinic with stroke-prevention services within 24h of initial presentation' objects='patient, referral form' id='activity18'/>
+        </branch>
+        <branch condition='TIA without high-risk features' id='branch19'>
+          <activity role='ED staff' action='Arrange brain CT scan' objects='patient, CT scanner' id='activity19-1'/>
+          <activity role='ED staff' action='Interpret brain CT scan results immediately upon availability' objects='patient, CT scan results' id='activity19-1a'/>
+          <activity role='ED staff' action='Assess if patient is already on antiplatelet therapy at presentation' objects='patient, medication history' id='activity22-2'/>
+          <exclusiveGateway id='exclusivegateway6-2'>
+            <branch condition='Not on antiplatelet agent' id='branch22-2'>
+              <activity role='ED staff' action='Start antiplatelet therapy immediately after brain imaging excludes intracranial hemorrhage' objects='patient, antiplatelet agents' id='activity23-2'/>
+              <exclusiveGateway id='exclusivegateway7-2'>
+                <branch condition='Patient fails swallowing screening' id='branch23-2'>
+                  <activity role='ED staff' action='Offer rectal or gastric ASA as necessary' objects='patient, rectal/gastric ASA' id='activity24-2'/>
+                </branch>
+                <branch condition='Patient passes swallowing screening' id='branch24-2'>
+                  <activity role='ED staff' action='Administer oral antiplatelet therapy' objects='patient, oral antiplatelet agents' id='activity25-2'/>
+                </branch>
+              </exclusiveGateway>
+            </branch>
+            <branch condition='Already on antiplatelet agent' id='branch25-2'>
+              <activity role='ED staff' action='Continue current antiplatelet therapy as appropriate' objects='patient, current medication' id='activity26-2'/>
+            </branch>
+          </exclusiveGateway>
+          <activity role='ED staff' action='Refer to outpatient clinic with stroke-prevention services for comprehensive evaluation and management within 1 month of symptom onset' objects='patient, referral form' id='activity20'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </exclusiveGateway>
+  <activity role='ED staff' action='Ensure hospital has ready access to rectal ASA' objects='hospital pharmacy, rectal ASA' id='activity27'/>
+  <activity role='ED staff' action='Provide cross-continuum secondary prevention assessments and therapies (Modules 5 and 10) to all patients before discharge or transfer' objects='patient, prevention protocol' id='activity28'/>
+</process>

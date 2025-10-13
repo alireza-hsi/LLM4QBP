@@ -1,0 +1,92 @@
+<process>
+  <activity role='ED medical staff' action='Obtain patient history' objects='patient' id='activity1-1'/>
+  <activity role='ED medical staff' action='Perform neurological examination' objects='patient' id='activity1-2'/>
+  <activity role='ED medical staff' action='Assess time of symptom onset' objects='patient' id='activity1-3'/>
+  <activity role='ED medical staff' action='Measure blood glucose' objects='patient' id='activity2'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='If hypoglycemia detected' id='branch2'>
+      <activity role='ED medical staff' action='Correct hypoglycemia immediately' objects='patient' id='activity3'/>
+    </branch>
+    <branch condition='If first random glucose > 11 mmol/L' id='branch3'>
+      <activity role='ED medical staff' action='Repeat blood glucose measurement' objects='patient' id='activity4'/>
+    </branch>
+    <branch condition='If glucose normal and ≤ 11 mmol/L' id='branch4'>
+      <activity role='ED medical staff' action='Proceed to next steps' objects='patient' id='activity5'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='ED medical staff' action='Evaluate body temperature as part of routine vital signs every 4 hours for first 48 hours' objects='patient' id='activity6'/>
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='If temperature > 37.5°C' id='branch6'>
+      <parallelGateway id='parallelgateway2'>
+        <branch id='branch7'>
+          <activity role='ED medical staff' action='Initiate temperature-reducing measures' objects='patient' id='activity7'/>
+        </branch>
+        <branch id='branch8-1'>
+          <activity role='ED medical staff' action='Order laboratory tests for infection' objects='patient' id='activity8-1'/>
+        </branch>
+        <branch id='branch8-2'>
+          <activity role='ED medical staff' action='Order chest X-ray if respiratory infection suspected' objects='patient' id='activity8-2'/>
+        </branch>
+        <branch id='branch9'>
+          <activity role='ED medical staff' action='Initiate antipyretic and antimicrobial therapy as required' objects='patient' id='activity9'/>
+        </branch>
+      </parallelGateway>
+    </branch>
+    <branch condition='If temperature ≤ 37.5°C' id='branch10'>
+      <activity role='ED medical staff' action='Continue routine monitoring' objects='patient' id='activity10'/>
+    </branch>
+  </exclusiveGateway>
+  <exclusiveGateway id='exclusivegateway3'>
+    <branch condition='TIA with high-risk features or minor stroke' id='branch13'>
+      <activity role='ED medical staff' action='Order brain CT scan' objects='patient' id='activity12-1'/>
+      <activity role='ED medical staff' action='Review CT scan results' objects='patient' id='activity12-2'/>
+      <inclusiveGateway id='inclusivegateway1'>
+        <branch condition='Patient presents with fluctuating/crescendo hemibody motor weakness, sensory loss, or speech difficulty' id='branch18'>
+          <activity role='ED medical staff' action='Evaluate in ED for consideration of hospital admission' objects='patient' id='activity18'/>
+        </branch>
+        <branch condition='Patient not on antiplatelet agent at presentation and brain imaging excludes intracranial hemorrhage' id='branch19'>
+          <exclusiveGateway id='exclusivegateway5'>
+            <branch condition='Patient can swallow' id='branch20'>
+              <activity role='ED medical staff' action='Start antiplatelet therapy immediately (choose one: ASA 160 mg loading dose then 81–325 mg daily, clopidogrel 300 mg loading dose then 75 mg daily, or extended-release dipyridamole 200 mg/ASA 25 mg bid after ASA 160 mg loading)' objects='patient' id='activity19'/>
+            </branch>
+            <branch condition='Patient fails swallowing screening' id='branch21'>
+              <activity role='ED medical staff' action='Offer rectal or gastric ASA as necessary' objects='patient' id='activity20'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </inclusiveGateway>
+      <exclusiveGateway id='exclusivegateway4'>
+        <branch condition='Immediate access to specialized TIA/minor stroke clinic' id='branch14'>
+          <activity role='ED medical staff' action='Provide immediate care at specialized TIA/minor stroke clinic' objects='patient' id='activity13'/>
+        </branch>
+        <branch condition='Delay to specialized clinic poses risk' id='branch15'>
+          <activity role='ED medical staff' action='Perform evaluation in appropriately resourced ED and consider inpatient evaluation/management for stroke prevention' objects='patient' id='activity14'/>
+        </branch>
+        <branch condition='Medical attention sought after 48 hours from symptom onset' id='branch16'>
+          <activity role='ED medical staff' action='Refer for evaluation at specialized TIA/minor stroke clinic or outpatient clinic with stroke-prevention services within 24 hours of initial presentation' objects='patient' id='activity15'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch condition='TIA without high-risk features' id='branch17'>
+      <activity role='ED medical staff' action='Order brain CT scan' objects='patient' id='activity16-1'/>
+      <activity role='ED medical staff' action='Review CT scan results' objects='patient' id='activity16-2'/>
+      <inclusiveGateway id='inclusivegateway2'>
+        <branch condition='Patient presents with fluctuating/crescendo hemibody motor weakness, sensory loss, or speech difficulty' id='branch22'>
+          <activity role='ED medical staff' action='Evaluate in ED for consideration of hospital admission' objects='patient' id='activity22'/>
+        </branch>
+        <branch condition='Patient not on antiplatelet agent at presentation and brain imaging excludes intracranial hemorrhage' id='branch23'>
+          <exclusiveGateway id='exclusivegateway6'>
+            <branch condition='Patient can swallow' id='branch24'>
+              <activity role='ED medical staff' action='Start antiplatelet therapy immediately (choose one: ASA 160 mg loading dose then 81–325 mg daily, clopidogrel 300 mg loading dose then 75 mg daily, or extended-release dipyridamole 200 mg/ASA 25 mg bid after ASA 160 mg loading)' objects='patient' id='activity23'/>
+            </branch>
+            <branch condition='Patient fails swallowing screening' id='branch25'>
+              <activity role='ED medical staff' action='Offer rectal or gastric ASA as necessary' objects='patient' id='activity24'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </inclusiveGateway>
+      <activity role='ED medical staff' action='Refer to outpatient clinic with stroke-prevention services for comprehensive evaluation and management within 1 month of symptom onset' objects='patient' id='activity17'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='ED medical staff' action='Provide cross-continuum secondary prevention assessment and therapies (Modules 5 and 10)' objects='patient' id='activity11'/>
+</process>

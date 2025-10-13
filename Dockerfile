@@ -9,18 +9,18 @@ RUN conda config --set always_yes yes \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy environment and requirements
-COPY environment-base.yml environment-mao.yml ./
+COPY environment-promoai.yml environment-mao.yml ./
 COPY ProMoAI/requirements.txt ProMoAI/requirements.txt
-COPY MAO/Code/requirements.txt MAO/Code/requirements.txt
+COPY MAO/Version-2.2/Code/requirements.txt MAO/Version-2.2/Code/requirements.txt
 
 # Copy application code
 COPY . .
 
-# 1) Build the 'base' conda environment
+# 1) Build the 'promoai' conda environment
 RUN conda config --set always_yes yes \
     && conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main \
     && conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r \
-    && conda env update -n base -f environment-base.yml
+    && conda env update -n promoai -f environment-promoai.yml
 
 # 2) Build the 'MAO' conda environment and clean up
 RUN conda config --set always_yes yes \
@@ -30,8 +30,8 @@ RUN conda config --set always_yes yes \
     && conda clean -afy
 
 # Install vendored bpmn_python into each environment
-RUN conda run -n base pip install -e ./libs/bpmn_python \
-    && conda run -n MAO_conda_env pip install -e ./libs/bpmn_python
+RUN conda run -n promoai pip install -e ./libs/bpmn_python \
+    && conda run -n mao pip install -e ./libs/bpmn_python
 
 # Install Node.js for frontend tooling
 RUN apt-get update && apt-get install -y curl \

@@ -1,0 +1,91 @@
+<process>
+  <activity role='ED medical staff' action='Initiate early treatment protocol for TIA or minor (nondisabling) stroke' objects='patient' id='activity1'/>
+  <activity role='ED medical staff' action='Check blood glucose' objects='patient, glucometer' id='activity2'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='If hypoglycemia detected' id='branch1'>
+      <activity role='ED medical staff' action='Correct hypoglycemia immediately' objects='patient, glucose' id='activity3'/>
+    </branch>
+    <branch condition='If first random glucose > 11 mmol/L' id='branch2'>
+      <activity role='ED medical staff' action='Repeat blood glucose measurement' objects='patient, glucometer' id='activity4'/>
+    </branch>
+    <branch condition='If glucose normal and ≤ 11 mmol/L' id='branch3'>
+      <activity role='ED medical staff' action='Continue protocol' objects='patient' id='activity5'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='ED medical staff' action='Evaluate body temperature as part of routine vital signs every 4 hours for first 48 hours' objects='patient, thermometer' id='activity6'/>
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='If temperature > 37.5°C' id='branch4'>
+      <parallelGateway id='parallelgateway1'>
+        <branch id='branch5'>
+          <activity role='ED medical staff' action='Initiate temperature-reducing measures' objects='patient, cooling methods' id='activity7'/>
+        </branch>
+        <branch id='branch6'>
+          <activity role='ED medical staff' action='Investigate potential infection' objects='patient, diagnostic tests' id='activity8'/>
+        </branch>
+        <branch id='branch7'>
+          <activity role='ED medical staff' action='Initiate antipyretic and antimicrobial therapy as required' objects='patient, medications' id='activity9'/>
+        </branch>
+      </parallelGateway>
+    </branch>
+    <branch condition='If temperature ≤ 37.5°C' id='branch8'>
+      <activity role='ED medical staff' action='Continue routine monitoring' objects='patient' id='activity10'/>
+    </branch>
+  </exclusiveGateway>
+  <exclusiveGateway id='exclusivegateway3'>
+    <branch condition='If TIA with high-risk features or minor stroke' id='branch9'>
+      <activity role='ED medical staff' action='Order brain CT scan' objects='patient, CT scanner' id='activity12'/>
+      <activity role='ED medical staff' action='Review CT scan results and exclude intracranial hemorrhage' objects='patient, CT results' id='activity13'/>
+      <activity role='ED medical staff' action='Initiate antiplatelet therapy (if not contraindicated)' objects='patient, antiplatelet agents' id='activity14'/>
+      <exclusiveGateway id='exclusivegateway4'>
+        <branch condition='If immediate care available at specialized TIA/minor stroke clinic' id='branch10'>
+          <activity role='ED medical staff' action='Refer patient to specialized TIA/minor stroke clinic for rapid evaluation and treatment' objects='patient, referral' id='activity15'/>
+        </branch>
+        <branch condition='If delay to specialized clinic poses risk' id='branch11'>
+          <activity role='ED medical staff' action='Perform evaluation and management in appropriately resourced ED; consider inpatient evaluation for stroke prevention' objects='patient, ED resources' id='activity16'/>
+        </branch>
+        <branch condition='If medical attention sought after 48 hours from symptom onset' id='branch12'>
+          <activity role='ED medical staff' action='Refer for evaluation at specialized TIA/minor stroke clinic or outpatient clinic with stroke-prevention services within 24 hours of initial presentation' objects='patient, referral' id='activity17'/>
+        </branch>
+      </exclusiveGateway>
+      <inclusiveGateway id='inclusivegateway1'>
+        <branch condition='If TIA patient presents with fluctuating or crescendo hemibody motor weakness, sensory loss, or speech difficulty' id='branch13'>
+          <activity role='ED medical staff' action='Evaluate for possible admission to hospital' objects='patient' id='activity18'/>
+        </branch>
+        <branch condition='If TIA or minor stroke patient not on antiplatelet agent at presentation and brain imaging excludes intracranial hemorrhage' id='branch14'>
+          <activity role='ED medical staff' action='Assess swallowing ability' objects='patient' id='activity19'/>
+          <exclusiveGateway id='exclusivegateway5'>
+            <branch condition='If patient can swallow' id='branch15'>
+              <activity role='ED medical staff' action='Start antiplatelet therapy immediately (choose one: ASA 160 mg loading then 81–325 mg daily, clopidogrel 300 mg loading then 75 mg daily, or extended-release dipyridamole 200 mg/ASA 25 mg bid after ASA 160 mg load)' objects='patient, antiplatelet agents' id='activity20'/>
+            </branch>
+            <branch condition='If patient fails swallowing screening' id='branch16'>
+              <activity role='ED medical staff' action='Offer rectal or gastric ASA as necessary' objects='patient, rectal/gastric ASA' id='activity21'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </inclusiveGateway>
+    </branch>
+    <branch condition='If TIA without high-risk features' id='branch17'>
+      <activity role='ED medical staff' action='Order brain CT scan' objects='patient, CT scanner' id='activity22'/>
+      <activity role='ED medical staff' action='Review CT scan results and exclude intracranial hemorrhage' objects='patient, CT results' id='activity23'/>
+      <activity role='ED medical staff' action='Initiate antiplatelet therapy (if not contraindicated)' objects='patient, antiplatelet agents' id='activity24'/>
+      <activity role='ED medical staff' action='Refer to outpatient clinic with stroke-prevention services for comprehensive evaluation and management within 1 month of symptom onset' objects='patient, referral' id='activity25'/>
+      <inclusiveGateway id='inclusivegateway2'>
+        <branch condition='If TIA patient presents with fluctuating or crescendo hemibody motor weakness, sensory loss, or speech difficulty' id='branch18'>
+          <activity role='ED medical staff' action='Evaluate for possible admission to hospital' objects='patient' id='activity26'/>
+        </branch>
+        <branch condition='If TIA or minor stroke patient not on antiplatelet agent at presentation and brain imaging excludes intracranial hemorrhage' id='branch19'>
+          <activity role='ED medical staff' action='Assess swallowing ability' objects='patient' id='activity27'/>
+          <exclusiveGateway id='exclusivegateway6'>
+            <branch condition='If patient can swallow' id='branch20'>
+              <activity role='ED medical staff' action='Start antiplatelet therapy immediately (choose one: ASA 160 mg loading then 81–325 mg daily, clopidogrel 300 mg loading then 75 mg daily, or extended-release dipyridamole 200 mg/ASA 25 mg bid after ASA 160 mg load)' objects='patient, antiplatelet agents' id='activity28'/>
+            </branch>
+            <branch condition='If patient fails swallowing screening' id='branch21'>
+              <activity role='ED medical staff' action='Offer rectal or gastric ASA as necessary' objects='patient, rectal/gastric ASA' id='activity29'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </inclusiveGateway>
+    </branch>
+  </exclusiveGateway>
+  <activity role='ED medical staff' action='Provide cross-continuum secondary prevention assessments and therapies (per Modules 5 and 10)' objects='patient' id='activity11'/>
+</process>

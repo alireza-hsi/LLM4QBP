@@ -1,0 +1,67 @@
+<process>
+  <activity role='EMS' action='Divert suspected stroke/TIA patients to regional/district stroke centres if feasible' objects='suspected stroke/TIA patient' id='activity1'/>
+  <activity role='EMS' action='Prenotify receiving hospital about incoming stroke/TIA patient' objects='patient information' id='activity2'/>
+  <activity role='hospital acute stroke team' action='Respond to EMS prenotification and prepare for patient arrival' objects='prenotification details' id='activity3'/>
+  <parallelGateway id='parallelgateway1-activity4'>
+    <branch id='branch1-activity4'>
+      <activity role='medical staff' action='Assess airway' objects='patient' id='activity4-1'/>
+    </branch>
+    <branch id='branch2-activity4'>
+      <activity role='medical staff' action='Assess breathing' objects='patient' id='activity4-2'/>
+    </branch>
+    <branch id='branch3-activity4'>
+      <activity role='medical staff' action='Assess circulation' objects='patient' id='activity4-3'/>
+    </branch>
+  </parallelGateway>
+  <activity role='medical staff' action='Perform neurological examination and assess stroke severity using NIHSS or CNS' objects='patient' id='activity5'/>
+  <parallelGateway id='parallelgateway2-activity6'>
+    <branch id='branch4-activity6'>
+      <activity role='medical staff' action='Initiate immediate brain imaging (CT or MRI)' objects='patient' id='activity6'/>
+      <activity role='healthcare provider with imaging expertise' action='Interpret brain imaging immediately' objects='CT or MRI results' id='activity7'/>
+    </branch>
+    <branch id='branch5-activity6'>
+      <activity role='medical staff' action='Perform ECG to detect atrial fibrillation and other acute arrhythmias' objects='patient' id='activity8'/>
+    </branch>
+    <branch id='branch6-activity6'>
+      <exclusiveGateway id='exclusivegateway1-activity9'>
+        <branch condition='Troponin test not clinically indicated' id='branch7-activity9'>
+          <activity role='medical staff' action='Order standard blood tests (CBC, electrolytes, creatinine, glucose, INR, partial thromboplastin time)' objects='patient' id='activity9-1'/>
+        </branch>
+        <branch condition='Troponin test clinically indicated' id='branch8-activity9'>
+          <activity role='medical staff' action='Order troponin test' objects='patient' id='activity9-2'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch9-activity6'>
+      <activity role='medical staff' action='Order chest x-ray if indicated, ensuring it does not delay assessment for thrombolysis' objects='patient' id='activity11'/>
+    </branch>
+  </parallelGateway>
+  <activity role='healthcare provider' action='Interpret blood work results immediately upon availability' objects='blood test results' id='activity10'/>
+  <activity role='medical staff' action='Make patient NPO and screen swallowing ability using bedside protocol before oral intake' objects='patient' id='activity12'/>
+  <exclusiveGateway id='exclusivegateway2-activity13'>
+    <branch condition='Patient not alert within first 24 hours' id='branch10-activity13'>
+      <activity role='medical staff' action='Monitor closely and screen swallowing ability when clinically appropriate' objects='patient' id='activity13'/>
+    </branch>
+    <branch condition='Patient presents with features of dysphagia or pulmonary aspiration' id='branch11-activity13'>
+      <activity role='speech-language pathologist or trained specialist' action='Conduct full clinical swallowing assessment and advise on diet/fluid consistency' objects='patient' id='activity14'/>
+    </branch>
+  </exclusiveGateway>
+  <exclusiveGateway id='exclusivegateway3-activity15'>
+    <branch condition='Patient is suspected TIA' id='branch12-activity15'>
+      <activity role='medical staff' action='Use standardized triage tool to determine appropriate care location for TIA' objects='patient' id='activity15'/>
+      <exclusiveGateway id='exclusivegateway4-activity16'>
+        <branch condition='TIA/minor stroke within 48 hours of symptom onset or fluctuating motor/speech symptoms' id='branch13-activity16'>
+          <activity role='medical staff' action='Initiate immediate vascular imaging of neck arteries (carotid ultrasound, CTA, or MRA) unless not a candidate for revascularization' objects='patient' id='activity16'/>
+        </branch>
+        <branch condition='TIA/minor stroke beyond 48 hours' id='branch14-activity16'>
+          <activity role='medical staff' action='Order vascular imaging of brain and neck arteries as soon as possible' objects='patient' id='activity17'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch condition='Patient is not TIA/minor stroke' id='branch15-activity15'>
+      <activity role='medical staff' action='Continue standard stroke assessment pathway' objects='patient' id='activity18'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='medical staff' action='Conduct secondary prevention assessment' objects='patient' id='activity19-1'/>
+  <activity role='medical staff' action='Initiate secondary prevention therapy' objects='patient' id='activity19-2'/>
+</process>
