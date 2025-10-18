@@ -1,5 +1,5 @@
 # LLM4QBP
-Repository for the paper LLM4QBP which contains codes, prompt, experiment results, etc.
+This repository accompanies the works "LLM4QBP," "An LLM Pipeline for Automatic Extraction and Evaluation of Care Pathways from Clinical Guidelines," and the M.Sc. thesis titled "Automated Care Pathway Modeling using Agentic and Knowledge-Aware LLMs." It includes code, prompts, experimental results, and related resources.
 
 ---
 
