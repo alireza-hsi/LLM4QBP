@@ -6,6 +6,12 @@
 * **Anaconda or Miniconda** installed.
 * **Node.js ≥ 18** (required for BPMN auto-layout).
 
+Initialize conda for your shell:
+```
+conda init <shell name>
+```
+(e.g., zsh, bash, PowerShell)
+
 If your repo provides shell setup, run:
 
 ```bash
@@ -38,7 +44,7 @@ Install local editable Python package(s) used by MAO (e.g., `bpmn_python`):
 
 ```bash
 # from repo root
-pip install -e MAO/Code/Helper/bpmn_python
+pip install -e libs/bpmn_python
 ```
 
 > Note: If your folder path differs, adjust accordingly.
@@ -64,9 +70,8 @@ npm --version
 Install the auto-layout tool’s Node dependencies:
 
 ```bash
-cd MAO/Code/Helper/bpmn-auto-layout
+cd libs/bpmn_python
 npm install
-cd ../../../../..
 ```
 
 ---

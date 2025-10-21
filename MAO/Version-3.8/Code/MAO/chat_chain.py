@@ -270,7 +270,8 @@ class ChatChain:
                 # Check helper files exist
                 helper_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Helper")
                 converter_path = os.path.join(helper_dir, "BPMN_converter.py")
-                layout_path = os.path.join(helper_dir, "bpmn-auto-layout", "layout.js")
+                # layout_path = os.path.join(helper_dir, "bpmn-auto-layout", "layout.js")
+                layout_path = os.path.join("MAO", "Version-2.2", "Code", "Helper", "bpmn-auto-layout", "layout.js")
                 
                 log_and_print_online(f"Checking paths:\nConverter: {converter_path}\nLayout: {layout_path}")
                 

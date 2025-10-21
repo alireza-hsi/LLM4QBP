@@ -1,0 +1,52 @@
+<process>
+  <activity role='healthcare provider' action='Conduct rapid initial evaluation for airway, breathing, and circulation' objects='patient' id='activity1'/>
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1'>
+      <activity role='healthcare provider' action='Perform neurological examination to determine focal neurological deficits' objects='patient' id='activity2-1'/>
+      <activity role='healthcare provider' action='Assess stroke severity using standardized stroke scale (NIHSS or CNS)' objects='patient' id='activity2-2'/>
+    </branch>
+    <branch id='branch2'>
+      <activity role='healthcare provider' action='Order immediate brain imaging (CT or MRI)' objects='patient' id='activity3-1'/>
+      <activity role='healthcare provider' action='Perform immediate brain imaging (CT or MRI)' objects='patient' id='activity3-2'/>
+      <activity role='qualified imaging interpreter' action='Interpret brain imaging immediately' objects='CT or MRI results' id='activity4'/>
+    </branch>
+    <branch id='branch3'>
+      <activity role='healthcare provider' action='Perform ECG to detect atrial fibrillation and other acute arrhythmias' objects='patient' id='activity5'/>
+    </branch>
+    <branch id='branch4'>
+      <activity role='healthcare provider' action='Order blood work' objects='patient' id='activity6-1'/>
+      <activity role='healthcare provider' action='Collect blood samples and send to laboratory' objects='patient' id='activity6-2'/>
+      <activity role='laboratory staff' action='Process blood samples and generate results' objects='blood samples' id='activity6-3'/>
+    </branch>
+    <branch id='branch5'>
+      <activity role='healthcare provider' action='Order chest x-ray if indicated, ensuring it does not delay assessment for thrombolysis' objects='patient' id='activity7'/>
+    </branch>
+    <branch id='branch6'>
+      <activity role='healthcare provider' action='Make patient NPO initially' objects='patient' id='activity8-1'/>
+      <activity role='healthcare provider' action='Screen swallowing ability using a simple, valid, reliable bedside protocol before initiating oral medication, fluid, or food' objects='patient' id='activity8-2'/>
+      <exclusiveGateway id='exclusivegateway1'>
+        <branch condition='Patient not alert within first 24 hours' id='branch7'>
+          <activity role='healthcare provider' action='Monitor patient closely and screen swallowing ability when clinically appropriate' objects='patient' id='activity9'/>
+        </branch>
+        <branch condition='Patient presents with features indicating dysphagia or pulmonary aspiration' id='branch8'>
+          <activity role='speech-language pathologist or trained specialist' action='Conduct full clinical assessment of swallowing ability and advise on swallowing and required consistency of diet and fluids' objects='patient' id='activity10'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch7a'>
+      <activity role='healthcare provider' action='Use standardized triage tool to determine appropriate location for care of patients with TIA' objects='patient' id='activity12'/>
+    </branch>
+    <branch id='branch8a'>
+      <exclusiveGateway id='exclusivegateway2'>
+        <branch condition='Patient with TIA or minor (nondisabling) stroke presents within 48 hours of symptom onset or with fluctuating motor or speech symptoms and is a candidate for carotid artery revascularization' id='branch12'>
+          <activity role='healthcare provider' action='Order immediate vascular imaging of neck arteries (carotid ultrasound, CTA, or MRA)' objects='patient' id='activity13'/>
+        </branch>
+        <branch condition='Patient presents beyond 48 hours or not a candidate for carotid artery revascularization' id='branch13'>
+          <activity role='healthcare provider' action='Order vascular imaging of brain and neck arteries as soon as possible' objects='patient' id='activity14'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </parallelGateway>
+  <activity role='healthcare provider' action='Interpret blood work results immediately' objects='blood work results' id='activity15'/>
+  <activity role='healthcare provider' action='Provide appropriate cross-continuum secondary prevention assessments and therapies (refer to Modules 5 and 10), regardless of admission or discharge status' objects='patient' id='activity11'/>
+</process>

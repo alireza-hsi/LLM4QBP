@@ -1,1 +1,1 @@
-export PATH="/Users/wvw/anaconda3/bin:$PATH"
+export PATH="<parent folder>/anaconda3/bin:$PATH"

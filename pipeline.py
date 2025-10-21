@@ -80,6 +80,12 @@ def run_mao(task_file, config, org, name, model, code_root):
         cmd += ["--model", model]
     try:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+        
+        # process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # out, error = [ b.decode('UTF-8') for b in process.communicate() ]
+        # print("error:"); print(error)
+        # print("out:"); print(out)
+        # result = out
     except subprocess.CalledProcessError as e:
         print("Error running MAO run.py:", e)
         print("STDOUT:", e.stdout)
