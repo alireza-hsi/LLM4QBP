@@ -33,8 +33,13 @@ You can use all features of this project instantly with our prebuilt Docker imag
 ## Quick Start: Use the Prebuilt Docker Image
 
 ### 1. **Pull the Latest Image**
+#### For Apple Silicon (M series)
 ```sh
 docker pull alirezahsi/llm4qbp:latest
+```
+#### NOTE: For windows/Intel (amd64) systems, change the tag from "latest" to "windows" from now on, such as the example below:
+```sh
+docker pull alirezahsi/llm4qbp:widnows
 ```
 
 ### 2. **Run the Streamlit Web UI**
