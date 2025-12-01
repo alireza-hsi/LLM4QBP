@@ -6,7 +6,9 @@ import re
 MODEL_MAP = {
     "GPT_4o1": "gpt-4.1",
     "4o1":     "gpt-4.1",
-    "GPT_4o1_nano": "gpt-4.1-nano"
+    "GPT_4o1_nano": "gpt-4.1-nano",
+    "GPT_5o1": "gpt-5.1",
+    "5o1": "gpt-5.1",
 }
 
 def get_initial_messages(txt_path: str):
@@ -275,7 +277,7 @@ def generate_code_from_messages(messages, openai_api_key=None, model="GPT_4o1"):
         model=api_model,
         messages=messages,
         temperature=0.2,
-        max_tokens=2000
+        max_completion_tokens=2000
     )
     text = response.choices[0].message.content
 

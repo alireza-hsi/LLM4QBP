@@ -1,0 +1,57 @@
+<process>
+  <activity role='healthcare provider' action='Conduct rapid initial evaluation for airway, breathing, and circulation' objects='suspected TIA or minor stroke patient' id='activity1'/>
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1'>
+      <activity role='healthcare provider' action='Perform neurological examination to determine focal neurological deficits' objects='suspected TIA or minor stroke patient' id='activity2-1'/>
+      <activity role='healthcare provider' action='Assess stroke severity using standardized stroke scale (NIHSS or CNS)' objects='suspected TIA or minor stroke patient' id='activity2-2'/>
+    </branch>
+    <branch id='branch2'>
+      <activity role='healthcare provider' action='Order immediate brain imaging (CT or MRI)' objects='suspected TIA or minor stroke patient' id='activity3-1'/>
+      <activity role='healthcare provider' action='Perform immediate brain imaging (CT or MRI)' objects='suspected TIA or minor stroke patient' id='activity3-2'/>
+      <activity role='qualified imaging interpreter' action='Interpret brain imaging immediately' objects='CT or MRI results' id='activity4'/>
+    </branch>
+    <branch id='branch3'>
+      <activity role='healthcare provider' action='Perform ECG to detect atrial fibrillation and other acute arrhythmias' objects='suspected TIA or minor stroke patient' id='activity5'/>
+    </branch>
+    <branch id='branch4'>
+      <activity role='healthcare provider' action='Order, collect, and immediately interpret blood work (CBC, electrolytes, creatinine, glucose, INR, partial thromboplastin time, troponin if indicated)' objects='suspected TIA or minor stroke patient' id='activity6-merged'/>
+    </branch>
+    <branch id='branch5'>
+      <activity role='healthcare provider' action='Order chest x-ray if indicated but ensure it does not delay assessment for thrombolysis' objects='suspected TIA or minor stroke patient' id='activity7'/>
+    </branch>
+    <branch id='branch6'>
+      <activity role='healthcare provider' action='Make patient NPO initially and screen swallowing ability using valid bedside protocol before oral medication, fluid, or food' objects='suspected stroke patient' id='activity8'/>
+      <exclusiveGateway id='exclusivegateway1'>
+        <branch condition='Patient not alert within first 24 hours' id='branch7'>
+          <activity role='healthcare provider' action='Monitor patient closely and screen swallowing ability when clinically appropriate' objects='stroke patient' id='activity9'/>
+        </branch>
+        <branch condition='Patient alert within first 24 hours' id='branch8'>
+          <activity role='healthcare provider' action='Proceed with standard care' objects='stroke patient' id='activity10'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exclusivegateway2'>
+        <branch condition='Features indicating dysphagia or pulmonary aspiration present' id='branch9'>
+          <activity role='speech-language pathologist or trained specialist' action='Conduct full clinical assessment of swallowing ability and advise on diet/fluid consistency' objects='stroke patient' id='activity11'/>
+        </branch>
+        <branch condition='No features indicating dysphagia or pulmonary aspiration' id='branch10'>
+          <activity role='healthcare provider' action='Continue routine monitoring' objects='stroke patient' id='activity12'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch12'>
+      <activity role='healthcare provider' action='Apply standardized triage tool for TIA' objects='TIA patient' id='activity14-1'/>
+      <activity role='healthcare provider' action='Determine appropriate care location based on triage results' objects='TIA patient' id='activity14-2'/>
+    </branch>
+    <branch id='branch13'>
+      <exclusiveGateway id='exclusivegateway3'>
+        <branch condition='TIA or minor stroke presenting within 48 hours of symptom onset or with fluctuating motor/speech symptoms and candidate for carotid revascularization' id='branch14'>
+          <activity role='healthcare provider' action='Order immediate vascular imaging of neck arteries (carotid ultrasound, CTA, or MRA)' objects='TIA or minor stroke patient' id='activity15'/>
+        </branch>
+        <branch condition='TIA or ischemic stroke presenting beyond 48 hours OR not candidate for carotid revascularization' id='branch15'>
+          <activity role='healthcare provider' action='Order vascular imaging of brain and neck arteries as soon as possible' objects='TIA or ischemic stroke patient' id='activity16'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </parallelGateway>
+  <activity role='healthcare provider' action='Provide appropriate cross-continuum secondary prevention assessments and therapies (per Modules 5 and 10)' objects='all patients (admitted or discharged)' id='activity13'/>
+</process>

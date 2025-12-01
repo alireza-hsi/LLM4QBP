@@ -14,7 +14,7 @@ import re
 from streamlit_runner import PROMOAI_ENV
 
 # Ensure your MAO helpers are on PYTHONPATH
-MAO_HELPER = os.path.join("MAO", "Version-2.2", "Code", "Helper")
+MAO_HELPER = os.path.join("MAO", "MAO(AiO version)", "Code", "Helper")
 sys.path.insert(0, MAO_HELPER)
 
 from automatedActivityMapping import extract_activity_names, get_alignment, get_revision, update_activity_names
@@ -23,21 +23,21 @@ from bpmn_compare_similarity import CompareBPMN
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--framework",
-                   choices=["MAO-v2.2","ProMoAI","MAO-v3","MAO-v3.2","MAO-v3.3","MAO-v3.4","MAO-v3.5","MAO-v3.6","MAO-v3.7","MAO-v3.8"],
+                   choices=["ProMoAI","MAO (AiO version)"],
                    required=True)
     p.add_argument("--task-file",   required=True)
     p.add_argument("--gold-bpmn",   required=False)
     p.add_argument("--runs",  type=int, default=1)
-    p.add_argument("--config", default="Default")
-    p.add_argument("--org",    default="DefaultOrganization")
+    p.add_argument("--config", default=None)
+    p.add_argument("--org",    default=None)
     p.add_argument("--name",   default="PipelineProject")
-    p.add_argument("--model",  default="GPT_4o1",
-                   help="Always use GPT_4o1 for analytics")
+    p.add_argument("--model",  default="GPT_5o1",
+                   help="Always use GPT_5o1 for analytics")
     p.add_argument("--mapped-output", default=None)
     p.add_argument("--results-db",    default="resultsDb.sqlite")
     p.add_argument("--gold-bpmn-filename", default=None)
     p.add_argument("--mapping-model",
-                   default="gpt-4.1",
+                   default="gpt-5.1",
                    help="GPT model to use for activity mapping")
     return p.parse_args()
 
@@ -165,12 +165,13 @@ def process_run(args, run_idx):
 
     # 1) Generate BPMN
     try:
-        if args.framework.startswith("MAO-v"):
+        if args.framework.startswith("MAO (AiO version)"):
             #suffix    = args.framework.split("MAO-v",1)[1]
             # Extract version number from framework string, e.g. "MAO-v3.1" -> "3.1"
-            mao_version = re.search(r"MAO-v(.+)", args.framework)
-            ver_str = mao_version.group(1) if mao_version else "2.2"  # default fallback
-            code_root = os.path.join("MAO", f"Version-{ver_str}", "Code")
+            #mao_version = re.search(r"MAO-v(.+)", args.framework)
+            #ver_str = mao_version.group(1) if mao_version else "2.2"  # default fallback
+            #code_root = os.path.join("MAO", f"Version-{ver_str}", "Code")
+            code_root = os.path.join("MAO", "MAO(AiO version)", "Code")
             gen_bpmn = run_mao(args.task_file, args.config, args.org, run_name, args.model, code_root)
         else:
             code_root = os.path.join(
@@ -189,7 +190,7 @@ def process_run(args, run_idx):
         return
     
     # After generation, adjust BPMN path for MAO
-    if args.framework.startswith("MAO-v"):
+    if args.framework == "MAO (AiO version)":
         no_dummy_bpmn = gen_bpmn.replace("process.bpmn", "process_no_dummy.bpmn")
         if os.path.exists(no_dummy_bpmn):
             gen_bpmn = no_dummy_bpmn

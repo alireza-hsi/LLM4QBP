@@ -174,7 +174,7 @@ After cloning the repository, you can use these example files to quickly test th
 │ ├── WareHouse/ # ProMoAI output BPMN files and logs (per run)
 │ ├── QBP_1/ ... QBP_4/ # QBP-specific folders
 │ └── ...
-├── MAO/
+├── MAO(AiO version)/
 │ └── Code/
 │ ├── run.py
 │ ├── Helper/
@@ -192,9 +192,9 @@ After cloning the repository, you can use these example files to quickly test th
 - Python 3.8+
 - [Anaconda/Miniconda](https://docs.conda.io/en/latest/)
 - The following conda environments:
-  - `base` (for ProMoAI)
+  - `promoai` (for ProMoAI)
   - `MAO_conda_env` (for MAO)
-- All dependencies listed in `MAO/Code/requirements.txt` and `ProMoAI/requirements.txt` 
+- All dependencies listed in `MAO/requirements.txt` and `ProMoAI/requirements.txt` 
 
 ---
 
@@ -206,7 +206,7 @@ Run the pipeline for either framework:
 
 ```sh
 # For ProMoAI
-conda run -n base python pipeline.py \
+conda run -n promoai python pipeline.py \
   --framework ProMoAI \
   --task-file <input_task.txt> \
   --gold-bpmn <gold.bpmn> \
@@ -217,14 +217,14 @@ conda run -n base python pipeline.py \
 
 # For MAO
 conda run -n MAO_conda_env python pipeline.py \
-  --framework MAO-v2.2 \
+  --framework MAO(AiO version) \
   --task-file <input_task.txt> \
   --gold-bpmn <gold.bpmn> \
   --runs 3 \
   --name MyExperiment \
   --results-db my_results.sqlite \
   --model GPT_4o1 \
-  --config Default \
+  --config Version-2.2 \
   --org DefaultOrganization
 ```
 

@@ -32,15 +32,26 @@ api_key = st.text_input(
     help="Enter your OpenAI API key (it will not be displayed)."
 )
 
-framework = st.selectbox("Framework", ["ProMoAI", "MAO-v2.2", "MAO-v3", "MAO-v3.2", "MAO-v3.3", "MAO-v3.4", "MAO-v3.5", "MAO-v3.6", "MAO-v3.7", "MAO-v3.8"])
+framework = st.selectbox("Framework", ["ProMoAI", "MAO (AiO version)"])
 task_file = st.file_uploader("Upload task file (.txt)", type="txt")
 gold_bpmn_file = st.file_uploader("Upload gold BPMN file (.bpmn, .xml) (optional)", type=["bpmn","xml"])
 runs = st.number_input("Number of runs", min_value=1, value=1)
-config = st.text_input("MAO config", value="Default")
-org = st.text_input("MAO organization", value="DefaultOrganization")
+config_options = ["Version-2.2", "Version-3.0", "Version-3.2", "Version-3.3", "Version-3.4", "Version-3.5", "Version-3.6", "Version-3.7", "Version-3.8"]
+
+if framework == "MAO (AiO version)":
+    config = st.selectbox("MAO Version", config_options)
+    if "org_auto_set" not in st.session_state or st.session_state.get("last_config") != config:
+        st.session_state["org"] = config
+        st.session_state["org_auto_set"] = True
+    st.session_state["last_config"] = config
+    org = st.text_input("MAO organization", value=st.session_state.get("org", config))
+    st.session_state["org"] = org
+else:
+    config = None
+    org = None
 name = st.text_input("Project name / base run name", value="PipelineRun")
-model = st.text_input("Model name (e.g., GPT_4o1)", value="GPT_4o1")
-mapping_model = st.text_input("Mapping model", value="gpt-4.1")
+model = st.text_input("Model name (e.g., GPT_5o1)", value="GPT_5o1")
+mapping_model = st.text_input("Mapping model", value="gpt-5.1")
 results_db = st.text_input("SQLite DB path", value="resultsDb.sqlite")
 
 # ——— Run button with clear_logs callback ———
@@ -75,7 +86,7 @@ if run:
                 f.write(gold_bpmn_file.read())
 
         # Choose interpreter
-        if framework.startswith("MAO-"):
+        if framework == "MAO (AiO version)":
             prefix = ["conda","run","-n",MAO_ENV,"python","-u"]
         else:
             prefix = ["conda","run","-n",PROMOAI_ENV,"python","-u"]
@@ -93,7 +104,7 @@ if run:
         ]
         if gold_bpmn_file:
             cmd += ["--gold-bpmn", gold_path, "--gold-bpmn-filename", gold_bpmn_file.name]
-        if framework.startswith("MAO-v"):
+        if framework == "MAO (AiO version)":
             cmd += ["--config", config, "--org", org, "--model", model]
 
         st.write("Running:", "`" + " ".join(cmd) + "`")

@@ -1,0 +1,165 @@
+<process>
+  <activity role='EMS' action='Suspect stroke/TIA and initiate stroke/TIA protocol including prenotification to receiving hospital' objects='suspected stroke/TIA patient, EMS prenotification process' id='activity1'/>
+  <activity role='EMS' action='Perform on-scene stroke/TIA assessment and stabilize patient per EMS stroke protocol' objects='prehospital stroke assessment tool, monitoring equipment' id='activity1_1'/>
+  <activity role='EMS' action='Initiate prenotification call or electronic alert to receiving hospital with key stroke/TIA information' objects='EMS communication system, prenotification template' id='activity1_2'/>
+
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='Receiving hospital is regional/district stroke centre and diversion feasible' id='branch1'>
+      <activity role='EMS' action='Divert suspected stroke/TIA patient to regional or district stroke centre' objects='regional/district stroke centre destination' id='activity2'/>
+    </branch>
+    <branch condition='Diversion to stroke centre not feasible' id='branch2'>
+      <activity role='EMS' action='Transport suspected stroke/TIA patient to nearest appropriate hospital' objects='nearest appropriate hospital' id='activity3'/>
+    </branch>
+  </exclusiveGateway>
+
+  <activity role='ED triage nurse' action='Register and triage patient as CTAS I or CTAS II for suspected stroke/TIA' objects='triage record, CTAS scale' id='activity4'/>
+  <activity role='ED clerk' action='Notify acute stroke team upon EMS prenotification or triage identification of suspected stroke/TIA (for appropriate patients)' objects='acute stroke team contact list' id='activity5'/>
+
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch3'>
+      <activity role='ED/acute care nurse or physician' action='Perform rapid initial evaluation of airway, breathing, and circulation (ABC)' objects='vital signs equipment, airway equipment' id='activity6'/>
+      <exclusiveGateway id='exclusivegateway7'>
+        <branch condition='ABC stable' id='branch31'>
+          <activity role='ED/acute care nurse or physician' action='Proceed with routine monitoring of airway, breathing, and circulation' objects='vital signs monitor, observation chart' id='activity6_1'/>
+        </branch>
+        <branch condition='ABC compromised' id='branch32'>
+          <activity role='ED/acute care nurse or physician' action='Initiate immediate stabilization interventions for compromised ABC (e.g., airway positioning, oxygen, IV access, resuscitation)' objects='airway equipment, oxygen supply, IV equipment, resuscitation cart' id='activity6_2'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch4'>
+      <activity role='ED/acute care nurse or physician' action='Initiate standardized stroke/TIA assessment and treatment protocol/tool' objects='hospital stroke/TIA protocol, standardized tools' id='activity7'/>
+      <parallelGateway id='parallelgateway6'>
+        <branch id='branch33'>
+          <activity role='ED/acute care nurse or physician' action='Apply standardized stroke/TIA screening scale and document findings' objects='stroke/TIA screening form, electronic health record' id='activity7_1'/>
+        </branch>
+        <branch id='branch34'>
+          <activity role='ED/acute care nurse or physician' action='Initiate time-critical stroke/TIA orders (e.g., labs, imaging, IV access) according to protocol' objects='order entry system, stroke order set' id='activity7_2'/>
+        </branch>
+      </parallelGateway>
+    </branch>
+    <branch id='branch5'>
+      <activity role='hospital administration and stroke program leaders' action='Ensure sufficient stroke unit, staffing, and hospital resource capacity for timely diagnosis and treatment' objects='staffing plan, stroke unit resources, on-call lists' id='activity8_revised'/>
+    </branch>
+  </parallelGateway>
+
+  <parallelGateway id='parallelgateway2'>
+    <branch id='branch6'>
+      <activity role='neurologist or trained physician' action='Perform neurological examination and assess stroke severity using standardized stroke scale (NIHSS or CNS)' objects='NIHSS or CNS scale, neurological exam tools' id='activity9'/>
+      <activity role='neurologist or trained physician' action='Conduct focused neurological examination to identify focal deficits' objects='neurological exam tools, patient chart' id='activity9_1'/>
+      <activity role='neurologist or trained physician' action='Score stroke severity using NIHSS or CNS and record baseline score' objects='NIHSS or CNS scale, documentation system' id='activity9_2'/>
+    </branch>
+    <branch id='branch7'>
+      <activity role='ED/acute care physician or radiologist' action='Select appropriate brain imaging modality (CT vs MRI) based on clinical status and availability' objects='clinical guidelines, imaging availability information' id='activity10_1'/>
+      <activity role='radiology technologist' action='Perform brain imaging acquisition using selected modality' objects='CT or MRI scanner, imaging protocol' id='activity10_2'/>
+    </branch>
+    <branch id='branch8'>
+      <activity role='cardiology/ED staff' action='Perform ECG to detect atrial fibrillation and other acute arrhythmias' objects='ECG machine, ECG leads' id='activity11'/>
+    </branch>
+    <branch id='branch9'>
+      <activity role='laboratory staff' action='Draw and process blood work (CBC, electrolytes, creatinine, glucose, INR, partial thromboplastin time, troponin if clinically indicated)' objects='blood collection tubes, lab requisition' id='activity12'/>
+    </branch>
+    <branch id='branch10'>
+      <activity role='ED/acute care physician' action='Order chest x-ray if indicated ensuring it does not delay assessment for thrombolysis' objects='chest x-ray order, radiology system' id='activity13'/>
+    </branch>
+  </parallelGateway>
+
+  <activity role='radiologist or qualified physician' action='Interpret brain imaging (CT and/or MRI) immediately' objects='CT/MRI images, radiology reporting system' id='activity14'/>
+  <activity role='radiologist or qualified physician' action='Rapidly review brain imaging for hemorrhage, large vessel occlusion, and other acute findings' objects='CT/MRI images, viewing workstation' id='activity14_1'/>
+  <activity role='radiologist or qualified physician' action='Document formal imaging report and communicate critical findings immediately to stroke team' objects='radiology reporting system, communication tools' id='activity14_2'/>
+
+  <parallelGateway id='parallelgateway3'>
+    <branch id='branch11'>
+      <activity role='ED/acute care nurse or physician' action='Make all patients with stroke NPO initially' objects='NPO order, patient chart' id='activity15'/>
+      <activity role='ED/acute care nurse or trained clinician' action='Screen swallowing ability using simple, valid, reliable bedside testing protocol as part of initial assessment and before any oral medication, fluid, or food' objects='bedside swallowing screening protocol' id='activity16'/>
+      <activity role='ED/acute care nurse or trained clinician' action='Perform bedside swallowing screen according to protocol' objects='swallowing screening checklist' id='activity16_1'/>
+      <activity role='ED/acute care nurse or trained clinician' action='Document swallowing screen result and communicate NPO or diet plan to team' objects='patient chart, communication tools' id='activity16_2'/>
+    </branch>
+    <branch id='branch12'>
+      <exclusiveGateway id='exclusivegateway2'>
+        <branch condition='Patient with stroke not alert within first 24 hours' id='branch13'>
+          <activity role='stroke unit/ED nurse' action='Monitor non-alert stroke patient closely and screen swallowing ability when clinically appropriate within first 24 hours' objects='vital signs monitor, swallowing screening protocol' id='activity17'/>
+        </branch>
+        <branch condition='Patient with stroke alert within first 24 hours' id='branch14'>
+          <activity role='stroke unit/ED nurse' action='Continue routine neurological and swallowing status monitoring per stroke protocol' objects='neurological observation chart' id='activity18'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch15'>
+      <exclusiveGateway id='exclusivegateway3'>
+        <branch condition='Patient with stroke has features indicating dysphagia or pulmonary aspiration' id='branch16'>
+          <activity role='speech-language pathologist or appropriately trained specialist' action='Perform full clinical assessment of swallowing ability and recommend swallowing safety and required consistency of diet and fluids' objects='swallowing assessment tools, diet/fluids consistency guidelines' id='activity19'/>
+        </branch>
+        <branch condition='No features indicating dysphagia or pulmonary aspiration' id='branch17'>
+          <activity role='stroke team' action='Proceed with standard diet advancement per local stroke protocol after passing bedside screen' objects='standard diet order set' id='activity20'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </parallelGateway>
+
+  <exclusiveGateway id='exclusivegateway4'>
+    <branch condition='Presentation is TIA or minor (nondisabling) stroke' id='branch18'>
+      <activity role='ED/acute care clinician' action='Apply standardized triage tool to determine appropriate location of care for TIA patient' objects='TIA triage tool' id='activity22'/>
+      <activity role='ED/acute care clinician' action='Collect required clinical information and scores for TIA triage tool' objects='patient history, examination findings, triage form' id='activity22_1'/>
+      <activity role='ED/acute care clinician' action='Determine and document recommended care location based on TIA triage tool result' objects='triage tool algorithm, patient chart' id='activity22_2'/>
+
+      <parallelGateway id='parallelgateway4'>
+        <branch id='branch19'>
+          <exclusiveGateway id='exclusivegateway5'>
+            <branch condition='TIA or minor (nondisabling) stroke within 48 hours of symptom onset OR fluctuating motor or speech symptoms' id='branch20'>
+              <activity role='radiology/vascular lab' action='Perform immediate vascular imaging of neck arteries (carotid ultrasound, CTA, or MRA) unless clearly not a candidate for carotid revascularization' objects='carotid ultrasound, CTA or MRA equipment, imaging order' id='activity23'/>
+              <activity role='stroke/ED physician or radiology team' action='Select vascular imaging modality (carotid ultrasound, CTA, or MRA) based on clinical factors and availability' objects='clinical guidelines, imaging resources' id='activity23_1'/>
+              <activity role='radiology/vascular technologist' action='Perform neck vascular imaging using selected modality' objects='vascular imaging equipment, imaging protocol' id='activity23_2'/>
+            </branch>
+            <branch condition='TIA or ischemic stroke presenting beyond 48 hours' id='branch21'>
+              <activity role='radiology/vascular lab' action='Perform vascular imaging of brain and neck arteries as soon as possible' objects='CTA/MRA/ultrasound equipment, imaging order' id='activity24'/>
+              <activity role='stroke/ED physician or radiology team' action='Plan combined brain and neck vascular imaging strategy (CTA/MRA/ultrasound)' objects='clinical guidelines, imaging resources' id='activity24_1'/>
+              <activity role='radiology/vascular technologist' action='Perform ordered vascular imaging of brain and/or neck arteries' objects='vascular imaging equipment, imaging protocol' id='activity24_2'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch id='branch22a'>
+          <exclusiveGateway id='exclusivegateway6'>
+            <branch condition='Patient not admitted to hospital' id='branch23a'>
+              <activity role='ED/stroke physician or coordinator' action='Refer patient to rapid-assessment TIA/minor stroke unit, TIA clinic, or provincial stroke-prevention clinic' objects='referral form, appointment system' id='activity25'/>
+            </branch>
+            <branch condition='Patient admitted to hospital' id='branch24a'>
+              <activity role='inpatient stroke team' action='Coordinate in-hospital stroke-prevention assessment and plan follow-up in stroke-prevention clinic' objects='inpatient orders, follow-up referral' id='activity26'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </parallelGateway>
+    </branch>
+    <branch condition='Recommendations not applicable (not TIA or minor nondisabling stroke)' id='branch25'>
+      <activity role='stroke/ED physician' action='Manage patient according to appropriate non-TIA/non-minor-stroke stroke pathway (outside scope of this module)' objects='alternative stroke pathway protocol' id='activity27'/>
+    </branch>
+  </exclusiveGateway>
+
+  <parallelGateway id='parallelgateway5'>
+    <branch id='branch26'>
+      <activity role='hospital/EMS educators' action='Provide ongoing education to EMS crews on recognition of stroke/TIA symptoms and regional medical redirect protocols' objects='education materials, training sessions' id='activity28'/>
+    </branch>
+    <branch id='branch27'>
+      <activity role='stroke network coordinators' action='Collaborate between local EMS and stroke service institutions to support quality improvement and access to stroke care' objects='stroke network agreements, QI data' id='activity29'/>
+    </branch>
+    <branch id='branch28'>
+      <activity role='hospital administration and stroke program leaders' action='Maintain standardized stroke/TIA assessment and treatment protocols/tools in all EDs' objects='standardized protocols, clinical decision support tools' id='activity30'/>
+    </branch>
+    <branch id='branch29'>
+      <activity role='hospital administration and radiology leadership' action='Ensure CTAS I/II suspected stroke/TIA patients have prioritized access to diagnostic imaging for early assessment' objects='imaging scheduling system, CT/MRI capacity' id='activity31'/>
+    </branch>
+    <branch id='branch30a'>
+      <activity role='public health and stroke advocacy organizations' action='Conduct and sustain public awareness campaigns about stroke/TIA symptoms and when to contact 911' objects='public campaigns, media materials' id='activity32'/>
+    </branch>
+  </parallelGateway>
+
+  <activity role='stroke/ED physician or stroke prevention team' action='Provide cross-continuum secondary prevention assessments and therapies for all patients whether admitted or discharged (per Modules 5 and 10)' objects='secondary prevention protocol, prescriptions, education materials' id='activity21'/>
+  <parallelGateway id='parallelgateway7'>
+    <branch id='branch35'>
+      <activity role='stroke/ED physician or stroke prevention team' action='Perform secondary prevention risk assessment (vascular risk factors, etiology, recurrence risk)' objects='risk assessment tools, patient history, diagnostic results' id='activity21_1'/>
+    </branch>
+    <branch id='branch36'>
+      <activity role='stroke/ED physician or stroke prevention team' action='Initiate secondary prevention therapies and provide patient/caregiver education' objects='medication prescriptions, lifestyle counseling materials, follow-up plan' id='activity21_2'/>
+    </branch>
+  </parallelGateway>
+</process>

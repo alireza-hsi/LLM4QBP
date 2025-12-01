@@ -11,7 +11,7 @@ RUN conda config --set always_yes yes \
 # Copy environment and requirements
 COPY environment-promoai.yml environment-mao.yml ./
 COPY ProMoAI/requirements.txt ProMoAI/requirements.txt
-COPY MAO/Version-2.2/Code/requirements.txt MAO/Version-2.2/Code/requirements.txt
+COPY MAO/requirements.txt MAO/requirements.txt
 
 # Copy application code
 COPY . .

@@ -46,7 +46,7 @@ def main():
     powl_model = None
 
     # 2) iterate fresh generations
-    fresh_attempt = repair_attempt = None  # <--- add this
+    fresh_attempt = repair_attempt = None  
     for fresh in range(1, MAX_FRESH+1):
         print(f"[Fresh attempt {fresh}/{MAX_FRESH}] Generating initial code…")
         try:
