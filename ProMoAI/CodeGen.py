@@ -7,10 +7,11 @@ MODEL_MAP = {
     "GPT_4o1": "gpt-4.1",
     "4o1":     "gpt-4.1",
     "GPT_4o1_nano": "gpt-4.1-nano",
-    "GPT_5o1": "gpt-5.1",
-    "5o1": "gpt-5.1",
+    "GPT_5o2": "gpt-5.2",
+    "5o2": "gpt-5.2",
 }
 
+reasoning_models = ["gpt-5.2"]
 def get_initial_messages(txt_path: str):
     """
     Read the clinical-guideline text and build the single initial user message.
@@ -272,14 +273,23 @@ def generate_code_from_messages(messages, openai_api_key=None, model="GPT_4o1"):
             "OpenAI API key must be provided or set in the OPENAI_API_KEY environment variable."
         )
 
-    # v1.x client call
-    response = openai.chat.completions.create(
-        model=api_model,
-        messages=messages,
-        temperature=0.2,
-        max_completion_tokens=2000
-    )
-    text = response.choices[0].message.content
+    if api_model in reasoning_models:
+            resp_obj = openai.responses.create(
+                model=api_model,
+                input=messages,
+                reasoning={"effort": "none"},
+                text={"verbosity": "low"},
+                max_output_tokens=2000,
+            )
+            text = resp_obj.output[0].content[0].text
+    else:
+        # v1.x client call
+        text = openai.chat.completions.create(
+            model=api_model,
+            messages=messages,
+            temperature=0.2,
+            max_completion_tokens=2000,
+        ).choices[0].message.content
 
     # extract code
     match = re.search(r"```python(.*?)```", text, re.DOTALL)

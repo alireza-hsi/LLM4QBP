@@ -55,6 +55,80 @@ class OpenAIModel(ModelBackend):
         self.model_type = model_type
         self.model_config_dict = model_config_dict
 
+    def _log_usage(self, response: Dict[str, Any]) -> None:
+        usage = response.get("usage", {}) or {}
+
+        # Chat Completions shape
+        if "prompt_tokens" in usage or "completion_tokens" in usage:
+            prompt = usage.get("prompt_tokens", 0)
+            completion = usage.get("completion_tokens", 0)
+            total = usage.get("total_tokens", prompt + completion)
+
+        # Responses shape
+        else:
+            prompt = usage.get("input_tokens", usage.get("prompt_tokens", 0))
+            completion = usage.get("output_tokens", usage.get("completion_tokens", 0))
+            total = usage.get("total_tokens", prompt + completion)
+
+        log_and_print_online(
+            "**[OpenAI_Usage_Info Receive]**\n"
+            f"prompt_tokens/input_tokens: {prompt}\n"
+            f"completion_tokens/output_tokens: {completion}\n"
+            f"total_tokens: {total}\n"
+        )   
+
+    def responses_to_chatcompletions_dict(self, resp: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Convert OpenAI Responses API result (model_dump dict) into the legacy
+        Chat Completions-style dict expected by downstream code.
+        """
+        # ---- Extract text output ----
+        text_parts = []
+
+        # Responses commonly: output: [{content: [{type:"output_text", text:"..."}], role:"assistant"}]
+        for item in resp.get("output", []) or []:
+            for c in item.get("content", []) or []:
+                if c.get("type") in ("output_text", "text"):
+                    if "text" in c and c["text"]:
+                        text_parts.append(c["text"])
+
+        content = "\n".join(text_parts).strip()
+
+        # Fallbacks (SDK variations)
+        if not content:
+            # Some SDKs expose convenience fields
+            maybe = resp.get("output_text")
+            if isinstance(maybe, str) and maybe.strip():
+                content = maybe.strip()
+
+        # ---- Usage normalization ----
+        usage = resp.get("usage", {}) or {}
+        prompt = usage.get("prompt_tokens", usage.get("input_tokens", 0))
+        completion = usage.get("completion_tokens", usage.get("output_tokens", 0))
+        total = usage.get("total_tokens", prompt + completion)
+
+        # ---- Build Chat Completions-like shape ----
+        return {
+            "id": resp.get("id", ""),
+            "object": "chat.completion",
+            "created": resp.get("created", None),
+            "model": resp.get("model", None),
+            "choices": [
+                {
+                    "index": 0,
+                    "finish_reason": "stop",
+                    "message": {
+                        "role": "assistant",
+                        "content": content,
+                    },
+                }
+            ],
+            "usage": {
+                "prompt_tokens": prompt,
+                "completion_tokens": completion,
+                "total_tokens": total,
+            },
+        }
     def run(self, *args, **kwargs) -> Dict[str, Any]:
         string = "\n".join([message["content"] for message in kwargs["messages"]])
         encoding = tiktoken.encoding_for_model(self.model_type.value_for_tiktoken) 
@@ -72,26 +146,39 @@ class OpenAIModel(ModelBackend):
             "gpt-4-32k": 32768,
             "gpt-4o": 16384,
             "gpt-4.1": 30000,
-            "gpt-5.1": 30000,
+            "gpt-5.2": 30000,
         }
         # TODO: The 'openai.api_base' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(api_base="https://sailaoda.cn/v1")'
         # openai.api_base = "https://sailaoda.cn/v1"
         num_max_token = num_max_token_map[self.model_type.value]
         num_max_completion_tokens = num_max_token - num_prompt_tokens
-        self.model_config_dict['max_completion_tokens'] = num_max_completion_tokens
-        response = client.chat.completions.create(*args, **kwargs,
-                                                model=self.model_type.value,
-                                                **self.model_config_dict)
 
-        response=response.model_dump()
+        if self.model_type.value == "gpt-5.2":
+            resp_obj = client.responses.create(
+                model=self.model_type.value,
+                input=kwargs["messages"],
+                reasoning={"effort": "none"},
+                text={"verbosity": "low"},
+                max_output_tokens=num_max_completion_tokens,
+            )
+            resp_dict = resp_obj.model_dump()
+            response = self.responses_to_chatcompletions_dict(resp_dict)
 
-        log_and_print_online(
-            "**[OpenAI_Usage_Info Receive]**\nprompt_tokens: {}\ncompletion_tokens: {}\ntotal_tokens: {}\n".format(
-                response["usage"]["prompt_tokens"], response["usage"]["completion_tokens"],
-                response["usage"]["total_tokens"]))
+        else:
+            chat_cfg = dict(self.model_config_dict)
+            chat_cfg["max_tokens"] = num_max_completion_tokens
+            chat_cfg.pop("max_output_tokens", None)
+            chat_cfg.pop("max_completion_tokens", None)
 
-        if not isinstance(response, Dict):
-            raise RuntimeError("Unexpected return from OpenAI API")
+            resp_obj = client.chat.completions.create(
+                *args,
+                **kwargs,
+                model=self.model_type.value,
+                **chat_cfg,
+            )
+            response = resp_obj.model_dump()
+
+        self._log_usage(response)
         return response
 
 
@@ -127,7 +214,7 @@ class ModelFactory:
         default_model_type = ModelType.GPT_4
         if model_type in {
             ModelType.GPT_3_5_TURBO, ModelType.GPT_4, ModelType.GPT_4_32k, ModelType.GPT_4o, ModelType.GPT_4o1, 
-            ModelType.GPT_5o1,
+            ModelType.GPT_5o2,
             None
         }:
             model_class = OpenAIModel

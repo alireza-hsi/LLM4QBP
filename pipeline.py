@@ -31,13 +31,13 @@ def parse_args():
     p.add_argument("--config", default=None)
     p.add_argument("--org",    default=None)
     p.add_argument("--name",   default="PipelineProject")
-    p.add_argument("--model",  default="GPT_5o1",
-                   help="Always use GPT_5o1 for analytics")
+    p.add_argument("--model",  default="GPT_5o2",
+                   help="Always use GPT_5o2 for analytics")
     p.add_argument("--mapped-output", default=None)
     p.add_argument("--results-db",    default="resultsDb.sqlite")
     p.add_argument("--gold-bpmn-filename", default=None)
     p.add_argument("--mapping-model",
-                   default="gpt-5.1",
+                   default="gpt-5.2",
                    help="GPT model to use for activity mapping")
     return p.parse_args()
 
@@ -209,13 +209,12 @@ def process_run(args, run_idx):
         print(f"→ NodeSim={node_sim:.3f}, StructSim={struct_sim:.3f}, GED={ged}", flush=True)
 
         # 4) Log results
-        log_results(
-          args.results_db, base, args.framework,
-          node_sim, struct_sim, ged,
-          args.gold_bpmn_filename or os.path.basename(args.gold_bpmn),
-          gen_bpmn, args.model,
-          promoai_retries=promoai_retries if args.framework == "ProMoAI" else None
-        )
+        if args.framework == "ProMoAI":
+            log_results(args.results_db, base, args.framework, node_sim, struct_sim, ged, args.gold_bpmn_filename or os.path.basename(args.gold_bpmn), gen_bpmn, args.model, promoai_retries=promoai_retries)
+        else:
+            config = args.config.replace("Version-", "")
+            config = "MAO-v" + config
+            log_results(args.results_db, base, config, node_sim, struct_sim, ged, args.gold_bpmn_filename or os.path.basename(args.gold_bpmn), gen_bpmn, args.model, promoai_retries=promoai_retries)
     else:
         # No gold BPMN: log with nulls for sim fields, but with generated path
         log_results(

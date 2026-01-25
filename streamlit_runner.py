@@ -50,8 +50,8 @@ else:
     config = None
     org = None
 name = st.text_input("Project name / base run name", value="PipelineRun")
-model = st.text_input("Model name (e.g., GPT_5o1)", value="GPT_5o1")
-mapping_model = st.text_input("Mapping model", value="gpt-5.1")
+model = st.text_input("Model name (e.g., GPT_5o2)", value="GPT_5o2")
+mapping_model = st.text_input("Mapping model", value="gpt-5.2")
 results_db = st.text_input("SQLite DB path", value="resultsDb.sqlite")
 
 # ——— Run button with clear_logs callback ———

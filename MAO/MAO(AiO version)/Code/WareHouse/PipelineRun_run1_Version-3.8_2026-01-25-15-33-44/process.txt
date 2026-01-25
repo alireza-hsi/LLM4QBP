@@ -1,0 +1,129 @@
+<process>
+  <activity role='EMS' action='confirm suspected stroke/TIA and determine last known well time' objects='patient, witness history' id='activity1.1'/>
+  <activity role='EMS' action='prenotify receiving facility using standardized template' objects='patient status, last known well time, symptoms, vitals, glucose, anticoagulant use' id='activity1.2'/>
+
+  <activity role='ED triage nurse/receiving clinician' action='screen prenotification against acute stroke activation criteria' objects='prenotification details, activation criteria' id='activity2.1'/>
+  <activity role='ED triage nurse/receiving clinician' action='activate/assemble acute stroke team and prepare ED/CT access (for appropriate patients)' objects='stroke team roster, CT access, ED bay' id='activity2.2'/>
+
+  <parallelGateway id='parallelgateway0_module1'>
+    <branch id='branch0_diagnostics_and_swallow'>
+      <activity role='ED clinician' action='perform rapid initial ABC assessment (airway, breathing, circulation) and stabilize as needed' objects='patient, airway equipment, oxygen/ventilation support, monitor, IV access supplies' id='activity3_abc'/>
+
+      <parallelGateway id='parallelgateway1'>
+        <branch id='branch1'>
+          <activity role='ED clinician' action='assess focal neurological deficits' objects='patient' id='activity4.1'/>
+          <activity role='ED clinician' action='score stroke severity using standardized stroke scale (NIHSS or CNS)' objects='NIHSS/CNS tool, patient' id='activity4.2'/>
+        </branch>
+        <branch id='branch2'>
+          <activity role='ED nurse/physician' action='obtain ECG to detect atrial fibrillation and other acute arrhythmias' objects='ECG machine, patient' id='activity5'/>
+          <activity role='ED clinician/cardiology' action='interpret ECG immediately and document arrhythmia findings' objects='ECG tracing, interpretation note' id='activity5.1'/>
+        </branch>
+        <branch id='branch3'>
+          <activity role='ED clinician' action='order stroke blood work panel (CBC, electrolytes, creatinine, glucose, INR, PTT; troponin if indicated)' objects='lab requisition/order set' id='activity6.1'/>
+          <activity role='ED nurse/phlebotomy' action='collect and send blood specimens to laboratory' objects='blood samples, labels, transport bag' id='activity6.2'/>
+          <activity role='ED clinician/lab medicine' action='interpret blood work results immediately when available and communicate critical values to stroke team' objects='lab results, critical value protocol' id='activity6.2a'/>
+        </branch>
+        <branch id='branch4'>
+          <exclusiveGateway id='exclusivegateway6'>
+            <branch condition='CT is available and no MRI-only indication/constraint' id='branch18'>
+              <activity role='ED clinician' action='select CT as immediate brain imaging modality' objects='imaging protocol, patient' id='activity7.1'/>
+              <activity role='ED clinician' action='place urgent brain imaging order and arrange immediate transport to scanner' objects='CT order, patient, transport' id='activity7.3_ct'/>
+              <activity role='radiology/qualified provider' action='interpret brain imaging immediately by a health care provider with expertise in reading CT and/or MRI' objects='CT images' id='activity8_ct'/>
+            </branch>
+            <branch condition='MRI is immediately available and appropriate (e.g., CT unavailable or MRI preferred and feasible)' id='branch19'>
+              <activity role='ED clinician' action='select MRI as immediate brain imaging modality' objects='imaging protocol, patient' id='activity7.2'/>
+              <activity role='ED clinician' action='place urgent brain imaging order and arrange immediate transport to scanner' objects='MRI order, patient, transport' id='activity7.3_mri'/>
+              <activity role='radiology/qualified provider' action='interpret brain imaging immediately by a health care provider with expertise in reading CT and/or MRI' objects='MRI images' id='activity8_mri'/>
+            </branch>
+            <branch condition='neither CT nor MRI is immediately available/feasible' id='branch25'>
+              <activity role='ED clinician/radiology' action='escalate imaging access issue and initiate contingency plan (prioritize next available scanner or arrange transfer per protocol)' objects='escalation protocol, transfer pathway, patient' id='activity7.4'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch id='branch5'>
+          <exclusiveGateway id='exclusivegateway_cxr_mod'>
+            <branch condition='chest x-ray is clinically required' id='branch_cxr_yes_mod'>
+              <activity role='ED team' action='obtain chest x-ray without delaying thrombolysis assessment/decision-making' objects='portable x-ray, chest x-ray order (if required)' id='activity9_mod'/>
+            </branch>
+            <branch condition='chest x-ray is not clinically required' id='branch_cxr_no_mod'>
+              <activity role='ED team' action='skip chest x-ray and continue acute stroke assessment pathway' objects='acute stroke pathway' id='activity9_skip_mod'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </parallelGateway>
+
+      <activity role='ED clinician' action='review critical lab results when available and flag abnormalities affecting acute decisions' objects='lab results' id='activity6.3'/>
+
+      <activity role='ED nurse' action='make all patients with stroke NPO initially' objects='NPO order, patient' id='activity10'/>
+
+      <exclusiveGateway id='exclusivegateway1'>
+        <branch condition='patient not alert within the first 24 hours' id='branch8'>
+          <activity role='ED/acute care nurse' action='monitor closely within the first 24 hours and screen swallowing ability when clinically appropriate' objects='patient, monitoring equipment' id='activity12'/>
+          <activity role='ED nurse' action='perform bedside swallow screen using a simple, valid, reliable protocol before any oral intake when clinically appropriate' objects='bedside swallow screen tool' id='activity11.1a'/>
+        </branch>
+        <branch condition='patient alert within the first 24 hours' id='branch9'>
+          <activity role='ED nurse' action='perform bedside swallow screen using a simple, valid, reliable protocol before any oral intake' objects='bedside swallow screen tool' id='activity11.1'/>
+        </branch>
+      </exclusiveGateway>
+
+      <exclusiveGateway id='exclusivegateway7'>
+        <branch condition='swallow screen passed and safe for oral intake per protocol' id='branch20'>
+          <activity role='ED clinician' action='allow oral meds/fluids/food per protocol and document clearance' objects='swallow screen result, diet order' id='activity11.2'/>
+        </branch>
+        <branch condition='swallow screen failed/indeterminate or unsafe for oral intake' id='branch21'>
+          <activity role='ED clinician' action='continue NPO and use non-oral routes for medications/fluids as appropriate' objects='NPO order, medication plan' id='activity11.3'/>
+          <exclusiveGateway id='exclusivegateway2'>
+            <branch condition='features indicating dysphagia or pulmonary aspiration present' id='branch10'>
+              <activity role='speech-language pathologist/appropriately trained specialist' action='perform full clinical assessment of swallowing ability and advise required consistency of diet and fluids' objects='patient, swallowing assessment tools' id='activity14'/>
+            </branch>
+            <branch condition='no features indicating dysphagia or pulmonary aspiration' id='branch11'>
+              <activity role='ED clinician' action='document swallow screen result and maintain NPO/modified plan per protocol' objects='swallow screen result, care plan' id='activity15'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+
+    <branch id='branch0_tia_triage_early_parallel'>
+      <exclusiveGateway id='exclusivegateway3'>
+        <branch condition='presentation is TIA or minor (nondisabling) stroke' id='branch12'>
+          <activity role='ED clinician' action='calculate standardized TIA triage/risk score using a standardized tool' objects='TIA triage tool, patient data' id='activity16.1'/>
+          <activity role='ED clinician' action='initiate early disposition planning (start bed request/clinic booking/discharge planning) based on triage tool while diagnostics proceed' objects='triage score, bed management system, clinic scheduling, discharge planning checklist' id='activity16.1a'/>
+          <exclusiveGateway id='exclusivegateway8'>
+            <branch condition='requires admission/urgent in-hospital management per triage tool' id='branch22'>
+              <activity role='ED clinician' action='admit patient to appropriate acute care/stroke service' objects='admission order, bed request' id='activity16.2'/>
+            </branch>
+            <branch condition='appropriate for rapid-assessment TIA/minor stroke clinic pathway' id='branch23'>
+              <activity role='ED clinician' action='refer to rapid-assessment TIA/minor stroke clinic and arrange expedited appointment' objects='referral order, clinic contact' id='activity16.3'/>
+            </branch>
+            <branch condition='appropriate for ED discharge with urgent outpatient follow-up per triage tool' id='branch24'>
+              <activity role='ED clinician' action='discharge with written instructions and urgent follow-up plan' objects='discharge instructions, follow-up booking' id='activity16.4'/>
+            </branch>
+          </exclusiveGateway>
+          <activity role='ED clinician' action='confirm disposition after key diagnostic results are available and update plan if needed' objects='brain imaging report, ECG, labs, clinical status, triage tool result' id='activity16.5'/>
+          <exclusiveGateway id='exclusivegateway4'>
+            <branch condition='within 48 hours of symptom onset OR fluctuating motor or speech symptoms' id='branch13'>
+              <exclusiveGateway id='exclusivegateway5'>
+                <branch condition='clearly not a candidate for carotid artery revascularization' id='branch14'>
+                  <activity role='ED clinician' action='document not a candidate for carotid artery revascularization and do not perform immediate neck-artery vascular imaging' objects='clinical assessment, contraindications' id='activity17'/>
+                </branch>
+                <branch condition='candidate for carotid artery revascularization (or not clearly excluded)' id='branch15'>
+                  <activity role='ED clinician/radiology' action='perform immediate vascular imaging of the neck arteries (carotid ultrasound, CTA, or MRA)' objects='vascular imaging order, patient' id='activity18'/>
+                </branch>
+              </exclusiveGateway>
+            </branch>
+            <branch condition='beyond 48 hours from symptom onset' id='branch16'>
+              <activity role='ED clinician/radiology' action='perform vascular imaging of the brain and neck arteries as soon as possible' objects='vascular imaging order, patient' id='activity19'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch condition='presentation is stroke (not TIA/minor nondisabling stroke)' id='branch17'>
+          <activity role='ED clinician' action='proceed with acute stroke pathway decisions based on early assessment findings' objects='clinical findings, imaging, labs' id='activity20'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </parallelGateway>
+
+  <activity role='stroke team/ED clinician' action='initiate secondary prevention assessments and therapies (per Modules 5 and 10)' objects='secondary prevention protocol, medication orders' id='activity21.1'/>
+  <activity role='stroke team/ED clinician' action='arrange referrals/follow-up and provide patient education for admitted or discharged patients' objects='referrals, follow-up appointments, education materials' id='activity21.2'/>
+</process>

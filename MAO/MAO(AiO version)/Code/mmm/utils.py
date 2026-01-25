@@ -6,8 +6,6 @@ import logging
 from easydict import EasyDict
 import openai
 from openai import OpenAI
-
-client = OpenAI(api_key="sk-oYlPfsN4LrwmXlNTAaEbC3676e5e458dBbFdE1A548973c46")
 import numpy as np
 import faiss
 import requests
@@ -22,6 +20,7 @@ from tenacity import (
     wait_fixed
 )
 
+client = OpenAI(api_key=os.environ['OPENAI_API_KEY'])
 
 def getFilesFromType(sourceDir, filetype):
     files = []
@@ -187,10 +186,13 @@ class OpenAIModel(ModelBackend):
             "gpt-4": 8192,
             "gpt-4-0613": 8192,
             "gpt-4-32k": 32768,
+            "gpt-4o": 16384,
+            "gpt-4.1": 30000,
+            "gpt-5.2": 30000,
         }
         # messages = [{"role": "user", "content": "Hello"}]
         response = client.chat.completions.create(messages = messages,
-        model = "gpt-3.5-turbo-16k",
+        model = self.model_type,
         temperature = 0.2,
         top_p = 1.0,
         n = 1,

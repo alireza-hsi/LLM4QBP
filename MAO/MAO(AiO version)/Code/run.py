@@ -53,7 +53,7 @@ def parse_args():
     parser.add_argument('--name', type=str, default="",
                         help="Name of software, your software will be generated in WareHouse/name_org_timestamp")
     parser.add_argument('--model', type=str, default="GPT_4",
-                        help="GPT Model, choose from {'GPT_3_5_TURBO','GPT_4','GPT_4_32K','GPT_4o', GPT_4o1, GPT_5o1}")
+                        help="GPT Model, choose from {'GPT_3_5_TURBO','GPT_4','GPT_4_32K','GPT_4o', GPT_4o1, GPT_5o2}")
     args = parser.parse_args()
     
     if args.task_file:
@@ -77,7 +77,7 @@ if __name__ == "__main__":
         'GPT_4_32K': ModelType.GPT_4_32k,
         'GPT_4o': ModelType.GPT_4o,
         'GPT_4o1': ModelType.GPT_4o1,
-        'GPT_5o1': ModelType.GPT_5o1
+        'GPT_5o2': ModelType.GPT_5o2
     }
     
     chat_chain = ChatChain(
