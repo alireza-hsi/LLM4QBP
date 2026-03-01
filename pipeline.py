@@ -1,8 +1,30 @@
 #!/usr/bin/env python3
 """
-Unified pipeline for MAO-* and ProMoAI frameworks,
-including activity mapping, BPMN comparison, and
-skipping/logging runs that fail all retries.
+Unified pipeline for MAO (AiO version) and ProMoAI frameworks,
+including activity mapping, BPMN comparison, and logging results.
+
+Supports:
+- Batch mode via --batch-manifest (JSON from Streamlit UI)
+- Parallel execution via --max-workers
+- Incremental DB writes (crash-safe; writes as each run completes)
+- Progress output lines for Streamlit parsing: "PROGRESS X/Y"
+
+Batch manifest item format (from the Streamlit UI):
+[
+  {
+    "id": "a1b2c3d4",
+    "framework": "ProMoAI" | "MAO (AiO version)",
+    "runs": 5,
+    "name": "PipelineRun",
+    "model": "GPT_5o2",
+    "mapping_model": "gpt-5.2",
+    "config": "Version-3.8",     # MAO only
+    "org": "Version-3.8",        # MAO only
+    "task_file": "/tmp/.../id__QBP1.txt",
+    "gold_bpmn": "/tmp/.../id__QBP1.bpmn" | null,
+    "gold_bpmn_filename": "QBP1.bpmn" | null
+  }
+]
 """
 import argparse
 import os
@@ -10,40 +32,78 @@ import sys
 import subprocess
 import sqlite3
 import re
+import json
+import shutil
+import uuid
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from queue import Queue
+from threading import Thread
 
-from streamlit_runner import PROMOAI_ENV
+# Conda env names can be set by Streamlit via env vars; defaults provided.
+PROMOAI_ENV = os.environ.get("PROMOAI_ENV", "promoai")
+MAO_ENV = os.environ.get("MAO_ENV", "mao")
 
 # Ensure your MAO helpers are on PYTHONPATH
 MAO_HELPER = os.path.join("MAO", "MAO(AiO version)", "Code", "Helper")
 sys.path.insert(0, MAO_HELPER)
 
-from automatedActivityMapping import extract_activity_names, get_alignment, get_revision, update_activity_names
+from automatedActivityMapping import (
+    extract_activity_names,
+    get_alignment,
+    get_revision,
+    update_activity_names,
+)
 from bpmn_compare_similarity import CompareBPMN
 
+
+# ---------------------------
+# Args
+# ---------------------------
 def parse_args():
     p = argparse.ArgumentParser()
-    p.add_argument("--framework",
-                   choices=["ProMoAI","MAO (AiO version)"],
-                   required=True)
-    p.add_argument("--task-file",   required=True)
-    p.add_argument("--gold-bpmn",   required=False)
-    p.add_argument("--runs",  type=int, default=1)
+
+    # Batch mode
+    p.add_argument("--batch-manifest", default=None,
+                   help="JSON list of experiments (from Streamlit UI).")
+    p.add_argument("--max-workers", type=int, default=1,
+                   help="Parallel workers for batch jobs.")
+    p.add_argument("--batch-id", default=None,
+                   help="Optional batch id for grouping; if omitted a UUID is generated.")
+
+    # Single mode (backwards compatible)
+    p.add_argument("--framework", choices=["ProMoAI", "MAO (AiO version)"], required=False)
+    p.add_argument("--task-file", required=False)
+    p.add_argument("--gold-bpmn", required=False)
+    p.add_argument("--runs", type=int, default=1)
     p.add_argument("--config", default=None)
-    p.add_argument("--org",    default=None)
-    p.add_argument("--name",   default="PipelineProject")
-    p.add_argument("--model",  default="GPT_5o2",
-                   help="Always use GPT_5o2 for analytics")
+    p.add_argument("--org", default=None)
+    p.add_argument("--name", default="PipelineProject")
+    p.add_argument("--model", default="GPT_5o2")
     p.add_argument("--mapped-output", default=None)
-    p.add_argument("--results-db",    default="resultsDb.sqlite")
+    p.add_argument("--results-db", default="resultsDb.sqlite")
     p.add_argument("--gold-bpmn-filename", default=None)
-    p.add_argument("--mapping-model",
-                   default="gpt-5.2",
-                   help="GPT model to use for activity mapping")
+    p.add_argument("--mapping-model", default="gpt-5.2")
+
     return p.parse_args()
 
-def log_results(db, qbp, framework, node_sim, struct_sim, ged, gold, gen, model, promoai_retries=None):
-    conn = sqlite3.connect(db)
+
+# ---------------------------
+# DB helpers (WAL + create tables)
+# ---------------------------
+def db_connect(db_path: str) -> sqlite3.Connection:
+    conn = sqlite3.connect(db_path, timeout=30)
+    # Improve robustness under frequent writes
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA synchronous=NORMAL;")
+    conn.execute("PRAGMA busy_timeout=30000;")
+    return conn
+
+
+def db_init(conn: sqlite3.Connection):
     c = conn.cursor()
+
+    # Your existing table (kept as-is)
     c.execute("""
       CREATE TABLE IF NOT EXISTS experiment_results (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -59,7 +119,52 @@ def log_results(db, qbp, framework, node_sim, struct_sim, ged, gold, gen, model,
         promoai_retries TEXT
       )
     """)
+
+    # New run-level tracking (for progress/resume/debug)
     c.execute("""
+      CREATE TABLE IF NOT EXISTS experiment_runs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        batch_id TEXT,
+        job_id TEXT,
+        qbp_name TEXT,
+        framework TEXT,
+        run_index INTEGER,
+        status TEXT,
+        started_at TEXT,
+        finished_at TEXT,
+        error TEXT,
+        UNIQUE(batch_id, job_id)
+      )
+    """)
+
+    conn.commit()
+
+
+def db_mark_started(conn: sqlite3.Connection, batch_id: str, job_id: str,
+                    qbp: str, framework: str, run_index: int):
+    conn.execute("""
+      INSERT OR IGNORE INTO experiment_runs
+        (batch_id, job_id, qbp_name, framework, run_index, status, started_at, finished_at, error)
+      VALUES
+        (?, ?, ?, ?, ?, 'started', datetime('now'), NULL, NULL)
+    """, (batch_id, job_id, qbp, framework, run_index))
+    conn.commit()
+
+
+def db_mark_finished(conn: sqlite3.Connection, batch_id: str, job_id: str,
+                     status: str, error: str | None):
+    conn.execute("""
+      UPDATE experiment_runs
+      SET status=?, finished_at=datetime('now'), error=?
+      WHERE batch_id=? AND job_id=?
+    """, (status, error, batch_id, job_id))
+    conn.commit()
+
+
+def db_insert_result(conn: sqlite3.Connection, qbp: str, framework: str,
+                     node_sim, struct_sim, ged,
+                     gold, gen, model, promoai_retries):
+    conn.execute("""
       INSERT INTO experiment_results (
         timestamp, qbp_name, framework,
         node_similarity, structure_similarity, graph_edit_distance,
@@ -67,53 +172,77 @@ def log_results(db, qbp, framework, node_sim, struct_sim, ged, gold, gen, model,
       ) VALUES (datetime('now'),?,?,?,?,?,?,?, ?, ?)
     """, (qbp, framework, node_sim, struct_sim, ged, gold, gen, model, promoai_retries))
     conn.commit()
-    conn.close()
 
+
+# ---------------------------
+# Misc helpers
+# ---------------------------
+def _stem(path: str) -> str:
+    return os.path.splitext(os.path.basename(path))[0]
+
+
+def _safe_makedirs(path: str):
+    if path and not os.path.exists(path):
+        os.makedirs(path, exist_ok=True)
+
+
+def _conda_prefix(env_name: str):
+    conda = shutil.which("conda")
+    if conda:
+        return ["conda", "run", "-n", env_name, "python", "-u"]
+    return None
+
+
+def _strip_eid_prefix(filename: str, eid: str) -> str:
+    base = os.path.basename(filename)
+    prefix = f"{eid}__"
+    if base.startswith(prefix):
+        base = base[len(prefix):]
+    return os.path.splitext(base)[0]
+
+
+# ---------------------------
+# Framework runners
+# ---------------------------
 def run_mao(task_file, config, org, name, model, code_root):
     script = os.path.join(code_root, "run.py")
-    cmd = [sys.executable, script,
-           "--task-file", task_file,
-           "--config",    config,
-           "--org",       org,
-           "--name",      name]
+
+    # Prefer MAO conda env if available; otherwise fallback
+    prefix = _conda_prefix(MAO_ENV)
+    if prefix is None:
+        prefix = [sys.executable, "-u"]
+
+    cmd = prefix + [
+        script,
+        "--task-file", task_file,
+        "--config", config,
+        "--org", org,
+        "--name", name
+    ]
     if model:
         cmd += ["--model", model]
-    try:
-        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        
-        # process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        # out, error = [ b.decode('UTF-8') for b in process.communicate() ]
-        # print("error:"); print(error)
-        # print("out:"); print(out)
-        # result = out
-    except subprocess.CalledProcessError as e:
-        print("Error running MAO run.py:", e)
-        print("STDOUT:", e.stdout)
-        print("STDERR:", e.stderr)
-        raise
+
+    result = subprocess.run(cmd, check=True, capture_output=True, text=True)
     bpmn_path = result.stdout.strip().splitlines()[-1]
     return bpmn_path
 
+
 def run_promoai(task_file, model, code_root, project_name):
     script = "ProMoAI_API.py"
-    cmd = [
-        "conda", "run", "-n", PROMOAI_ENV, "python",
+    prefix = _conda_prefix(PROMOAI_ENV)
+    if prefix is None:
+        raise RuntimeError("conda not found on PATH, but ProMoAI execution requires conda env.")
+
+    cmd = prefix + [
         script,
-        "--task-file",    task_file,
-        "--model",        model,
-        "--output-dir",   "WareHouse",
+        "--task-file", task_file,
+        "--model", model,
+        "--output-dir", "WareHouse",
         "--project-name", project_name
     ]
-    try:
-        result = subprocess.run(cmd, cwd=code_root,
-                                check=True,
-                                capture_output=True,
-                                text=True)
-    except subprocess.CalledProcessError as e:
-        print("▶ ProMoAI_API.py stdout:\n", e.stdout, flush=True)
-        print("▶ ProMoAI_API.py stderr:\n", e.stderr, flush=True)
-        raise
-    # Parse PROMOAI_RETRIES from stdout
+
+    result = subprocess.run(cmd, cwd=code_root, check=True, capture_output=True, text=True)
+
     lines = result.stdout.strip().splitlines()
     promoai_retries = None
     bpmn_path = None
@@ -124,19 +253,26 @@ def run_promoai(task_file, model, code_root, project_name):
             bpmn_path = line
     return bpmn_path, promoai_retries
 
+
+# ---------------------------
+# Mapping + Compare
+# ---------------------------
 def extract_python_lists(text):
-    import re, ast
+    import ast
     set_a = set_c = None
-    for var in ("Set_A","Set_C"):
+    for var in ("Set_A", "Set_C"):
         m = re.search(rf"{var}\s*=\s*(\[[\s\S]*?\])", text)
         if m:
             try:
                 val = ast.literal_eval(m.group(1))
-                if var=="Set_A": set_a = val
-                else:           set_c = val
-            except:
+                if var == "Set_A":
+                    set_a = val
+                else:
+                    set_c = val
+            except Exception:
                 pass
     return set_a, set_c
+
 
 def map_activities(generated, gold, mapped_out, mapping_model):
     a = extract_activity_names(generated)
@@ -144,93 +280,380 @@ def map_activities(generated, gold, mapped_out, mapping_model):
     mapping, set_c, table = get_alignment(a, b, model=mapping_model)
     revision_raw = get_revision(a, b, table, model=mapping_model)
     rev_a, rev_c = extract_python_lists(revision_raw)
-    if rev_a is None: rev_a = a
-    if rev_c is None: rev_c = set_c
-    final_map = {
-      x: (x if c.strip().lower().startswith("no") else c)
-      for x,c in zip(rev_a, rev_c)
-    }
+    if rev_a is None:
+        rev_a = a
+    if rev_c is None:
+        rev_c = set_c
+    final_map = {x: (x if c.strip().lower().startswith("no") else c) for x, c in zip(rev_a, rev_c)}
     update_activity_names(generated, mapped_out, final_map)
+
 
 def compare_bpmn(gold, mapped):
     comp = CompareBPMN(export_csv=False, export_excel=False)
     return comp.calculate_similarity(gold, mapped)
 
-def process_run(args, run_idx):
-    base     = os.path.splitext(os.path.basename(args.task_file))[0]
-    run_name = f"{args.name}_run{run_idx}"
-    print(f"\n=== Run {run_idx} for {base} ===", flush=True)
 
-    promoai_retries = None  # <--- add this
+# ---------------------------
+# Job building
+# ---------------------------
+def load_jobs(args):
+    jobs = []
 
-    # 1) Generate BPMN
+    if args.batch_manifest:
+        with open(args.batch_manifest, "r", encoding="utf-8") as f:
+            manifest = json.load(f)
+        if not isinstance(manifest, list):
+            raise ValueError("--batch-manifest must be a JSON list")
+
+        for item in manifest:
+            eid = item.get("id") or "noid"
+            framework = item.get("framework")
+            if framework not in ("ProMoAI", "MAO (AiO version)"):
+                raise ValueError(f"Invalid or missing framework in manifest item: {framework}")
+
+            runs = int(item.get("runs", 1))
+            task_file = item.get("task_file")
+            if not task_file:
+                continue
+
+            qbp = item.get("qbp") or _strip_eid_prefix(task_file, eid)
+
+            for run_idx in range(1, runs + 1):
+                job_id = f"{eid}:{qbp}:run{run_idx}"
+                jobs.append({
+                    "job_id": job_id,
+                    "id": eid,
+                    "qbp": qbp,
+                    "framework": framework,
+                    "run_idx": run_idx,
+                    "task_file": task_file,
+                    "gold_bpmn": item.get("gold_bpmn"),
+                    "gold_bpmn_filename": item.get("gold_bpmn_filename"),
+                    "name": item.get("name", "PipelineProject"),
+                    "model": item.get("model", "GPT_5o2"),
+                    "mapping_model": item.get("mapping_model", "gpt-5.2"),
+                    "config": item.get("config"),
+                    "org": item.get("org"),
+                    "mapped_output": item.get("mapped_output"),
+                })
+
+        return jobs
+
+    # Single mode (old behavior)
+    if not args.framework or not args.task_file:
+        raise ValueError("Single mode requires --framework and --task-file (or use --batch-manifest).")
+
+    base = _stem(args.task_file)
+    gold_fn = args.gold_bpmn_filename or (os.path.basename(args.gold_bpmn) if args.gold_bpmn else None)
+
+    for run_idx in range(1, args.runs + 1):
+        jobs.append({
+            "job_id": f"single:{base}:run{run_idx}",
+            "id": "single",
+            "qbp": base,
+            "framework": args.framework,
+            "run_idx": run_idx,
+            "task_file": args.task_file,
+            "gold_bpmn": args.gold_bpmn,
+            "gold_bpmn_filename": gold_fn,
+            "name": args.name,
+            "model": args.model,
+            "mapping_model": args.mapping_model,
+            "config": args.config,
+            "org": args.org,
+            "mapped_output": args.mapped_output,
+        })
+    return jobs
+
+
+# ---------------------------
+# Execute one job (NO DB writes here)
+# ---------------------------
+def run_one_job(job):
+    eid = job["id"]
+    qbp = job["qbp"]
+    run_idx = job["run_idx"]
+    framework = job["framework"]
+    job_id = job["job_id"]
+
+    jid = f"{job_id}"
+
+    def jprint(msg: str):
+        print(f"[{jid}] {msg}", flush=True)
+
+    name_prefix = job.get("name") or "PipelineProject"
+    model = job.get("model") or "GPT_5o2"
+    mapping_model = job.get("mapping_model") or "gpt-5.2"
+    task_file = job["task_file"]
+    gold_bpmn = job.get("gold_bpmn")
+    gold_bpmn_filename = job.get("gold_bpmn_filename")
+    mapped_output_override = job.get("mapped_output")
+
+    config = job.get("config")
+    org = job.get("org")
+
+    run_name = f"{name_prefix}_{qbp}_{eid}_run{run_idx}"
+    jprint(f"=== Run {run_idx} for {qbp} ({framework}) ===")
+
+    promoai_retries = None
+    gen_bpmn = None
+
+    # 1) Generate
     try:
-        if args.framework.startswith("MAO (AiO version)"):
-            #suffix    = args.framework.split("MAO-v",1)[1]
-            # Extract version number from framework string, e.g. "MAO-v3.1" -> "3.1"
-            #mao_version = re.search(r"MAO-v(.+)", args.framework)
-            #ver_str = mao_version.group(1) if mao_version else "2.2"  # default fallback
-            #code_root = os.path.join("MAO", f"Version-{ver_str}", "Code")
+        if framework == "MAO (AiO version)":
+            if not config or not org:
+                raise ValueError("MAO job missing config/org (set them in the UI card).")
             code_root = os.path.join("MAO", "MAO(AiO version)", "Code")
-            gen_bpmn = run_mao(args.task_file, args.config, args.org, run_name, args.model, code_root)
+            gen_bpmn = run_mao(task_file, config, org, run_name, model, code_root)
         else:
-            code_root = os.path.join(
-                "ProMoAI"
-            )
-            gen_bpmn, promoai_retries = run_promoai(args.task_file, args.model, code_root, run_name)
-    except subprocess.CalledProcessError:
-        print("✗ Generation failed after all retries; skipping this run.", flush=True)
-        log_results(
-          args.results_db, base, args.framework,
-          None, None, None,
-          args.gold_bpmn_filename or (os.path.basename(args.gold_bpmn) if args.gold_bpmn else None),
-          None, args.model,
-          promoai_retries="failed" if args.framework == "ProMoAI" else None
-        )
-        return
-    
-    # After generation, adjust BPMN path for MAO
-    if args.framework == "MAO (AiO version)":
+            code_root = os.path.join("ProMoAI")
+            gen_bpmn, promoai_retries = run_promoai(task_file, model, code_root, run_name)
+
+    except subprocess.CalledProcessError as e:
+        jprint("✗ Generation failed after all retries; skipping.")
+        return {
+            "job_id": job_id,
+            "qbp": qbp,
+            "framework_db": framework,
+            "run_idx": run_idx,
+            "status": "failed_generation",
+            "error": "generation_failed_after_retries",
+            "node_sim": None,
+            "struct_sim": None,
+            "ged": None,
+            "gold_for_db": gold_bpmn_filename or (os.path.basename(gold_bpmn) if gold_bpmn else None),
+            "gen_bpmn": None,
+            "model": model,
+            "promoai_retries": "failed" if framework == "ProMoAI" else None,
+        }
+    except Exception as e:
+        jprint(f"✗ Job error: {e}")
+        return {
+            "job_id": job_id,
+            "qbp": qbp,
+            "framework_db": framework,
+            "run_idx": run_idx,
+            "status": "failed_error",
+            "error": str(e),
+            "node_sim": None,
+            "struct_sim": None,
+            "ged": None,
+            "gold_for_db": gold_bpmn_filename or (os.path.basename(gold_bpmn) if gold_bpmn else None),
+            "gen_bpmn": None,
+            "model": model,
+            "promoai_retries": promoai_retries if framework == "ProMoAI" else None,
+        }
+
+    # Adjust MAO output
+    if framework == "MAO (AiO version)" and gen_bpmn:
         no_dummy_bpmn = gen_bpmn.replace("process.bpmn", "process_no_dummy.bpmn")
         if os.path.exists(no_dummy_bpmn):
             gen_bpmn = no_dummy_bpmn
 
-    print("✔ Generated BPMN:", gen_bpmn, flush=True)
+    jprint(f"✔ Generated BPMN: {gen_bpmn}")
 
-    if args.gold_bpmn:
-        # 2) Map activity names
-        mapped = args.mapped_output or gen_bpmn.replace(".bpmn", "_mapped.bpmn")
-        os.makedirs(os.path.dirname(mapped), exist_ok=True)
-        map_activities(gen_bpmn, args.gold_bpmn, mapped, args.mapping_model)
-        print("✔ Mapped  BPMN:", mapped, flush=True)
+    # No gold: log generation only
+    if not gold_bpmn:
+        return {
+            "job_id": job_id,
+            "qbp": qbp,
+            "framework_db": framework,
+            "run_idx": run_idx,
+            "status": "ok_no_gold",
+            "error": None,
+            "node_sim": None,
+            "struct_sim": None,
+            "ged": None,
+            "gold_for_db": None,
+            "gen_bpmn": gen_bpmn,
+            "model": model,
+            "promoai_retries": promoai_retries if framework == "ProMoAI" else None,
+        }
 
-        # 3) Compare structure
-        node_sim, struct_sim, ged = compare_bpmn(args.gold_bpmn, mapped)
-        print(f"→ NodeSim={node_sim:.3f}, StructSim={struct_sim:.3f}, GED={ged}", flush=True)
+    # 2) Map + 3) Compare
+    try:
+        mapped = mapped_output_override or gen_bpmn.replace(".bpmn", "_mapped.bpmn")
+        _safe_makedirs(os.path.dirname(mapped))
+        map_activities(gen_bpmn, gold_bpmn, mapped, mapping_model)
+        jprint(f"✔ Mapped  BPMN: {mapped}")
 
-        # 4) Log results
-        if args.framework == "ProMoAI":
-            log_results(args.results_db, base, args.framework, node_sim, struct_sim, ged, args.gold_bpmn_filename or os.path.basename(args.gold_bpmn), gen_bpmn, args.model, promoai_retries=promoai_retries)
+        node_sim, struct_sim, ged = compare_bpmn(gold_bpmn, mapped)
+        jprint(f"→ NodeSim={node_sim:.3f}, StructSim={struct_sim:.3f}, GED={ged}")
+
+        # Framework formatting like your original code
+        if framework == "ProMoAI":
+            db_framework = "ProMoAI"
         else:
-            config = args.config.replace("Version-", "")
-            config = "MAO-v" + config
-            log_results(args.results_db, base, config, node_sim, struct_sim, ged, args.gold_bpmn_filename or os.path.basename(args.gold_bpmn), gen_bpmn, args.model, promoai_retries=promoai_retries)
-    else:
-        # No gold BPMN: log with nulls for sim fields, but with generated path
-        log_results(
-          args.results_db, base, args.framework,
-          None, None, None,
-          None,  # gold_bpmn_path
-          gen_bpmn, args.model,
-          promoai_retries=promoai_retries if args.framework == "ProMoAI" else None
-        )
-        print("Logged results to", args.results_db)
+            db_framework = "MAO-v" + config.replace("Version-", "") if config else "MAO (AiO version)"
 
+        return {
+            "job_id": job_id,
+            "qbp": qbp,
+            "framework_db": db_framework,
+            "run_idx": run_idx,
+            "status": "ok",
+            "error": None,
+            "node_sim": node_sim,
+            "struct_sim": struct_sim,
+            "ged": ged,
+            "gold_for_db": gold_bpmn_filename or os.path.basename(gold_bpmn),
+            "gen_bpmn": gen_bpmn,
+            "model": model,
+            "promoai_retries": promoai_retries if framework == "ProMoAI" else None,
+        }
+
+    except Exception as e:
+        jprint(f"✗ Post-process failed: {e}")
+
+        if framework == "MAO (AiO version)" and config:
+            db_framework = "MAO-v" + config.replace("Version-", "")
+        else:
+            db_framework = framework
+
+        return {
+            "job_id": job_id,
+            "qbp": qbp,
+            "framework_db": db_framework,
+            "run_idx": run_idx,
+            "status": "failed_postprocess",
+            "error": str(e),
+            "node_sim": None,
+            "struct_sim": None,
+            "ged": None,
+            "gold_for_db": gold_bpmn_filename or os.path.basename(gold_bpmn),
+            "gen_bpmn": gen_bpmn,
+            "model": model,
+            "promoai_retries": promoai_retries if framework == "ProMoAI" else None,
+        }
+
+
+# ---------------------------
+# DB writer thread (single writer, crash-safe)
+# ---------------------------
+def db_writer_loop(db_path: str, batch_id: str, q: Queue):
+    conn = db_connect(db_path)
+    try:
+        db_init(conn)
+        while True:
+            item = q.get()
+            if item is None:
+                break
+
+            # item contains: {"type": "...", ...}
+            t = item.get("type")
+
+            if t == "started":
+                db_mark_started(
+                    conn,
+                    batch_id=batch_id,
+                    job_id=item["job_id"],
+                    qbp=item["qbp"],
+                    framework=item["framework"],
+                    run_index=item["run_idx"],
+                )
+
+            elif t == "finished":
+                # write the results row first (so it's present even if later update fails)
+                db_insert_result(
+                    conn,
+                    qbp=item["qbp"],
+                    framework=item["framework_db"],
+                    node_sim=item["node_sim"],
+                    struct_sim=item["struct_sim"],
+                    ged=item["ged"],
+                    gold=item["gold_for_db"],
+                    gen=item["gen_bpmn"],
+                    model=item["model"],
+                    promoai_retries=item.get("promoai_retries"),
+                )
+                db_mark_finished(
+                    conn,
+                    batch_id=batch_id,
+                    job_id=item["job_id"],
+                    status=item["status"],
+                    error=item.get("error"),
+                )
+            else:
+                # ignore unknown messages
+                pass
+
+    finally:
+        conn.close()
+
+
+# ---------------------------
+# Main
+# ---------------------------
 def main():
     args = parse_args()
-    print(f"Pipeline → framework={args.framework}, runs={args.runs}, model={args.model}", flush=True)
-    for i in range(1, args.runs + 1):
-        process_run(args, i)
+
+    # batch id for grouping
+    batch_id = args.batch_id or uuid.uuid4().hex
+    print(f"BATCH_ID {batch_id}", flush=True)
+
+    max_workers = int(args.max_workers or 1)
+    if max_workers < 1:
+        max_workers = 1
+
+    jobs = load_jobs(args)
+    total = len(jobs)
+    if total == 0:
+        print("No jobs to run.", flush=True)
+        return
+
+    print(
+        f"Pipeline → jobs={total}, max_workers={max_workers}, results_db={args.results_db}, "
+        f"PROMOAI_ENV={PROMOAI_ENV}, MAO_ENV={MAO_ENV}",
+        flush=True,
+    )
+
+    # Start DB writer
+    q = Queue()
+    writer = Thread(target=db_writer_loop, args=(args.results_db, batch_id, q), daemon=True)
+    writer.start()
+
+    done = 0
+    start_time = time.time()
+
+    # Run jobs
+    if max_workers == 1:
+        for job in jobs:
+            # mark started (in DB)
+            q.put({"type": "started", "job_id": job["job_id"], "qbp": job["qbp"],
+                   "framework": job["framework"], "run_idx": job["run_idx"]})
+
+            r = run_one_job(job)
+            q.put({"type": "finished", **r})
+
+            done += 1
+            print(f"PROGRESS {done}/{total}", flush=True)
+
+    else:
+        with ThreadPoolExecutor(max_workers=max_workers) as ex:
+            future_to_job = {}
+
+            # submit all jobs; mark started in DB as they are submitted
+            for job in jobs:
+                q.put({"type": "started", "job_id": job["job_id"], "qbp": job["qbp"],
+                       "framework": job["framework"], "run_idx": job["run_idx"]})
+                fut = ex.submit(run_one_job, job)
+                future_to_job[fut] = job
+
+            # as jobs finish, write to DB + progress
+            for fut in as_completed(future_to_job):
+                r = fut.result()
+                q.put({"type": "finished", **r})
+
+                done += 1
+                print(f"PROGRESS {done}/{total}", flush=True)
+
+    # stop writer
+    q.put(None)
+    writer.join()
+
+    elapsed = time.time() - start_time
+    print(f"DONE {done}/{total} in {elapsed:.2f}s", flush=True)
+
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,80 @@
+<process>
+  <activity role='hospital leadership/quality team' action='maintain common standardized risk stratification assessment tool/process across hospital' objects='standardized protocol' id='activity21'/>
+  <activity role='hospital leadership/ED operations' action='maintain pathway/mechanism to transfer patients to a higher level provider' objects='transfer pathway' id='activity22'/>
+
+  <activity role='ED triage nurse' action='identify suspected acute heart failure presentation and initiate standardized risk stratification process' objects='standardized risk stratification tool' id='activity1'/>
+  <activity role='ED triage nurse' action='perform initial stabilization checks (ABCs) and confirm patient is stable for standard ED workflow' objects='triage assessment/vital signs' id='activity1_0'/>
+  <exclusiveGateway id='exclusivegateway0'>
+    <branch condition='immediate life-threatening instability present' id='branch0a'>
+      <activity role='ED physician' action='initiate immediate resuscitation and urgent escalation pathway' objects='resuscitation protocol' id='activity1_2'/>
+    </branch>
+    <branch condition='no immediate life-threatening instability' id='branch0b'>
+      <activity role='ED triage nurse' action='document HF red flags and triggers for early escalation review' objects='triage notes/escalation criteria' id='activity1_3'/>
+    </branch>
+  </exclusiveGateway>
+
+  <activity role='ED nurse' action='frequently measure heart rate, blood pressure, and oxygen saturation until patient is stabilized (ongoing throughout ED workup)' objects='vital signs monitor/pulse oximeter' id='activity10'/>
+
+  <activity role='ED physician' action='perform risk assessment/stratification consistently using hospital-standard tool' objects='risk stratification assessment tool' id='activity2'/>
+  <activity role='ED physician' action='assess likelihood of acute heart failure and primary clinical syndrome' objects='history/physical exam findings' id='activity2_1'/>
+  <activity role='ED physician' action='identify precipitants/comorbidities influencing risk and disposition (e.g., ACS, infection, renal dysfunction)' objects='problem list/initial differential' id='activity2_2'/>
+
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1'>
+      <activity role='ED nurse' action='obtain serum creatinine and electrolyte levels' objects='blood sample' id='activity3'/>
+      <activity role='ED nurse' action='obtain troponin measurements' objects='blood sample' id='activity4'/>
+      <activity role='ED nurse' action='obtain complete blood count' objects='blood sample' id='activity5'/>
+    </branch>
+    <branch id='branch2'>
+      <activity role='ED staff' action='perform electrocardiogram' objects='ECG machine' id='activity6'/>
+      <activity role='radiology' action='perform chest x-ray examination' objects='x-ray imaging' id='activity7'/>
+    </branch>
+    <branch id='branch3'>
+      <exclusiveGateway id='exclusivegateway1'>
+        <branch condition='no recent echocardiogram available' id='branch3a'>
+          <activity role='cardiology/echo lab' action='perform echocardiogram' objects='echocardiography' id='activity8'/>
+        </branch>
+        <branch condition='recent echocardiogram available' id='branch3b'>
+          <activity role='ED physician' action='review most recent echocardiogram results' objects='prior echocardiogram report' id='activity9'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </parallelGateway>
+
+  <activity role='ED physician' action='assess responsiveness to diuresis (including response to furosemide administered in ED)' objects='diuresis response data' id='activity11'/>
+  <activity role='ED physician' action='administer or adjust IV diuretic per protocol and document timing/dose' objects='diuretic order/protocol' id='activity11_1'/>
+  <activity role='ED nurse' action='reassess diuresis response (urine output, symptom relief, repeat vitals) after diuretic' objects='I&O record/clinical reassessment' id='activity11_2'/>
+
+  <activity role='ED physician' action='screen for high-risk markers (respiratory distress, hypoxemia, severity of pulmonary edema, hemodynamic compromise, significant arrhythmias, positive troponin, poor response to furosemide in ED)' objects='clinical findings and test results' id='activity12'/>
+  <activity role='ED physician' action='calculate acute heart failure risk score (e.g., EHMRG) to predict 7-day mortality risk' objects='EHMRG inputs and score' id='activity13'/>
+
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='high intensity required (ventilation and/or ICU with higher nurse-to-patient staffing) OR high-risk markers present' id='branch5'>
+      <activity role='ED physician' action='activate pathway to transfer patient to higher level provider (ICU/critical care)' objects='transfer protocol' id='activity14'/>
+      <activity role='ED physician' action='notify receiving ICU/critical care team and request acceptance' objects='consult/notification request' id='activity14_1'/>
+      <activity role='ED nurse' action='prepare patient for transfer and complete standardized handover package' objects='handover checklist/transfer documents' id='activity14_2'/>
+      <exclusiveGateway id='exclusivegateway3'>
+        <branch condition='noninvasive ventilation required' id='branch6'>
+          <activity role='ED/respiratory therapy' action='initiate noninvasive ventilation' objects='NIV equipment' id='activity15'/>
+        </branch>
+        <branch condition='invasive ventilation required' id='branch7'>
+          <activity role='ED/critical care team' action='initiate invasive ventilation' objects='airway equipment/ventilator' id='activity16'/>
+        </branch>
+      </exclusiveGateway>
+      <activity role='bed management/critical care' action='admit to intensive care unit with higher nurse-to-patient staffing' objects='ICU bed' id='activity17'/>
+    </branch>
+
+    <branch condition='not high intensity; EHMRG quintiles 3-5 (higher-risk) or other clinical considerations favor admission' id='branch8'>
+      <activity role='ED physician' action='admit patient to inpatient care with normal nurse-to-patient staffing (average intensity)' objects='admission orders' id='activity18'/>
+    </branch>
+
+    <branch condition='EHMRG quintiles 1-2 (low-risk) AND responded to initial ED treatment AND no other considerations (e.g., advanced directives, severe dementia, estimated impact of admission on life-expectancy)' id='branch9'>
+      <activity role='ED physician' action='treat in ED or outpatient setting and discharge home without inpatient admission (low intensity)' objects='discharge plan' id='activity19'/>
+      <activity role='ED nurse' action='provide discharge instructions and self-management education (worsening symptoms, daily weights, when to return)' objects='patient instructions/education materials' id='activity19_1'/>
+      <activity role='ED physician/pharmacist' action='reconcile and confirm discharge medications and dosing' objects='medication list/prescriptions' id='activity19_2'/>
+      <activity role='ED staff' action='arrange follow-up visit with primary care provider within days of discharge from the ED' objects='follow-up appointment details' id='activity20'/>
+      <activity role='ED clerk/scheduling' action='book follow-up appointment and document date/time/contact' objects='scheduling system' id='activity20_1'/>
+      <activity role='ED physician/clerical' action='send discharge summary and key test results to primary care provider' objects='discharge summary/diagnostic results' id='activity20_2'/>
+    </branch>
+  </exclusiveGateway>
+</process>

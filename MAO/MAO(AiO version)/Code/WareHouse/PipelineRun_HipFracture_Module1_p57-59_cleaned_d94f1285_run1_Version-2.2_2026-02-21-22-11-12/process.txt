@@ -1,0 +1,121 @@
+<process>
+  <activity role='ED triage nurse' action='identify suspected hip fracture patient' objects='triage notes, presenting complaint' id='activity1'/>
+  <activity role='ED triage nurse' action='confirm suspected hip fracture criteria and trigger ED hip fracture pathway order set (perioperative patient goals by day of stay)' objects='hip fracture care pathway document/EMR order set' id='activity1_1'/>
+  <activity role='ED triage nurse' action='communicate hip fracture pathway activation to ED team' objects='ED huddle/EMR flags/notification' id='activity1_2'/>
+  <activity role='ED registration/triage' action='record time of arrival and start performance timers (physician ≤1 hour; orthopedic consult ≤2 hours; ED-to-admission ≤4 hours; surgery ≤48 hours if non-surgical hospital)' objects='ED tracking system/EMR' id='activity2'/>
+
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1'>
+      <activity role='ED physician' action='see patient within 1 hour of ED arrival (target: 90%)' objects='patient, triage notes' id='activity3'/>
+      <activity role='ED physician' action='assess and document reason for the fall' objects='history' id='activity4'/>
+      <activity role='ED physician' action='assess and document other collateral injuries' objects='physical exam' id='activity5'/>
+      <activity role='ED physician' action='assess and document comorbid conditions' objects='medical history/problem list' id='activity6'/>
+      <activity role='ED physician' action='assess and document current drug therapy including any anticoagulants' objects='medication list' id='activity7'/>
+      <activity role='ED physician' action='order tests for appropriate blood work' objects='lab requisitions' id='activity8'/>
+      <activity role='ED physician' action='order hip/pelvis X-rays' objects='imaging order in EMR' id='activity9_0'/>
+      <activity role='Radiology technologist' action='perform hip/pelvis X-rays' objects='radiology order, patient positioning' id='activity9_1'/>
+      <activity role='ED physician/Radiologist' action='interpret and document X-ray result' objects='images, radiology report' id='activity9_2'/>
+      <exclusiveGateway id='exclusivegateway2'>
+        <branch condition='X-ray confirms hip fracture' id='branch10'>
+          <activity role='ED physician' action='document confirmed hip fracture diagnosis' objects='EMR diagnosis/problem list' id='activity9_3'/>
+          <activity role='ED physician' action='set diagnosis status flag to hip fracture confirmed for pathway routing' objects='EMR problem flag/pathway status field' id='activity9_3a'/>
+        </branch>
+        <branch condition='X-ray inconclusive but clinical suspicion persists' id='branch11'>
+          <activity role='ED physician' action='order CT/MRI for occult hip fracture assessment' objects='CT/MRI order, imaging protocol' id='activity9_4'/>
+          <activity role='Radiology technologist' action='perform CT/MRI for occult hip fracture assessment' objects='CT/MRI order, patient positioning' id='activity9_5'/>
+          <activity role='Radiologist/ED physician' action='interpret and document CT/MRI result' objects='CT/MRI images, radiology report' id='activity9_6'/>
+          <exclusiveGateway id='exclusivegateway5'>
+            <branch condition='CT/MRI confirms hip fracture' id='branch16'>
+              <activity role='ED physician' action='document confirmed hip fracture diagnosis' objects='EMR diagnosis/problem list' id='activity9_7'/>
+              <activity role='ED physician' action='set diagnosis status flag to hip fracture confirmed for pathway routing' objects='EMR problem flag/pathway status field' id='activity9_7a'/>
+            </branch>
+            <branch condition='CT/MRI rules out hip fracture' id='branch17'>
+              <activity role='ED physician' action='document no hip fracture and prepare handoff to non–hip-fracture care pathway' objects='EMR assessment, alternate diagnosis plan' id='activity9_8'/>
+              <activity role='ED physician' action='set diagnosis status flag to hip fracture ruled out for pathway routing' objects='EMR problem flag/pathway status field' id='activity9_8a'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+
+    <branch id='branch2'>
+      <activity role='ED nurse' action='assess and document fluid balance' objects='intake/output, vitals' id='activity10'/>
+      <activity role='ED nurse' action='assess and document hydration and nutrition status' objects='screening questions, NPO status' id='activity11'/>
+      <activity role='ED nurse' action='assess and document pain' objects='pain scale' id='activity12'/>
+      <activity role='ED nurse' action='measure and document temperature' objects='thermometer, vitals chart' id='activity13'/>
+      <activity role='ED nurse' action='assess and document continence' objects='continence screen' id='activity14'/>
+      <activity role='ED nurse' action='assess and document pressure sore risk' objects='pressure injury risk tool' id='activity15'/>
+      <activity role='ED pharmacist/ED nurse' action='collect best possible medication history from available sources' objects='patient interview, pill bottles, community pharmacy records, caregiver list' id='activity16_1'/>
+      <activity role='ED pharmacist/ED nurse' action='identify anticoagulants/high-risk medications and notify ED physician' objects='med list, anticoagulant details, last dose time' id='activity16_2'/>
+      <activity role='ED pharmacist/ED nurse' action='document reconciled medication list using standardized form within ED' objects='standardized medication reconciliation form, EMR' id='activity16_3'/>
+    </branch>
+
+    <branch id='branch3'>
+      <activity role='Physiotherapist/ED nurse' action='assess and document pre-fracture functional ability and mobility' objects='baseline mobility history' id='activity17'/>
+      <activity role='Physiotherapist/ED nurse' action='assess and document physical and functional level' objects='functional assessment' id='activity18'/>
+      <activity role='ED clinician' action='assess and document mental state based on pre-morbid functioning using validated screening tool (MMSE or MOCA or CAM)' objects='MMSE/MOCA/CAM tool' id='activity19'/>
+      <activity role='Social worker/ED nurse' action='assess and document social circumstances (caregiver status, existing community supports, family involvement)' objects='social history' id='activity20'/>
+    </branch>
+
+    <branch id='branch4'>
+      <activity role='ED nurse' action='initiate hydration management within the ED' objects='IV/oral fluids plan' id='activity21'/>
+      <activity role='ED physician/ED nurse' action='initiate pain management within the ED' objects='analgesia orders, reassessment plan' id='activity22'/>
+      <activity role='ED team' action='initiate delirium risk management within the ED' objects='delirium prevention measures' id='activity23'/>
+      <activity role='ED nurse' action='initiate pressure sore risk management within the ED' objects='pressure-relieving surfaces, turning plan' id='activity24'/>
+    </branch>
+
+    <branch id='branch5'>
+      <activity role='ED physician' action='submit orthopedic consultation request with key clinical info' objects='consult request, imaging, labs, anticoagulant status' id='activity25_1'/>
+      <activity role='Orthopedic surgeon' action='assess patient and provide consultation within 2 hours (target: 90%)' objects='patient exam, imaging, labs' id='activity25_2'/>
+      <activity role='Orthopedic surgeon' action='document operative plan and disposition recommendations' objects='consult note, tentative OR plan' id='activity25_3'/>
+      <inclusiveGateway id='inclusivegateway1'>
+        <branch condition='anesthesia input needed' id='branch6'>
+          <activity role='ED physician' action='notify anesthesiologist and obtain consultation as needed' objects='clinical summary, vitals, labs' id='activity26'/>
+        </branch>
+        <branch condition='internal medicine input needed' id='branch7'>
+          <activity role='ED physician' action='notify internist and obtain consultation as needed' objects='clinical summary, comorbidities, labs' id='activity27'/>
+        </branch>
+      </inclusiveGateway>
+    </branch>
+  </parallelGateway>
+
+  <exclusiveGateway id='exclusivegateway6'>
+    <branch condition='hip fracture ruled out' id='branch18'>
+      <activity role='ED team' action='proceed under non–hip-fracture assessment/treatment pathway and close Module 1 hip fracture workflow' objects='alternate care plan, EMR pathway closure' id='activity35'/>
+    </branch>
+    <branch condition='hip fracture confirmed' id='branch19'>
+      <exclusiveGateway id='exclusivegateway1'>
+        <branch condition='presenting to surgical hospital' id='branch8'>
+          <exclusiveGateway id='exclusivegateway3'>
+            <branch condition='requires operative inpatient admission' id='branch12'>
+              <activity role='ED physician' action='place admission order and bed request from ED (target: 90% admitted within 4 hours spent in ED)' objects='admission order, bed request' id='activity28_2'/>
+              <activity role='ED bed management/inpatient unit' action='admit patient to acute care bed within 4 hours of ED time (target: 90%)' objects='bed assignment, transfer checklist' id='activity29'/>
+            </branch>
+            <branch condition='non-operative management indicated (e.g., palliative/contraindication to surgery)' id='branch13_mod'>
+              <activity role='ED physician/Orthopedic surgeon' action='document non-operative management decision and goals of care' objects='decision note, goals-of-care documentation' id='activity28_3_mod1'/>
+              <activity role='ED physician' action='place admission order for non-operative hip fracture management' objects='admission order, bed request' id='activity28_3_mod2'/>
+              <activity role='ED bed management/inpatient unit' action='admit patient to acute care bed within 4 hours of ED time (target: 90%)' objects='bed assignment, transfer checklist' id='activity29_mod'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch condition='presenting to non-surgical hospital' id='branch9'>
+          <activity role='ED physician/ED nurse' action='initiate monitoring/IV access and medically stabilize patient while awaiting transfer' objects='stabilization orders, monitoring, IV access' id='activity30_1'/>
+          <activity role='ED physician' action='address urgent medical issues including anticoagulation considerations before transfer' objects='reversal/hold plan, comorbidity stabilization' id='activity30_2'/>
+          <activity role='ED nurse' action='prepare transfer package (records, imaging, meds, consent/contacts)' objects='medical records, imaging upload, transfer checklist' id='activity30_3'/>
+          <activity role='Transfer coordinator/LHIN/hospital' action='contact receiving surgical hospital and obtain acceptance per protocol' objects='transfer protocol, receiving acceptance' id='activity31_1'/>
+          <exclusiveGateway id='exclusivegateway4'>
+            <branch condition='transfer accepted and transport available' id='branch14'>
+              <activity role='Transfer coordinator' action='book transport and complete clinical handover to receiving facility' objects='transport booking, handover report' id='activity31_2'/>
+            </branch>
+            <branch condition='transfer delayed/bed unavailable' id='branch15'>
+              <activity role='Transfer coordinator/LHIN/hospital leadership' action='escalate delay per formal protocol and identify alternate receiving site if needed' objects='escalation pathway, alternate site list' id='activity31_3'/>
+            </branch>
+          </exclusiveGateway>
+          <activity role='Transfer team' action='transfer patient to surgical hospital for operation' objects='transport, medical records, imaging' id='activity32'/>
+          <activity role='Surgical hospital orthopedic service' action='ensure surgery occurs within 48 hours of initial presentation (including if first admitted to non-surgical hospital)' objects='OR booking, pre-op clearance' id='activity33'/>
+          <activity role='LHIN/hospitals' action='repatriate patient to local hospital after surgery per formal protocol' objects='repatriation protocol, discharge/transfer summary' id='activity34'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </exclusiveGateway>
+</process>

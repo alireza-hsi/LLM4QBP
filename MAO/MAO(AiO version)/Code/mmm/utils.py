@@ -189,6 +189,9 @@ class OpenAIModel(ModelBackend):
             "gpt-4o": 16384,
             "gpt-4.1": 30000,
             "gpt-5.2": 30000,
+            "gpt-5.2-low-reasoning": 30000,
+            "gpt-5.2-medium-reasoning": 30000,
+            "gpt-5.2-high-reasoning": 30000,
         }
         # messages = [{"role": "user", "content": "Hello"}]
         response = client.chat.completions.create(messages = messages,

@@ -1,0 +1,120 @@
+<process>
+  <activity role='ED clinician' action='assess patient presenting to ED with symptoms of community-acquired pneumonia (CAP)' objects='history, physical exam' id='activity1'/>
+  <activity role='ED nurse/triage' action='perform triage and obtain initial vitals' objects='temperature, heart rate, respiratory rate, blood pressure, mental status' id='activity2'/>
+  <activity role='ED clinician' action='assess CAP severity and sepsis indicators (e.g., SIRS, hemodynamics)' objects='CRB-65 elements, SIRS elements, clinical assessment' id='activity3'/>
+  <activity role='ED clinician' action='measure oxygen saturation' objects='pulse oximeter' id='activity4'/>
+  <activity role='ED clinician' action='order chest x-ray to confirm diagnosis (recommended for all ED CAP presentations)' objects='chest x-ray order' id='activity5'/>
+  <activity role='radiology' action='perform chest x-ray and generate report' objects='chest x-ray images, radiology report' id='activity6'/>
+  <activity role='ED clinician' action='review chest x-ray result' objects='chest x-ray report' id='activity7'/>
+  <activity role='ED clinician' action='do not order CT scan for CAP diagnosis (not recommended)' objects='CT scan' id='activity8'/>
+
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='patient has sepsis' id='branch1'>
+      <activity role='ED clinician' action='initiate antibiotics without waiting for chest x-ray result' objects='empiric antibiotics' id='activity9'/>
+    </branch>
+    <branch condition='patient does not have sepsis' id='branch2'>
+      <activity role='ED clinician' action='wait for chest x-ray result prior to giving antibiotics' objects='chest x-ray result' id='activity10'/>
+      <activity role='ED clinician' action='initiate antibiotics after chest x-ray result' objects='chest x-ray result, antibiotics' id='activity11'/>
+    </branch>
+  </exclusiveGateway>
+
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='patient admitted to hospital (ward or ICU)' id='branch3'>
+      <parallelGateway id='parallelgateway1'>
+        <branch id='branch4'>
+          <activity role='inpatient clinician' action='order routine blood work (in addition to oxygen saturation): CBC, electrolytes, renal function tests' objects='CBC, electrolytes, creatinine/renal panel' id='activity12'/>
+        </branch>
+
+        <branch id='branch5'>
+          <exclusiveGateway id='exclusivegateway3'>
+            <branch condition='meets >2 CRB-65 criteria' id='branch6'>
+              <activity role='inpatient clinician' action='consider additional tests: blood gases, lactate, liver enzyme and liver function tests' objects='ABG/VBG, lactate, AST/ALT, bilirubin, INR/albumin' id='activity13'/>
+            </branch>
+            <branch condition='meets <=2 CRB-65 criteria' id='branch7'>
+              <activity role='inpatient clinician' action='do not add CRB-65-triggered tests beyond routine blood work (not indicated by CRB-65 criterion)' objects='additional labs' id='activity14'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+
+        <branch id='branch8'>
+          <exclusiveGateway id='exclusivegateway4'>
+            <branch condition='meets >2 SIRS criteria OR requires ICU admission' id='branch9'>
+              <activity role='nursing/lab staff' action='collect blood cultures (recommended when >2 SIRS criteria or ICU admission)' objects='blood culture sets' id='activity15'/>
+              <activity role='nursing/lab staff' action='draw blood culture sets prior to antibiotic administration' objects='aerobic/anaerobic culture bottles, venipuncture supplies' id='activity16'/>
+              <activity role='nursing/lab staff' action='label and send blood cultures to laboratory' objects='labeled culture bottles, requisition' id='activity17'/>
+            </branch>
+            <branch condition='does not meet >2 SIRS criteria AND does not require ICU admission' id='branch10'>
+              <activity role='inpatient clinician' action='do not routinely obtain blood cultures (not recommended by criteria)' objects='blood cultures' id='activity18'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+
+        <branch id='branch11'>
+          <exclusiveGateway id='exclusivegateway5'>
+            <branch condition='adequate sputum sample can be obtained' id='branch12'>
+              <activity role='nursing/respiratory therapy' action='coach patient and collect sputum specimen using appropriate technique' objects='sterile container, suction equipment if needed' id='activity20'/>
+              <exclusiveGateway id='exclusivegateway5.1'>
+                <branch condition='specimen is adequate quality' id='branch12.1'>
+                  <activity role='nursing/respiratory therapy' action='send sputum specimen to microbiology lab for culture' objects='sputum specimen, requisition' id='activity21'/>
+                  <activity role='microbiology lab' action='consider Gram stain if sputum culture is obtained' objects='sputum specimen' id='activity23'/>
+                  <exclusiveGateway id='exclusivegateway6'>
+                    <branch condition='targeted antibiotic planned (vs non-targeted)' id='branch15'>
+                      <activity role='inpatient clinician' action='use sputum culture results to support targeted antibiotic selection (prioritize follow-up)' objects='sputum culture result' id='activity25'/>
+                    </branch>
+                    <branch condition='non-targeted antibiotic planned' id='branch16'>
+                      <activity role='inpatient clinician' action='treat with non-targeted antibiotic regimen; sputum culture optional for de-escalation if available' objects='non-targeted antibiotics' id='activity26'/>
+                    </branch>
+                  </exclusiveGateway>
+                </branch>
+                <branch condition='specimen is inadequate quality' id='branch12.2'>
+                  <activity role='nursing/respiratory therapy' action='attempt re-collection if feasible or document inability to obtain adequate sample' objects='re-collection plan/documentation' id='activity22'/>
+                </branch>
+              </exclusiveGateway>
+            </branch>
+            <branch condition='adequate sputum sample cannot be obtained' id='branch13'>
+              <activity role='inpatient clinician' action='do not obtain sputum culture when adequate sample cannot be obtained; proceed with empiric (non-targeted) antibiotics' objects='empiric antibiotics plan' id='activity24'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </parallelGateway>
+
+      <inclusiveGateway id='inclusivegateway1'>
+        <branch condition='high-severity patient' id='branch17'>
+          <activity role='inpatient clinician' action='order urine antigen testing (recommended in high-severity patients)' objects='urine antigen test' id='activity27'/>
+          <activity role='nursing staff' action='collect urine specimen and send to laboratory' objects='urine specimen, requisition' id='activity28'/>
+        </branch>
+        <branch condition='enhanced surveillance directive from Public Health Ontario on Legionella in inpatients' id='branch18'>
+          <activity role='inpatient clinician' action='order urine antigen testing (recommended under enhanced surveillance directive)' objects='urine antigen test' id='activity29'/>
+        </branch>
+        <branch condition='not responding to drug therapy after 48–72 hours' id='branch19'>
+          <activity role='inpatient clinician' action='order urine antigen testing (recommended if not responding after 48–72 hours)' objects='urine antigen test' id='activity30'/>
+        </branch>
+        <branch condition='inpatient during peak season (mid-June to early October)' id='branch20'>
+          <activity role='inpatient clinician' action='order urine antigen testing (recommended for inpatients during peak season: mid-June to early October)' objects='urine antigen test' id='activity31'/>
+        </branch>
+        <branch condition='none of the urine antigen indications apply' id='branch24'>
+          <activity role='inpatient clinician' action='do not order urine antigen testing (no indication met)' objects='urine antigen test' id='activity40'/>
+        </branch>
+      </inclusiveGateway>
+
+      <exclusiveGateway id='exclusivegateway7'>
+        <branch condition='patient is intubated (e.g., high severity)' id='branch21'>
+          <activity role='inpatient/ICU clinician' action='consider PCR testing for Legionella (for intubated patients)' objects='Legionella PCR test' id='activity32'/>
+          <activity role='respiratory therapy/ICU clinician' action='collect lower respiratory specimen via endotracheal aspirate or BAL (as applicable)' objects='ET aspirate/BAL specimen' id='activity33'/>
+          <activity role='nursing/lab staff' action='send specimen for Legionella PCR testing' objects='specimen, PCR requisition' id='activity34'/>
+        </branch>
+        <branch condition='patient not intubated' id='branch22'>
+          <activity role='inpatient clinician' action='do not perform Legionella PCR solely based on intubation criterion (not indicated)' objects='Legionella PCR test' id='activity35'/>
+        </branch>
+      </exclusiveGateway>
+
+      <activity role='quality improvement team' action='conduct field evaluation to assess clinical utility of urine antigen testing in CAP' objects='urine antigen ordering/impact data' id='activity36'/>
+      <activity role='quality improvement team' action='define evaluation metrics and implement data capture plan' objects='metrics, data collection protocol' id='activity37'/>
+      <activity role='quality improvement team' action='analyze results and feedback into ordering guidance/protocol updates' objects='analysis report, updated guidance' id='activity38'/>
+    </branch>
+
+    <branch condition='patient not admitted (managed as outpatient from ED)' id='branch23'>
+      <activity role='ED clinician' action='no inpatient admission diagnostic bundle performed; continue outpatient management pathway as applicable' objects='disposition plan' id='activity39'/>
+    </branch>
+  </exclusiveGateway>
+</process>
