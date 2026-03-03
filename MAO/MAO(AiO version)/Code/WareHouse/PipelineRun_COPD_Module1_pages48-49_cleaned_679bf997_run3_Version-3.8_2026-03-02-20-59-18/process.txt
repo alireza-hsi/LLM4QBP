@@ -1,0 +1,159 @@
+<process>
+  <activity role='ED/outpatient triage nurse or admitting clinician' action='register patient and initiate COPD exacerbation pathway' objects='patient with suspected COPD exacerbation' id='activity1'/>
+
+  <parallelGateway id='parallelgateway0_initial'>
+    <branch id='branch0_abc'>
+      <activity role='ED clinician/RT/nursing team' action='perform immediate ABC assessment and resuscitation per ED protocols' objects='airway, breathing, circulation; immediate stabilization measures (oxygen/bronchodilators/IV/supportive care as indicated)' id='activity25_abc'/>
+      <exclusiveGateway id='exclusivegateway25_2_mod'>
+        <branch condition='persistent respiratory distress or hypercapnia despite initial measures' id='branch25_5_mod'>
+          <activity role='ED clinician/RT' action='escalate ventilatory support per protocol' objects='NIV/advanced airway consideration; escalation plan' id='activity25_5_mod'/>
+        </branch>
+        <branch condition='stabilizing with initial measures' id='branch25_6_mod'>
+          <activity role='ED clinician' action='continue current resuscitation measures and monitoring' objects='ongoing supportive care plan' id='activity25_6_mod'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+
+    <branch id='branch0_initial_assessment'>
+      <parallelGateway id='parallelgateway1'>
+        <branch id='branch1'>
+          <activity role='nurse/clinician' action='measure respiratory rate, heart rate, blood pressure, temperature' objects='RR, HR, BP, temperature' id='activity2_1'/>
+          <activity role='nurse/clinician' action='assess for hypoventilation' objects='breathing pattern/ventilation' id='activity2_2'/>
+          <activity role='nurse/clinician' action='check level of consciousness/cognition' objects='mental status' id='activity2_3'/>
+          <activity role='nurse/clinician' action='check blood-oxygen saturation via pulse oximetry' objects='SpO2' id='activity2_4'/>
+          <activity role='nurse/clinician' action='assess whether patient has purulent sputum' objects='sputum characteristics' id='activity2_5'/>
+        </branch>
+        <branch id='branch2'>
+          <activity role='clinician' action='perform physical examination' objects='respiratory and general exam' id='activity7'/>
+          <activity role='clinician' action='perform respiratory-focused examination' objects='work of breathing, wheeze, accessory muscle use, chest auscultation' id='activity7_1'/>
+          <activity role='clinician' action='perform cardiovascular and volume status examination' objects='heart sounds, edema, JVP, perfusion' id='activity7_2'/>
+          <activity role='clinician' action='assess for alternate diagnoses on exam' objects='signs of pneumonia, pneumothorax, heart failure, PE, asthma' id='activity7_3'/>
+        </branch>
+        <branch id='branch3'>
+          <activity role='clinician' action='check patient history' objects='COPD history, symptoms, comorbidities, prior exacerbations' id='activity8'/>
+          <activity role='clinician/pharmacist/nurse' action='document and reconcile medications currently used by patient' objects='current medication list' id='activity9'/>
+        </branch>
+      </parallelGateway>
+    </branch>
+
+    <branch id='branch0_diagnostics'>
+      <parallelGateway id='parallelgateway2A'>
+        <branch id='branch2A_abg'>
+          <exclusiveGateway id='exclusivegateway2A_abg'>
+            <branch condition='low oxygen saturation on oximetry and/or acute respiratory failure suspected' id='branch2A_abg_yes'>
+              <activity role='clinician/nurse/RT' action='check arterial blood gases where appropriate' objects='ABG sample and result' id='activity17A'/>
+              <activity role='ED clinician/RT' action='interpret ABG immediately and document implications' objects='interpreted pH/PaCO2/PaO2; ventilation/oxygenation plan impact' id='activity17B_interpret'/>
+            </branch>
+            <branch condition='no low oxygen saturation and no acute respiratory failure suspected' id='branch2A_abg_no'>
+              <activity role='clinician' action='defer arterial blood gases' objects='ABG not indicated' id='activity18A'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch id='branch2A_imaging_labs_ecg'>
+          <parallelGateway id='parallelgateway2B'>
+            <branch id='branch2B_cxr'>
+              <activity role='clinician' action='order chest x-ray (posteroanterior and lateral)' objects='CXR order: PA and lateral' id='activity10_orderB'/>
+              <exclusiveGateway id='exclusivegateway1B'>
+                <branch condition='patient too unwell to leave emergency department' id='branch1B_portable'>
+                  <activity role='radiology' action='perform portable chest x-ray (posteroanterior and lateral)' objects='portable CXR PA and lateral' id='activity11B'/>
+                </branch>
+                <branch condition='patient able to leave emergency department' id='branch1B_radiology'>
+                  <activity role='radiology' action='perform chest x-ray in radiology (posteroanterior and lateral)' objects='CXR PA and lateral in radiology suite' id='activity12B'/>
+                </branch>
+              </exclusiveGateway>
+              <exclusiveGateway id='exclusivegateway1B_pneumothorax'>
+                <branch condition='concern for pneumothorax' id='branch1B_pnx_yes'>
+                  <activity role='radiology' action='add expiratory view chest x-ray' objects='expiratory CXR view' id='activity13B'/>
+                </branch>
+                <branch condition='no concern for pneumothorax' id='branch1B_pnx_no'>
+                  <activity role='clinician' action='proceed with standard chest x-ray views only' objects='CXR standard views only' id='activity14B'/>
+                </branch>
+              </exclusiveGateway>
+              <activity role='ED clinician/radiologist' action='interpret chest x-ray immediately and document findings' objects='CXR result interpretation (e.g., pneumonia, pneumothorax, CHF signs, other changes)' id='activity10_interpretB'/>
+            </branch>
+
+            <branch id='branch2B_bloodwork'>
+              <activity role='clinician/nurse' action='order baseline blood work panel' objects='CBC, electrolytes, creatinine, BUN (if available)' id='activity15_1B'/>
+              <activity role='lab' action='collect specimen and process baseline blood work' objects='blood sample; baseline lab results' id='activity15_2B'/>
+              <activity role='ED clinician' action='interpret baseline blood work immediately and document findings' objects='interpreted CBC/electrolytes/creatinine/BUN results and clinical implications' id='activity15_3_interpretB'/>
+            </branch>
+
+            <branch id='branch2B_ecg'>
+              <activity role='clinician/nurse' action='perform electrocardiogram' objects='ECG for arrhythmias, ischemia, right ventricular strain' id='activity16B'/>
+              <activity role='ED clinician' action='interpret ECG immediately and document findings' objects='ECG interpretation (rhythm, ischemia, strain) and next-step implications' id='activity16_1_interpretB'/>
+            </branch>
+          </parallelGateway>
+        </branch>
+      </parallelGateway>
+    </branch>
+  </parallelGateway>
+
+  <inclusiveGateway id='inclusivegateway2'>
+    <branch condition='pneumonia or suspected sepsis' id='branch13'>
+      <activity role='clinician/nurse/lab' action='draw blood cultures' objects='blood cultures' id='activity19'/>
+    </branch>
+    <branch condition='suspected cardiac disorder' id='branch14'>
+      <activity role='clinician/nurse/lab' action='examine cardiac markers' objects='cardiac biomarkers (e.g., troponin)' id='activity20'/>
+    </branch>
+    <branch condition='other suspected diagnoses or comorbidities identified on clinical assessment' id='branch15'>
+      <activity role='clinician' action='perform other diagnostic interventions as appropriate to identify and/or rule out other suspected diagnoses or comorbidities' objects='additional diagnostics per assessment/hospital ED processes' id='activity21'/>
+    </branch>
+  </inclusiveGateway>
+
+  <activity role='clinician' action='identify patient wishes regarding goals of care and/or limitations of treatment (code status)' objects='goals of care/code status documentation' id='activity22'/>
+
+  <exclusiveGateway id='exclusivegateway3'>
+    <branch condition='no prior objective documentation of COPD through spirometry' id='branch16'>
+      <activity role='clinician' action='plan spirometry once patient has stabilized (not during initial assessment)' objects='spirometry order/arrangement after stabilization' id='activity23'/>
+    </branch>
+    <branch condition='prior objective spirometry documentation available' id='branch17'>
+      <activity role='clinician' action='do not arrange spirometry for this reason' objects='existing spirometry record' id='activity24'/>
+    </branch>
+  </exclusiveGateway>
+
+  <activity role='ED clinician' action='re-evaluate patient after resuscitation and initial assessment to determine level of care required' objects='reassessment findings' id='activity26'/>
+  <parallelGateway id='parallelgateway26_1'>
+    <branch id='branch26_1'>
+      <activity role='ED clinician/nurse' action='reassess symptoms and functional status' objects='dyspnea at rest, activity level, ability to cope' id='activity26_1'/>
+    </branch>
+    <branch id='branch26_2'>
+      <activity role='ED clinician/nurse' action='review vital signs and oxygenation/ventilation status' objects='SaO2, RR, mental status; ABG if available' id='activity26_2'/>
+    </branch>
+    <branch id='branch26_3'>
+      <activity role='ED clinician' action='review diagnostic results available' objects='CXR/ECG/labs/cultures/markers as ordered' id='activity26_3'/>
+    </branch>
+    <branch id='branch26_4'>
+      <activity role='ED clinician/social work/nursing' action='assess social support and home resources' objects='home supports, ability to cope, age/social circumstances' id='activity26_4'/>
+    </branch>
+  </parallelGateway>
+  <activity role='ED clinician' action='apply NICE/GOLD admission guide with clinical judgment and local resource availability' objects='admission criteria synthesis' id='activity26_5'/>
+
+  <exclusiveGateway id='exclusivegateway4'>
+    <branch condition='meets NICE/GOLD admission guide and/or clinical judgment indicates admission (including resource availability)' id='branch18'>
+      <activity role='admitting clinician' action='decide to admit patient and determine appropriate inpatient level of care' objects='NICE/GOLD criteria, CXR changes, SaO2&lt;90%, pH/PaO2, comorbidities, social supports' id='activity27'/>
+      <exclusiveGateway id='exclusivegateway27_1'>
+        <branch condition='requires ICU/critical care level' id='branch27_1'>
+          <activity role='admitting clinician/ICU team' action='admit to ICU/critical care and initiate unit-specific orders' objects='ICU bed request; critical care order set' id='activity27_1_act'/>
+        </branch>
+        <branch condition='requires monitored/step-down level' id='branch27_2'>
+          <activity role='admitting clinician' action='admit to step-down/telemetry level of care' objects='monitored bed request; admission orders' id='activity27_2'/>
+        </branch>
+        <branch condition='requires general inpatient ward level' id='branch27_3'>
+          <activity role='admitting clinician' action='admit to general medical ward' objects='ward bed request; admission orders' id='activity27_3'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch condition='does not meet admission guide and clinical judgment supports outpatient management' id='branch19'>
+      <activity role='ED/outpatient clinician' action='decide on discharge/outpatient management plan and required supports' objects='home support assessment, follow-up plan' id='activity28'/>
+    </branch>
+  </exclusiveGateway>
+
+  <parallelGateway id='parallelgateway3'>
+    <branch id='branch20'>
+      <activity role='hospital administration/quality team' action='on a quarterly basis, make hospital administration and admitting clinicians aware of COPD admission rates benchmarked against similar hospitals in the province' objects='quarterly benchmarked COPD admission rate report' id='activity29'/>
+    </branch>
+    <branch id='branch21'>
+      <activity role='ED staff' action='use a checklist for admission to hospital (minimum includes non-COPD concerns such as pain, anxiety, and comorbidities)' objects='admission checklist' id='activity30'/>
+    </branch>
+  </parallelGateway>
+</process>

@@ -1,0 +1,81 @@
+<process>
+  <activity role='Ontario hospitals' action='implement standardized risk-stratification tool and escalation/transfer pathway for ED acute HF presentations' objects='standardized risk stratification assessment tool/process; pathway to transfer/escalate to higher level provider' id='activity_hosp_prereq_merged1'/>
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1'>
+      <activity role='clinical team' action='obtain bloodwork (CBC, electrolytes, creatinine, troponin)' objects='blood tests' id='activity3_bw'/>
+      <activity role='healthcare expert' action='interpret bloodwork results and communicate findings' objects='bloodwork results' id='activity3_bw_interp'/>
+    </branch>
+    <branch id='branch2'>
+      <activity role='clinical team' action='perform electrocardiogram' objects='electrocardiogram' id='activity6'/>
+      <activity role='healthcare expert' action='interpret ECG and communicate findings' objects='ECG result' id='activity6_interp'/>
+    </branch>
+    <branch id='branch3'>
+      <exclusiveGateway id='exclusivegateway_cxr1'>
+        <branch condition='chest x-ray is required' id='branch_cxr_req'>
+          <activity role='clinical team' action='perform chest x-ray examination' objects='chest x-ray examination' id='activity7'/>
+          <activity role='healthcare expert' action='interpret chest x-ray and communicate findings' objects='chest x-ray result' id='activity7_interp'/>
+        </branch>
+        <branch condition='chest x-ray is not required' id='branch_cxr_skip'>
+          <activity role='clinical team' action='skip chest x-ray and continue assessment' objects='' id='activity_skip_cxr1'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch4'>
+      <exclusiveGateway id='exclusivegateway1'>
+        <branch condition='no recent echocardiogram is available' id='branch4a'>
+          <activity role='clinical team' action='perform an echocardiogram' objects='echocardiogram' id='activity8'/>
+          <activity role='healthcare expert' action='interpret echocardiogram and communicate findings' objects='echocardiogram result' id='activity8_interp'/>
+        </branch>
+        <branch condition='a recent echocardiogram is available' id='branch4b'>
+          <activity role='clinical team' action='proceed without an echocardiogram' objects='' id='activity30'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch5'>
+      <activity role='clinical team' action='frequently measure heart rate, blood pressure, and oxygen saturation until patient is stabilized' objects='heart rate, blood pressure, oxygen saturation' id='activity10'/>
+    </branch>
+  </parallelGateway>
+  <activity role='clinical team' action='calculate an acute heart failure risk score (e.g., the EHMRG) to assist with clinical decision-making and predicting 7-day mortality risk' objects='EHMRG risk score' id='activity11'/>
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='low-risk (e.g., EHMRG quintiles 1 and 2) AND responded to initial treatment in the ED AND no other considerations (e.g., advanced-directives, severe dementia, estimated impact of admission on life-expectancy, etc.)' id='branch10'>
+      <activity role='clinical team' action='discharge home without requiring inpatient admission' objects='' id='activity14'/>
+      <activity role='primary care provider' action='conduct a follow-up visit within days of discharge from the ED' objects='' id='activity15'/>
+    </branch>
+    <branch condition='higher-risk (e.g., EHMRG quintiles 3-5) OR respiratory distress OR hypoxemia OR severity of pulmonary edema OR poor response to furosemide administered in ED OR hemodynamic compromise OR significant arrhythmias OR positive troponin' id='branch13'>
+      <exclusiveGateway id='exclusivegateway4'>
+        <branch condition='NOT (requires ventilation (either noninvasive or invasive) OR requires admission to an intensive care unit with higher nurse-to-patient staffing)' id='branch14'>
+          <activity role='clinical team' action='admit to hospital' objects='' id='activity16a'/>
+          <parallelGateway id='parallelgateway2'>
+            <branch id='branch26'>
+              <activity role='inpatient care' action='provide admission to inpatient care' objects='' id='activity17_1'/>
+            </branch>
+            <branch id='branch27'>
+              <activity role='inpatient care' action='provide normal nurse-to-patient staffing' objects='' id='activity17_2'/>
+            </branch>
+          </parallelGateway>
+        </branch>
+        <branch condition='(requires ventilation (either noninvasive or invasive) OR requires admission to an intensive care unit with higher nurse-to-patient staffing)' id='branch15'>
+          <activity role='clinical team' action='admit to hospital' objects='' id='activity16b'/>
+          <inclusiveGateway id='inclusivegateway5'>
+            <branch condition='requires ventilation (noninvasive ventilation)' id='branch16'>
+              <activity role='clinical team' action='provide noninvasive ventilation' objects='' id='activity18'/>
+            </branch>
+            <branch condition='requires ventilation (invasive ventilation)' id='branch17'>
+              <activity role='clinical team' action='provide invasive ventilation' objects='' id='activity19'/>
+            </branch>
+            <branch condition='requires admission to an intensive care unit with higher nurse-to-patient staffing' id='branch18'>
+              <parallelGateway id='parallelgateway3'>
+                <branch id='branch28'>
+                  <activity role='intensive care unit' action='admit to an intensive care unit' objects='' id='activity20_1'/>
+                </branch>
+                <branch id='branch29'>
+                  <activity role='intensive care unit' action='provide higher nurse-to-patient staffing' objects='' id='activity20_2'/>
+                </branch>
+              </parallelGateway>
+            </branch>
+          </inclusiveGateway>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </exclusiveGateway>
+</process>

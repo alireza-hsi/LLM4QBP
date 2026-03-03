@@ -1,0 +1,110 @@
+<process>
+  <activity role='nursing staff' action='triage patient and record initial vital signs' objects='triage assessment, vital signs' id='act_001'/>
+  <activity role='ED clinician' action='assess patient presenting to ED with symptoms of community-acquired pneumonia (CAP)' objects='patient history, exam, oxygen saturation' id='act_002'/>
+  <activity role='ED clinician' action='assess severity and risk features (sepsis, CRB-65, SIRS) to guide testing urgency' objects='CRB-65 score, SIRS criteria, sepsis assessment' id='act_003'/>
+  <activity role='ED clinician' action='place chest x-ray order and request timely imaging' objects='radiology order in EMR' id='act_004'/>
+  <activity role='ED clinician' action='review chest x-ray result when available' objects='chest x-ray report/image' id='act_005'/>
+  <activity role='ED clinician' action='do not order CT scan for CAP diagnosis' objects='CT scan' id='act_006'/>
+  <exclusiveGateway id='exg_001'>
+    <branch condition='patient has sepsis' id='br_001'>
+      <activity role='ED clinician' action='initiate antibiotics without waiting for chest x-ray result' objects='empiric antibiotics' id='act_007'/>
+    </branch>
+    <branch condition='patient does not have sepsis' id='br_002'>
+      <activity role='ED clinician' action='wait for chest x-ray result prior to giving antibiotics' objects='chest x-ray result' id='act_008'/>
+      <activity role='ED clinician' action='initiate antibiotics after chest x-ray result is available' objects='empiric antibiotics' id='act_009'/>
+    </branch>
+  </exclusiveGateway>
+  <exclusiveGateway id='exg_002'>
+    <branch condition='patient admitted to hospital (ward or ICU)' id='br_003'>
+      <parallelGateway id='pg_001'>
+        <branch id='br_004'>
+          <activity role='nursing staff' action='measure oxygen saturation' objects='pulse oximetry' id='act_010'/>
+        </branch>
+        <branch id='br_005'>
+          <parallelGateway id='pg_002'>
+            <branch id='br_006'>
+              <activity role='clinician' action='order CBC' objects='CBC lab order' id='act_012'/>
+            </branch>
+            <branch id='br_007'>
+              <activity role='clinician' action='order electrolytes and renal function tests' objects='electrolytes, creatinine/eGFR lab orders' id='act_013'/>
+            </branch>
+          </parallelGateway>
+        </branch>
+      </parallelGateway>
+      <exclusiveGateway id='exg_003'>
+        <branch condition='CRB-65 criteria met >2' id='br_008'>
+          <activity role='clinician' action='consider additional tests' objects='blood gases, lactate, liver enzyme and liver function tests' id='act_014'/>
+        </branch>
+        <branch condition='CRB-65 criteria met ≤2' id='br_009'>
+          <activity role='clinician' action='do not add CRB-65-triggered tests' objects='blood gases, lactate, liver enzymes/liver function tests' id='act_015'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exg_004'>
+        <branch condition='meets >2 SIRS criteria OR requires ICU admission' id='br_010'>
+          <activity role='clinician' action='order blood culture set(s) (aerobic/anaerobic) per protocol' objects='blood culture orders' id='act_016'/>
+          <activity role='nursing staff' action='collect blood cultures prior to/with antibiotics when feasible' objects='blood culture specimens, labels, transport' id='act_017'/>
+        </branch>
+        <branch condition='does not meet >2 SIRS criteria AND does not require ICU admission' id='br_011'>
+          <activity role='clinician' action='do not obtain blood cultures' objects='blood cultures' id='act_018'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exg_005'>
+        <branch condition='adequate sputum sample can be obtained' id='br_012'>
+          <activity role='nursing staff' action='collect sputum for culture' objects='sputum sample' id='act_019'/>
+          <activity role='laboratory' action='process sputum culture' objects='sputum sample' id='act_020'/>
+          <exclusiveGateway id='exg_006'>
+            <branch condition='sputum culture obtained' id='br_013'>
+              <activity role='laboratory' action='consider Gram stain' objects='sputum sample' id='act_021'/>
+            </branch>
+            <branch condition='sputum culture not obtained' id='br_014'>
+              <activity role='clinician' action='skip Gram stain due to no sputum culture' objects='Gram stain' id='act_022'/>
+            </branch>
+          </exclusiveGateway>
+          <exclusiveGateway id='exg_007'>
+            <branch condition='using targeted antibiotic (vs non-targeted)' id='br_015'>
+              <activity role='clinician' action='prioritize obtaining sputum culture before/with targeted therapy' objects='sputum culture, antibiotic plan' id='act_023'/>
+            </branch>
+            <branch condition='using non-targeted antibiotic' id='br_016'>
+              <activity role='clinician' action='treat sputum culture as optional (as feasible)' objects='sputum culture' id='act_024'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch condition='adequate sputum sample cannot be obtained' id='br_017'>
+          <activity role='clinician' action='document inability to obtain adequate sputum sample and forgo sputum culture' objects='sputum culture order/status' id='act_025'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exg_009'>
+        <branch condition='high-severity patient' id='br_018'>
+          <activity role='clinician' action='place urine antigen test order (e.g., Legionella/pneumococcal per local panel)' objects='urine antigen lab order' id='act_026'/>
+          <activity role='nursing staff' action='collect urine sample and send to laboratory' objects='urine specimen, labels, transport' id='act_027'/>
+        </branch>
+        <branch condition='enhanced surveillance directive from Public Health Ontario on Legionella in inpatients' id='br_019'>
+          <activity role='clinician' action='order urine antigen test' objects='urine sample for antigen testing' id='act_028'/>
+        </branch>
+        <branch condition='not responding to drug therapy after 48–72 hours' id='br_020'>
+          <activity role='clinician' action='order urine antigen test at 48–72 hours of non-response' objects='urine sample for antigen testing' id='act_029'/>
+        </branch>
+        <branch condition='inpatient during peak season (mid-June to early October)' id='br_021'>
+          <activity role='clinician' action='order urine antigen test during peak season (mid-June to early October)' objects='urine sample for antigen testing' id='act_030'/>
+        </branch>
+        <branch condition='no urine antigen test indication present (none of the other conditions true)' id='br_025'>
+          <activity role='clinician' action='do not order urine antigen test' objects='urine antigen test' id='act_037'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exg_008'>
+        <branch condition='patient is intubated (e.g., high severity)' id='br_022'>
+          <activity role='respiratory therapist or clinician' action='obtain lower respiratory tract specimen from intubated patient' objects='ET aspirate/BAL specimen' id='act_031'/>
+          <activity role='clinician' action='order Legionella PCR and send specimen to laboratory' objects='PCR order, respiratory specimen transport' id='act_032'/>
+        </branch>
+        <branch condition='patient not intubated' id='br_023'>
+          <activity role='clinician' action='do not pursue Legionella PCR specific to intubation indication' objects='Legionella PCR' id='act_033'/>
+        </branch>
+      </exclusiveGateway>
+      <activity role='quality improvement team' action='conduct field evaluation to assess clinical utility of urine antigen testing in CAP' objects='urine antigen testing utilization and outcomes data' id='act_034'/>
+    </branch>
+    <branch condition='not admitted to hospital (ED/outpatient management)' id='br_024'>
+      <activity role='ED clinician' action='document no inpatient diagnostic test bundle required due to no admission' objects='disposition decision' id='act_035'/>
+      <activity role='quality improvement team' action='conduct field evaluation to assess clinical utility of urine antigen testing in CAP' objects='urine antigen testing utilization and outcomes data' id='act_036'/>
+    </branch>
+  </exclusiveGateway>
+</process>

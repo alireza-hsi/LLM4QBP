@@ -1,0 +1,116 @@
+<process>
+  <activity role='clinician' action='measure oxygen saturation' objects='' id='activity1'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='patient presenting to the emergency department with symptoms of community-acquired pneumonia' id='branch1'>
+      <parallelGateway id='parallelgateway_ed1'>
+        <branch id='branch_ed1_img'>
+          <activity role='clinician' action='obtain chest x-ray to confirm the diagnosis' objects='' id='activity2'/>
+          <activity role='clinician' action='interpret chest x-ray results' objects='chest x-ray images/report' id='activity_interp_cxr'/>
+        </branch>
+        <branch id='branch_ed1_abx'>
+          <exclusiveGateway id='exclusivegateway2_mod'>
+            <branch condition='patient without sepsis' id='branch2_mod'>
+              <activity role='clinician' action='wait for results of chest x-ray prior to giving antibiotics' objects='chest x-ray results' id='activity3'/>
+            </branch>
+            <branch condition='patient with sepsis' id='branch3_mod'>
+              <activity role='clinician' action='do not wait for results of chest x-ray prior to giving antibiotics' objects='chest x-ray results' id='activity4'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </parallelGateway>
+    </branch>
+    <branch condition='not presenting to the emergency department with symptoms of community-acquired pneumonia' id='branch4'>
+      <activity role='clinician' action='proceed without chest x-ray' objects='' id='activity4_1'/>
+    </branch>
+  </exclusiveGateway>
+  <exclusiveGateway id='exclusivegateway3'>
+    <branch condition='patient admitted to hospital' id='branch5'>
+      <parallelGateway id='parallelgateway1'>
+        <branch id='branch6'>
+          <activity role='clinician' action='obtain routine blood work' objects='CBC, electrolytes, renal function tests' id='activity7_routine_bloodwork'/>
+          <activity role='clinician' action='interpret routine blood work results' objects='routine blood work results' id='activity_interp_routine_labs_new'/>
+        </branch>
+        <branch id='branch7'>
+          <exclusiveGateway id='exclusivegateway4'>
+            <branch condition='patient meets >2 CRB-65 criteria' id='branch8'>
+              <parallelGateway id='parallelgateway2_1'>
+                <branch id='branch8_1'>
+                  <activity role='clinician' action='consider blood gases' objects='' id='activity8_1'/>
+                </branch>
+                <branch id='branch8_2'>
+                  <activity role='clinician' action='consider lactate' objects='' id='activity8_2'/>
+                </branch>
+                <branch id='branch8_3'>
+                  <activity role='clinician' action='consider liver enzyme tests' objects='' id='activity8_3'/>
+                </branch>
+                <branch id='branch8_4'>
+                  <activity role='clinician' action='consider liver function tests' objects='' id='activity8_4'/>
+                </branch>
+              </parallelGateway>
+              <activity role='clinician' action='interpret CRB-65 add-on lab results' objects='blood gases, lactate, liver enzyme, liver function results' id='activity_interp_crb65_addon_labs'/>
+            </branch>
+            <branch condition='patient does not meet >2 CRB-65 criteria' id='branch9'>
+              <activity role='clinician' action='do not consider tests' objects='blood gases, lactate, liver enzyme and liver function tests' id='activity9'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </parallelGateway>
+      <exclusiveGateway id='exclusivegateway1_bc'>
+        <branch condition='patient meets >2 SIRS criteria or requires admission to the ICU' id='branch10_bc'>
+          <activity role='clinician' action='obtain blood cultures' objects='' id='activity10_bc'/>
+          <activity role='clinician' action='interpret blood culture results' objects='blood culture results' id='activity_interp_blood_cultures'/>
+        </branch>
+        <branch condition='patient does not meet >2 SIRS criteria and does not require admission to the ICU' id='branch11_bc_keep'>
+          <activity role='clinician' action='proceed without blood cultures' objects='' id='activity11_bc_keep'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exclusivegateway5'>
+        <branch condition='possible to obtain an adequate sample' id='branch12'>
+          <activity role='clinician' action='consider sputum culture' objects='' id='activity12'/>
+          <activity role='clinician' action='interpret sputum culture results' objects='sputum culture results' id='activity_interp_sputum_culture'/>
+          <activity role='clinician' action='consider Gram staining' objects='sputum sample' id='activity13'/>
+          <activity role='clinician' action='interpret Gram stain results' objects='Gram stain results' id='activity_interp_gram_stain'/>
+        </branch>
+        <branch condition='not possible to obtain an adequate sample' id='branch13'>
+          <activity role='clinician' action='do not consider sputum culture' objects='' id='activity14'/>
+        </branch>
+      </exclusiveGateway>
+      <inclusiveGateway id='inclusivegateway2_mod'>
+        <branch condition='high-severity patient' id='branch14_mod'>
+          <activity role='clinician' action='urine antigen testing indicated' objects='indication: high severity' id='activity_uat_ind_1'/>
+        </branch>
+        <branch condition='enhanced surveillance directive from Public Health Ontario on Legionella in inpatients' id='branch15_uat_ind'>
+          <activity role='clinician' action='urine antigen testing indicated' objects='indication: enhanced surveillance directive' id='activity_uat_ind_2'/>
+        </branch>
+        <branch condition='not responding to drug therapy after 48–72 hours' id='branch16_uat_ind'>
+          <activity role='clinician' action='urine antigen testing indicated' objects='indication: non-response 48–72h' id='activity_uat_ind_3'/>
+        </branch>
+        <branch condition='inpatient during peak season (mid-June to early October)' id='branch17_uat_ind'>
+          <activity role='clinician' action='urine antigen testing indicated' objects='indication: peak season' id='activity_uat_ind_4'/>
+        </branch>
+      </inclusiveGateway>
+      <exclusiveGateway id='exclusivegateway_uat_decision'>
+        <branch condition='any urine antigen testing indication met' id='branch_uat_yes'>
+          <activity role='clinician' action='perform urine antigen testing' objects='urine sample' id='activity15_uat_once'/>
+          <activity role='clinician' action='interpret urine antigen test results' objects='urine antigen test results' id='activity_interp_uat_once'/>
+        </branch>
+        <branch condition='no urine antigen testing indication met' id='branch_uat_no'>
+          <activity role='clinician' action='proceed without urine antigen testing' objects='' id='activity_uat_skip'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exclusivegateway6'>
+        <branch condition='intubated patient' id='branch18'>
+          <activity role='clinician' action='consider PCR testing for Legionella' objects='' id='activity19'/>
+          <activity role='clinician' action='interpret Legionella PCR results' objects='Legionella PCR results' id='activity_interp_legionella_pcr'/>
+        </branch>
+        <branch condition='not intubated patient' id='branch19_keep'>
+          <activity role='clinician' action='proceed without PCR testing for Legionella' objects='' id='activity20_keep'/>
+        </branch>
+      </exclusiveGateway>
+      <activity role='panel' action='recommend a field evaluation to assess the clinical utility of urine antigen testing in patients with CAP' objects='' id='activity21'/>
+    </branch>
+    <branch condition='patient not admitted to hospital' id='branch20'>
+      <activity role='panel' action='recommend a field evaluation to assess the clinical utility of urine antigen testing in patients with CAP' objects='' id='activity22'/>
+    </branch>
+  </exclusiveGateway>
+</process>
