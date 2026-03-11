@@ -36,12 +36,12 @@ framework = st.selectbox("Framework", ["ProMoAI", "MAO (AiO version)"])
 task_file = st.file_uploader("Upload task file (.txt)", type="txt")
 gold_bpmn_file = st.file_uploader("Upload gold BPMN file (.bpmn, .xml) (optional)", type=["bpmn","xml"])
 runs = st.number_input("Number of runs", min_value=1, value=1)
-config_options = ["Version-2.2", "Version-3.0", "Version-3.2", "Version-3.3", "Version-3.4", "Version-3.5", "Version-3.6", "Version-3.7", "Version-3.8"]
+config_options = ["Version-2.2", "Version-3.0", "Version-3.2", "Version-3.3", "Version-3.4", "Version-3.5", "Version-3.6", "Version-3.7", "Version-3.8" , "Version-4.0" , "Version-4.1"]
 
 if framework == "MAO (AiO version)":
     config = st.selectbox("MAO Version", config_options)
     if "org_auto_set" not in st.session_state or st.session_state.get("last_config") != config:
-        st.session_state["org"] = config
+        st.session_state["org"] = "DefaultOrganization"
         st.session_state["org_auto_set"] = True
     st.session_state["last_config"] = config
     org = st.text_input("MAO organization", value=st.session_state.get("org", config))
@@ -87,9 +87,9 @@ if run:
 
         # Choose interpreter
         if framework == "MAO (AiO version)":
-            prefix = ["conda","run","-n",MAO_ENV,"python","-u"]
+            prefix = [conda_path,"run","-n",MAO_ENV,"python","-u"]
         else:
-            prefix = ["conda","run","-n",PROMOAI_ENV,"python","-u"]
+            prefix = [conda_path,"run","-n",PROMOAI_ENV,"python","-u"]
 
         # Build cmd
         cmd = prefix + [
