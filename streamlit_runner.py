@@ -36,7 +36,7 @@ framework = st.selectbox("Framework", ["ProMoAI", "MAO (AiO version)"])
 task_file = st.file_uploader("Upload task file (.txt)", type="txt")
 gold_bpmn_file = st.file_uploader("Upload gold BPMN file (.bpmn, .xml) (optional)", type=["bpmn","xml"])
 runs = st.number_input("Number of runs", min_value=1, value=1)
-config_options = ["Version-2.2", "Version-3.0", "Version-3.2", "Version-3.3", "Version-3.4", "Version-3.5", "Version-3.6", "Version-3.7", "Version-3.8" , "Version-4.0" , "Version-4.1"]
+config_options = ["Version-2.2", "Version-3.0", "Version-3.2", "Version-3.3", "Version-3.4", "Version-3.5", "Version-3.6", "Version-3.7", "Version-3.8" , "Version-4.0" , "Version-4.1" , "Version-4.2"]
 
 if framework == "MAO (AiO version)":
     config = st.selectbox("MAO Version", config_options)
