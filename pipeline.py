@@ -204,9 +204,9 @@ def _safe_makedirs(path: str):
 
 
 def _conda_prefix(env_name: str):
-    conda = shutil.which("conda")
-    if conda:
-        return ["conda", "run", "-n", env_name, "python", "-u"]
+    conda_exe = shutil.which("conda")
+    if conda_exe:
+        return [conda_exe, "run", "-n", env_name, "python", "-u"]
     return None
 
 

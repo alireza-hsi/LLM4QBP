@@ -49,7 +49,11 @@ with tab1:
 
     max_workers = st.number_input("Parallel workers", min_value=1, value=2)
 
-    config_options = ["Version-2.2","Version-3.0","Version-3.2","Version-3.3","Version-3.4","Version-3.5","Version-3.6","Version-3.7","Version-3.8","Version-4.0"]
+    config_options = [
+        "Version-2.2", "Version-3.0", "Version-3.2", "Version-3.3", "Version-3.4",
+        "Version-3.5", "Version-3.6", "Version-3.7", "Version-3.8",
+        "Version-4.0", "Version-4.1", "Version-4.2",
+    ]
 
     # Init experiments list
     if "experiments" not in st.session_state:
