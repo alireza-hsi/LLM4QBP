@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# pipeline.py
 """
 Unified pipeline for MAO (AiO version) and ProMoAI frameworks,
 including activity mapping, BPMN comparison, and logging results.
