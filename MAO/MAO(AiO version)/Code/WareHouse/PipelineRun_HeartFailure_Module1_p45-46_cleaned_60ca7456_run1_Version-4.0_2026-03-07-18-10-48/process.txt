@@ -1,0 +1,79 @@
+<process>
+  <activity role='Ontario hospitals' action='develop and consistently apply risk-stratification tools that can be used for multiple conditions (including HF) across all Ontario hospitals' objects='risk-stratification tools' id='activity1_1_merged'/>
+  <parallelGateway id='parallelgateway1_mod1'>
+    <branch id='branch1_mod1'>
+      <activity role='clinicians' action='order and collect blood work' objects='serum creatinine, electrolytes, troponin, complete blood count' id='activity_bloodwork1'/>
+      <activity role='clinicians' action='interpret blood work results' objects='blood work results' id='activity_bloodwork_interpret1'/>
+    </branch>
+    <branch id='branch2_mod1'>
+      <activity role='clinicians' action='perform electrocardiogram' objects='electrocardiogram' id='activity5'/>
+      <activity role='clinicians' action='interpret electrocardiogram findings' objects='electrocardiogram results' id='activity_ecg_interpret1'/>
+    </branch>
+    <branch id='branch3_mod1'>
+      <exclusiveGateway id='exclusivegateway_cxr_needed_mod1'>
+        <branch condition='chest x-ray required' id='branch_cxr_yes_mod1'>
+          <activity role='clinicians' action='perform chest x-ray examination' objects='chest x-ray examination' id='activity6'/>
+          <activity role='clinicians' action='interpret chest x-ray findings' objects='chest x-ray results' id='activity_cxr_interpret1'/>
+        </branch>
+        <branch condition='chest x-ray not required' id='branch_cxr_no_mod1'>
+          <activity role='clinicians' action='skip chest x-ray and continue assessment' objects='' id='activity_cxr_skip_mod1'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch4_mod1'>
+      <exclusiveGateway id='exclusivegateway1_mod1'>
+        <branch condition='no recent echocardiogram is available' id='branch7_mod1'>
+          <activity role='clinicians' action='perform an echocardiogram' objects='echocardiogram' id='activity7'/>
+          <activity role='clinicians' action='interpret echocardiogram findings' objects='echocardiogram results' id='activity_echo_interpret1'/>
+        </branch>
+        <branch condition='a recent echocardiogram is available' id='branch8_mod1'>
+          <activity role='clinicians' action='use and interpret recent echocardiogram' objects='recent echocardiogram results' id='activity8_mod1'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch20_mod1'>
+      <activity role='clinicians' action='frequently measure heart rate, blood pressure, and oxygen saturation until patient is stabilized' objects='heart rate, blood pressure, oxygen saturation' id='activity9'/>
+    </branch>
+  </parallelGateway>
+  <exclusiveGateway id='exclusivegateway3_mod1'>
+    <branch condition='patient stabilized' id='branch18_mod1'>
+      <activity role='clinicians' action='calculate an acute heart failure risk score (e.g., EHMRG) to assist with clinical decision-making and predicting the 7-day mortality risk' objects='EHMRG risk score' id='activity10'/>
+      <exclusiveGateway id='exclusivegateway2_mod1'>
+        <branch condition='low-risk (e.g., EHMRG quintiles 1 and 2) AND responded to initial treatment in the ED AND no other considerations' id='branch10_mod1'>
+          <activity role='clinicians' action='treat patient in the ED or outpatient setting and discharge home without requiring inpatient admission' objects='' id='activity11'/>
+          <activity role='primary care provider' action='conduct a follow-up visit within days of discharge from the ED' objects='follow-up visit' id='activity13'/>
+        </branch>
+        <branch condition='higher-risk (e.g., EHMRG quintiles 3-5)' id='branch13_mod1'>
+          <exclusiveGateway id='exclusivegateway4_mod1'>
+            <branch condition='average intensity' id='branch14_mod1'>
+              <activity role='hospital' action='admit patient to inpatient care with normal nurse-to-patient staffing' objects='' id='activity14'/>
+            </branch>
+            <branch condition='high intensity' id='branch15_mod1'>
+              <inclusiveGateway id='inclusivegateway1_mod1'>
+                <branch condition='requires ventilation (either noninvasive or invasive ventilation)' id='branch16_mod1'>
+                  <activity role='hospital' action='provide ventilation (either noninvasive or invasive ventilation)' objects='ventilation' id='activity15'/>
+                </branch>
+                <branch condition='requires admission to an intensive care unit with higher nurse-to-patient staffing' id='branch17_mod1'>
+                  <activity role='hospital' action='admit patient to an intensive care unit with higher nurse-to-patient staffing' objects='intensive care unit' id='activity16'/>
+                </branch>
+              </inclusiveGateway>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch condition='patient not stabilized' id='branch19_mod1'>
+      <activity role='clinicians' action='frequently measure heart rate, blood pressure, and oxygen saturation until patient is stabilized' objects='heart rate, blood pressure, oxygen saturation' id='activity9_loop'/>
+      <parallelGateway id='parallelgateway1_mod1_loop'>
+        <branch id='branch1_mod1_loop'>
+          <activity role='clinicians' action='order and collect blood work' objects='serum creatinine, electrolytes, troponin, complete blood count' id='activity_bloodwork1_loop'/>
+          <activity role='clinicians' action='interpret blood work results' objects='blood work results' id='activity_bloodwork_interpret1_loop'/>
+        </branch>
+        <branch id='branch2_mod1_loop'>
+          <activity role='clinicians' action='perform electrocardiogram' objects='electrocardiogram' id='activity5_loop'/>
+          <activity role='clinicians' action='interpret electrocardiogram findings' objects='electrocardiogram results' id='activity_ecg_interpret1_loop'/>
+        </branch>
+      </parallelGateway>
+    </branch>
+  </exclusiveGateway>
+</process>

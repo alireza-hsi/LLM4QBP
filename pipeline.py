@@ -55,6 +55,7 @@ from automatedActivityMapping import (
     update_activity_names,
 )
 from bpmn_compare_similarity import CompareBPMN
+from duplicateHandling import remove_safe_duplicates
 
 
 # ---------------------------
@@ -84,6 +85,11 @@ def parse_args():
     p.add_argument("--results-db", default="resultsDb.sqlite")
     p.add_argument("--gold-bpmn-filename", default=None)
     p.add_argument("--mapping-model", default="gpt-5.2")
+    p.add_argument(
+        "--use-dedup",
+        action="store_true",
+        help="Run duplicate handling on the final BPMN artefact before similarity comparison.",
+    )
 
     return p.parse_args()
 
@@ -119,6 +125,16 @@ def db_init(conn: sqlite3.Connection):
         promoai_retries TEXT
       )
     """)
+
+    # Add optional columns for additional artefact paths if they don't exist yet.
+    try:
+        c.execute("ALTER TABLE experiment_results ADD COLUMN mapped_bpmn_path TEXT")
+    except sqlite3.OperationalError:
+        pass
+    try:
+        c.execute("ALTER TABLE experiment_results ADD COLUMN dedup_bpmn_path TEXT")
+    except sqlite3.OperationalError:
+        pass
 
     # New run-level tracking (for progress/resume/debug)
     c.execute("""
@@ -163,14 +179,15 @@ def db_mark_finished(conn: sqlite3.Connection, batch_id: str, job_id: str,
 
 def db_insert_result(conn: sqlite3.Connection, qbp: str, framework: str,
                      node_sim, struct_sim, ged,
-                     gold, gen, model, promoai_retries):
+                     gold, gen, mapped, dedup, model, promoai_retries):
     conn.execute("""
       INSERT INTO experiment_results (
         timestamp, qbp_name, framework,
         node_similarity, structure_similarity, graph_edit_distance,
-        gold_bpmn_path, generated_bpmn_path, model, promoai_retries
-      ) VALUES (datetime('now'),?,?,?,?,?,?,?, ?, ?)
-    """, (qbp, framework, node_sim, struct_sim, ged, gold, gen, model, promoai_retries))
+        gold_bpmn_path, generated_bpmn_path, mapped_bpmn_path, dedup_bpmn_path,
+        model, promoai_retries
+      ) VALUES (datetime('now'),?,?,?,?,?,?,?,?,?,?,?)
+    """, (qbp, framework, node_sim, struct_sim, ged, gold, gen, mapped, dedup, model, promoai_retries))
     conn.commit()
 
 
@@ -332,6 +349,7 @@ def load_jobs(args):
                     "name": item.get("name", "PipelineProject"),
                     "model": item.get("model", "GPT_5o2"),
                     "mapping_model": item.get("mapping_model", "gpt-5.2"),
+                    "use_dedup": bool(item.get("use_dedup", False)),
                     "config": item.get("config"),
                     "org": item.get("org"),
                     "mapped_output": item.get("mapped_output"),
@@ -359,6 +377,7 @@ def load_jobs(args):
             "name": args.name,
             "model": args.model,
             "mapping_model": args.mapping_model,
+            "use_dedup": bool(args.use_dedup),
             "config": args.config,
             "org": args.org,
             "mapped_output": args.mapped_output,
@@ -388,9 +407,13 @@ def run_one_job(job):
     gold_bpmn = job.get("gold_bpmn")
     gold_bpmn_filename = job.get("gold_bpmn_filename")
     mapped_output_override = job.get("mapped_output")
+    use_dedup = bool(job.get("use_dedup"))
 
     config = job.get("config")
     org = job.get("org")
+
+    # Model identifier for DB / dashboard (optionally tag dedup runs)
+    db_model = f"{model}_dedup" if use_dedup else model
 
     run_name = f"{name_prefix}_{qbp}_{eid}_run{run_idx}"
     jprint(f"=== Run {run_idx} for {qbp} ({framework}) ===")
@@ -423,7 +446,9 @@ def run_one_job(job):
             "ged": None,
             "gold_for_db": gold_bpmn_filename or (os.path.basename(gold_bpmn) if gold_bpmn else None),
             "gen_bpmn": None,
-            "model": model,
+            "mapped_bpmn": None,
+            "dedup_bpmn": None,
+            "model": db_model,
             "promoai_retries": "failed" if framework == "ProMoAI" else None,
         }
     except Exception as e:
@@ -440,7 +465,9 @@ def run_one_job(job):
             "ged": None,
             "gold_for_db": gold_bpmn_filename or (os.path.basename(gold_bpmn) if gold_bpmn else None),
             "gen_bpmn": None,
-            "model": model,
+            "mapped_bpmn": None,
+            "dedup_bpmn": None,
+            "model": db_model,
             "promoai_retries": promoai_retries if framework == "ProMoAI" else None,
         }
 
@@ -466,18 +493,35 @@ def run_one_job(job):
             "ged": None,
             "gold_for_db": None,
             "gen_bpmn": gen_bpmn,
-            "model": model,
+            "mapped_bpmn": None,
+            "dedup_bpmn": None,
+            "model": db_model,
             "promoai_retries": promoai_retries if framework == "ProMoAI" else None,
         }
 
-    # 2) Map + 3) Compare
+    # 2) Map + 3) Optional duplicate handling + 4) Compare
     try:
+        mapped_bpmn_for_db = None
+        dedup_bpmn_for_db = None
+
         mapped = mapped_output_override or gen_bpmn.replace(".bpmn", "_mapped.bpmn")
         _safe_makedirs(os.path.dirname(mapped))
         map_activities(gen_bpmn, gold_bpmn, mapped, mapping_model)
         jprint(f"✔ Mapped  BPMN: {mapped}")
+        mapped_bpmn_for_db = mapped
 
-        node_sim, struct_sim, ged = compare_bpmn(gold_bpmn, mapped)
+        mapped_for_compare = mapped
+        if use_dedup:
+            dedup_path = mapped.replace(".bpmn", "_dedup.bpmn")
+            jprint(f"✔ Running duplicate handling on mapped BPMN: {mapped} → {dedup_path}")
+            try:
+                mapped_for_compare = remove_safe_duplicates(mapped, dedup_path)
+                dedup_bpmn_for_db = mapped_for_compare
+            except Exception as e:
+                jprint(f"✗ Duplicate handling failed; continuing with original mapped BPMN. Error: {e}")
+                mapped_for_compare = mapped
+
+        node_sim, struct_sim, ged = compare_bpmn(gold_bpmn, mapped_for_compare)
         jprint(f"→ NodeSim={node_sim:.3f}, StructSim={struct_sim:.3f}, GED={ged}")
 
         # Framework formatting like your original code
@@ -498,7 +542,9 @@ def run_one_job(job):
             "ged": ged,
             "gold_for_db": gold_bpmn_filename or os.path.basename(gold_bpmn),
             "gen_bpmn": gen_bpmn,
-            "model": model,
+            "mapped_bpmn": mapped_bpmn_for_db,
+            "dedup_bpmn": dedup_bpmn_for_db,
+            "model": db_model,
             "promoai_retries": promoai_retries if framework == "ProMoAI" else None,
         }
 
@@ -522,7 +568,9 @@ def run_one_job(job):
             "ged": None,
             "gold_for_db": gold_bpmn_filename or os.path.basename(gold_bpmn),
             "gen_bpmn": gen_bpmn,
-            "model": model,
+            "mapped_bpmn": mapped_bpmn_for_db if 'mapped_bpmn_for_db' in locals() else None,
+            "dedup_bpmn": dedup_bpmn_for_db if 'dedup_bpmn_for_db' in locals() else None,
+            "model": db_model,
             "promoai_retries": promoai_retries if framework == "ProMoAI" else None,
         }
 
@@ -563,6 +611,8 @@ def db_writer_loop(db_path: str, batch_id: str, q: Queue):
                     ged=item["ged"],
                     gold=item["gold_for_db"],
                     gen=item["gen_bpmn"],
+                    mapped=item.get("mapped_bpmn"),
+                    dedup=item.get("dedup_bpmn"),
                     model=item["model"],
                     promoai_retries=item.get("promoai_retries"),
                 )

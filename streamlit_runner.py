@@ -82,6 +82,13 @@ with tab1:
                 key=f"framework_{eid}"
             )
 
+            use_dedup = st.checkbox(
+                "Use duplicate handling on final BPMN before similarity check",
+                value=False,
+                key=f"use_dedup_{eid}",
+                help="If enabled, the pipeline will run safe duplicate removal on the last BPMN artefact before computing similarity scores.",
+            )
+
             # Runs per experiment
             runs = st.number_input("Number of runs (for this experiment)", min_value=1, value=5, key=f"runs_{eid}")
 
@@ -142,6 +149,7 @@ with tab1:
 
                     fw   = st.session_state.get(f"framework_{eid}", "ProMoAI")
                     runs = int(st.session_state.get(f"runs_{eid}", 1))
+                    use_dedup = bool(st.session_state.get(f"use_dedup_{eid}", False))
                     name_prefix = st.session_state.get(f"name_{eid}", default_name_prefix)
                     model = st.session_state.get(f"model_{eid}", default_model)
                     mapping_model = st.session_state.get(f"mapping_model_{eid}", default_mapping_model)
@@ -169,6 +177,7 @@ with tab1:
                         "name": name_prefix,
                         "model": model,
                         "mapping_model": mapping_model,
+                        "use_dedup": use_dedup,
                         "config": config,
                         "org": org,
                         "task_file": task_path,
