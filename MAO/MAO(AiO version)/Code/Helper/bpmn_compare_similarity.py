@@ -116,10 +116,7 @@ class CompareBPMN(object):
         :return:
         """
         file_list = os.listdir(bpmn_file_path)
-        for file in file_list:
-            if file.find('.xml') == -1 and file.find('.bpmn') == -1:
-                file_list.remove(file)
-        return file_list
+        return [file for file in file_list if file.find('.xml') != -1 or file.find('.bpmn') != -1]
 
     def get_bpmn_flows(self, bpmn):
         edges = bpmn.get_flows()
@@ -166,31 +163,39 @@ class CompareBPMN(object):
 
         self.__raw_bpmn_file_path = self.check_file_name(bpmn_file_path1)
         self.__bpmn_file_path = self.check_file_name(bpmn_file_path2)
+        self.result_list = []
         raw_bpmn_file_list = self.get_bpmn_file_list(self.__raw_bpmn_file_path)
         for bpmn_file in raw_bpmn_file_list:
             try:
                 # file name must be same!!
-                raw_file_name = os.path.join(self.__raw_bpmn_file_path + bpmn_file)
-                file_name = self.__bpmn_file_path + bpmn_file
-                node_matching_sim, structure_sim = self.calculate_similarity(raw_file_name, file_name)
+                raw_file_name = os.path.join(self.__raw_bpmn_file_path, bpmn_file)
+                file_name = os.path.join(self.__bpmn_file_path, bpmn_file)
+                node_matching_sim, structure_sim, _ = self.calculate_similarity(raw_file_name, file_name)
 
                 self.result_list.append((bpmn_file, node_matching_sim, structure_sim))
             except BaseException as e:
                 print(e, bpmn_file)
 
         df = pd.DataFrame(self.result_list)
-        df.sort_values(by=1, inplace=True, ascending=False)
+        if not df.empty:
+            df.sort_values(by=1, inplace=True, ascending=False)
 
-        print("avg node matching similarity: ", df.iloc[:, 1].mean())
-        print("avg structure similarity: ", df.iloc[:, 2].mean())
+        if not df.empty:
+            print("avg node matching similarity: ", df.iloc[:, 1].mean())
+            print("avg structure similarity: ", df.iloc[:, 2].mean())
 
-        df.columns = ['file_name', 'node_sim', 'structure_sim']
-        df.reset_index()
+        if not df.empty:
+            df.columns = ['file_name', 'node_sim', 'structure_sim']
+            df.reset_index(drop=True, inplace=True)
+        else:
+            df = pd.DataFrame(columns=['file_name', 'node_sim', 'structure_sim'])
         if self.export_csv:
-            df.to_csv(os.path.join(output_dir, "result_sim.csv"))
+            csv_path = os.path.join(output_dir, "result_sim.csv") if output_dir else "result_sim.csv"
+            df.to_csv(csv_path, index=False)
 
         if self.export_excel:
-            df.to_excel(os.path.join(output_dir + "result_sim.excel"))
+            excel_path = os.path.join(output_dir, "result_sim.xlsx") if output_dir else "result_sim.xlsx"
+            df.to_excel(excel_path, index=False)
 
 
     def check_file_name(self, file_name):
