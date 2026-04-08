@@ -68,7 +68,12 @@ if __name__ == "__main__":
         'GPT_5o2': ModelType.GPT_5o2,
         'GPT_5o2_low_reasoning': ModelType.GPT_5o2_low_reasoning,
         'GPT_5o2_medium_reasoning': ModelType.GPT_5o2_medium_reasoning,
-        'GPT_5o2_high_reasoning': ModelType.GPT_5o2_high_reasoning
+        'GPT_5o2_high_reasoning': ModelType.GPT_5o2_high_reasoning,
+        'GPT_5o4': ModelType.GPT_5o4,
+        'GPT_5o4_low_reasoning': ModelType.GPT_5o4_low_reasoning,
+        'GPT_5o4_medium_reasoning': ModelType.GPT_5o4_medium_reasoning,
+        'GPT_5o4_high_reasoning': ModelType.GPT_5o4_high_reasoning,
+        'GPT_5o4_xhigh_reasoning': ModelType.GPT_5o4_xhigh_reasoning
     }
     
     chat_chain = ChatChain(

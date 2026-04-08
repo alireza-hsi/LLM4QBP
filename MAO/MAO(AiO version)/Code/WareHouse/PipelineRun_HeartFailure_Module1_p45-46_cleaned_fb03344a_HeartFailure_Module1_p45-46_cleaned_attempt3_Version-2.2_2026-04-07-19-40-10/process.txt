@@ -1,0 +1,71 @@
+<process>
+  <activity role='emergency department clinician' action='assess initial clinical presentation and stability' objects='patient presentation, symptoms, vital signs' id='activity1_1'/>
+  <activity role='emergency department clinician' action='apply standardized acute heart failure risk stratification tool' objects='common hospital risk stratification tool, patient assessment data' id='activity1_2'/>
+  <activity role='emergency department clinician' action='administer initial diuresis and assess responsiveness to furosemide in the ED' objects='furosemide, patient response' id='activity2'/>
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1'>
+      <activity role='laboratory staff' action='measure serum creatinine and electrolyte levels' objects='blood samples' id='activity3'/>
+    </branch>
+    <branch id='branch2'>
+      <activity role='laboratory staff' action='measure troponin and complete blood count' objects='blood samples' id='activity4'/>
+    </branch>
+    <branch id='branch3'>
+      <activity role='diagnostic staff' action='perform electrocardiogram and chest x-ray examination' objects='electrocardiogram, chest x-ray' id='activity5'/>
+    </branch>
+    <branch id='branch4'>
+      <activity role='nursing staff' action='measure heart rate, blood pressure, and oxygen saturation frequently until the patient is stabilized' objects='vital signs, oxygen saturation readings' id='activity8'/>
+    </branch>
+  </parallelGateway>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='no recent echocardiogram is available' id='branch5'>
+      <activity role='cardiac imaging staff' action='perform echocardiogram' objects='echocardiogram study' id='activity6'/>
+    </branch>
+    <branch condition='recent echocardiogram is available' id='branch6'>
+      <activity role='emergency department clinician' action='review recent echocardiogram results' objects='recent echocardiogram record' id='activity7'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='emergency department clinician' action='evaluate high-risk markers including respiratory distress, hypoxemia, severity of pulmonary edema, poor response to furosemide, hemodynamic compromise, significant arrhythmias, and positive troponin' objects='clinical findings, investigation results' id='activity9'/>
+  <activity role='emergency department clinician' action='compile EHMRG score inputs from clinical assessment and investigation results' objects='EHMRG score inputs, clinical findings, investigation results' id='activity10_1'/>
+  <activity role='emergency department clinician' action='calculate and document acute heart failure risk score' objects='EHMRG score, patient record' id='activity10_2'/>
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='low risk such as EHMRG quintile 1 or 2, responded to initial ED treatment, and no other considerations preventing discharge' id='branch8'>
+      <activity role='emergency department clinician' action='prepare discharge plan and patient instructions' objects='discharge plan, patient instructions, follow-up recommendation' id='activity11_1'/>
+      <activity role='emergency department clinician' action='discharge patient home from the ED or outpatient setting' objects='completed discharge plan' id='activity11_2'/>
+    </branch>
+    <branch condition='average intensity care required with admission criteria met and no ventilation or ICU requirement' id='branch9'>
+      <activity role='inpatient admitting team' action='complete inpatient admission decision and handover' objects='admission decision, clinical handover, admission orders' id='activity13_1'/>
+      <activity role='inpatient admitting team' action='admit patient to inpatient care with normal nurse-to-patient staffing' objects='hospital bed, admission orders' id='activity13_2'/>
+    </branch>
+    <branch condition='high intensity care required because ventilation and/or ICU admission is needed or high-risk features warrant higher nurse-to-patient staffing' id='branch10'>
+      <activity role='critical care team' action='initiate high intensity acute heart failure management and critical care assessment' objects='critical care assessment, high acuity management plan' id='activity13_3'/>
+      <exclusiveGateway id='exclusivegateway4'>
+        <branch condition='noninvasive ventilation is required' id='branch11'>
+          <activity role='critical care team' action='provide noninvasive ventilation' objects='noninvasive ventilation support' id='activity14'/>
+        </branch>
+        <branch condition='invasive ventilation is required' id='branch12'>
+          <activity role='critical care team' action='provide invasive ventilation' objects='mechanical ventilation support' id='activity15'/>
+        </branch>
+        <branch condition='ventilatory support is not required' id='branch13'>
+          <activity role='critical care team' action='continue high acuity monitoring and supportive management without ventilation' objects='high acuity monitoring plan, supportive therapy' id='activity15_1'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exclusivegateway5'>
+        <branch condition='intensive care unit admission is required' id='branch16'>
+          <activity role='critical care team' action='admit patient to the intensive care unit with higher nurse-to-patient staffing' objects='ICU bed, intensive monitoring plan' id='activity16'/>
+        </branch>
+        <branch condition='intensive care unit admission is not required' id='branch17'>
+          <activity role='critical care team' action='manage patient in a non-ICU high acuity setting with higher nurse-to-patient staffing as indicated' objects='high acuity bed, monitoring plan' id='activity16_1'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exclusivegateway3'>
+        <branch condition='higher level provider is needed and transfer is required' id='branch14'>
+          <activity role='hospital transfer team' action='arrange transfer logistics with the higher level provider' objects='transfer pathway, receiving provider acceptance, transport arrangements' id='activity17_1'/>
+          <activity role='hospital transfer team' action='complete clinical handover and transport transfer' objects='clinical handover, transport team, transfer documentation' id='activity17_2'/>
+        </branch>
+        <branch condition='higher level provider transfer is not required' id='branch15'>
+          <activity role='critical care team' action='continue high intensity acute heart failure management at current hospital' objects='ICU treatment plan' id='activity18'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </exclusiveGateway>
+</process>

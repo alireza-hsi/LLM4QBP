@@ -1,0 +1,122 @@
+<process>
+  <activity role='clinician' action='assess' objects='respiratory and systemic features suggestive of CAP' id='activity1_1'/>
+  <activity role='clinician' action='assess' objects='severity indicators including sepsis status and likely level of care' id='activity1_2'/>
+  <activity role='clinician' action='order chest x-ray to confirm the diagnosis of CAP' objects='chest x-ray' id='activity2'/>
+  <activity role='clinician' action='avoid ordering' objects='CT scan' id='activity3'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='patient has sepsis' id='branch1'>
+      <activity role='clinician' action='do not wait for chest x-ray results before initiating antibiotics' objects='antibiotic timing decision' id='activity4'/>
+    </branch>
+    <branch condition='patient does not have sepsis' id='branch2'>
+      <activity role='clinician' action='wait for chest x-ray results prior to giving antibiotics' objects='chest x-ray results, antibiotics' id='activity5'/>
+    </branch>
+  </exclusiveGateway>
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='patient is admitted to hospital' id='branch3'>
+      <parallelGateway id='parallelgateway1'>
+        <branch id='branch4'>
+          <activity role='clinical staff' action='measure' objects='oxygen saturation' id='activity6'/>
+        </branch>
+        <branch id='branch5'>
+          <parallelGateway id='parallelgateway1_1'>
+            <branch id='branch5_1'>
+              <activity role='clinical staff' action='obtain' objects='CBC' id='activity7_1'/>
+            </branch>
+            <branch id='branch5_2'>
+              <activity role='clinical staff' action='obtain' objects='electrolytes' id='activity7_2'/>
+            </branch>
+            <branch id='branch5_3'>
+              <activity role='clinical staff' action='obtain' objects='renal function tests' id='activity7_3'/>
+            </branch>
+          </parallelGateway>
+        </branch>
+        <branch id='branch6'>
+          <exclusiveGateway id='exclusivegateway3'>
+            <branch condition='patient meets more than 2 CRB-65 criteria' id='branch7'>
+              <parallelGateway id='parallelgateway1_2'>
+                <branch id='branch7_1'>
+                  <activity role='clinician' action='consider ordering' objects='blood gases' id='activity8_1'/>
+                </branch>
+                <branch id='branch7_2'>
+                  <activity role='clinician' action='consider ordering' objects='lactate' id='activity8_2'/>
+                </branch>
+                <branch id='branch7_3'>
+                  <activity role='clinician' action='consider ordering' objects='liver enzyme tests' id='activity8_3'/>
+                </branch>
+                <branch id='branch7_4'>
+                  <activity role='clinician' action='consider ordering' objects='liver function tests' id='activity8_4'/>
+                </branch>
+              </parallelGateway>
+            </branch>
+            <branch condition='patient meets 2 or fewer CRB-65 criteria' id='branch8'>
+              <activity role='clinician' action='continue without additional CRB-65-triggered tests' objects='blood gases, lactate, liver enzyme tests, liver function tests' id='activity9'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch id='branch9'>
+          <exclusiveGateway id='exclusivegateway4'>
+            <branch condition='patient meets more than 2 SIRS criteria or requires ICU admission' id='branch10'>
+              <activity role='clinical staff' action='obtain' objects='blood cultures' id='activity10'/>
+            </branch>
+            <branch condition='patient meets 2 or fewer SIRS criteria and does not require ICU admission' id='branch11'>
+              <activity role='clinician' action='do not routinely obtain' objects='blood cultures' id='activity11'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch id='branch12'>
+          <exclusiveGateway id='exclusivegateway5'>
+            <branch condition='adequate sputum sample can be obtained' id='branch13'>
+              <activity role='clinical staff' action='obtain sputum culture and prioritize collection if targeted antibiotics are planned' objects='adequate sputum sample, sputum culture' id='activity12'/>
+              <activity role='laboratory staff' action='consider performing' objects='Gram stain on sputum sample' id='activity13'/>
+            </branch>
+            <branch condition='adequate sputum sample cannot be obtained' id='branch14'>
+              <activity role='clinician' action='document inability to obtain' objects='adequate sputum sample' id='activity14'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch id='branch15'>
+          <inclusiveGateway id='inclusivegateway7_revised'>
+            <branch condition='patient is high severity' id='branch24_1_revised'>
+              <activity role='clinician' action='order' objects='urine antigen test' id='activity23_1_revised'/>
+            </branch>
+            <branch condition='there is an enhanced surveillance directive from Public Health Ontario on Legionella for inpatients' id='branch24_2_revised'>
+              <activity role='clinician' action='order' objects='urine antigen test' id='activity23_2_revised'/>
+            </branch>
+            <branch condition='patient is an inpatient during peak season from mid-June to early October' id='branch24_3_revised'>
+              <activity role='clinician' action='order' objects='urine antigen test' id='activity23_3_revised'/>
+            </branch>
+          </inclusiveGateway>
+        </branch>
+        <branch id='branch20'>
+          <exclusiveGateway id='exclusivegateway6'>
+            <branch condition='patient is intubated' id='branch21'>
+              <activity role='clinician' action='consider ordering' objects='PCR testing for Legionella' id='activity19'/>
+            </branch>
+            <branch condition='patient is not intubated' id='branch22'>
+              <activity role='clinician' action='continue without routine PCR testing for Legionella' objects='PCR testing for Legionella' id='activity20'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </parallelGateway>
+      <activity role='clinician' action='reassess' objects='response to drug therapy after 48–72 hours' id='activity25'/>
+      <exclusiveGateway id='exclusivegateway8'>
+        <branch condition='patient is not responding to drug therapy after 48–72 hours' id='branch26'>
+          <exclusiveGateway id='exclusivegateway9'>
+            <branch condition='urine antigen test has not already been ordered' id='branch28'>
+              <activity role='clinician' action='order' objects='urine antigen test' id='activity26'/>
+            </branch>
+            <branch condition='urine antigen test has already been ordered' id='branch29'>
+              <activity role='clinician' action='avoid duplicate ordering and review existing urine antigen test status' objects='prior urine antigen test order, urine antigen test result status' id='activity28'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch condition='patient is responding to drug therapy after 48–72 hours' id='branch27'>
+          <activity role='clinician' action='continue current management without additional urine antigen testing indication' objects='treatment response status, urine antigen test' id='activity27'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch condition='patient is not admitted to hospital' id='branch23'>
+      <activity role='clinician' action='complete ED diagnostic testing and disposition without inpatient admission test bundle' objects='diagnostic findings, disposition plan' id='activity21'/>
+    </branch>
+  </exclusiveGateway>
+</process>

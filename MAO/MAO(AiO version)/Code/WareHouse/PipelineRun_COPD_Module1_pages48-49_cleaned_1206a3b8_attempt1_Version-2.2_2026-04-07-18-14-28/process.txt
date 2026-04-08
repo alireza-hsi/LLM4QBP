@@ -1,0 +1,86 @@
+<process>
+  <activity role='patient' action='present with suspected COPD exacerbation' objects='ED, outpatient clinic, or direct admission setting' id='activity1'/>
+  <activity role='emergency or outpatient clinical staff' action='trial immediate resuscitation on initial presentation when clinically indicated' objects='resuscitation measures' id='activity2'/>
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1'>
+      <parallelGateway id='parallelgateway1_1'>
+        <branch id='branch1_1'>
+          <activity role='clinical staff' action='assess hypoventilation' objects='respiratory status' id='activity3_1'/>
+        </branch>
+        <branch id='branch1_2'>
+          <activity role='clinical staff' action='check level of consciousness or cognition' objects='mental status' id='activity3_2'/>
+        </branch>
+        <branch id='branch1_3'>
+          <activity role='clinical staff' action='check blood-oxygen saturation via pulse oximetry' objects='oxygen saturation reading' id='activity3_3'/>
+        </branch>
+        <branch id='branch1_4'>
+          <activity role='clinical staff' action='assess purulent sputum status' objects='sputum characteristics' id='activity3_4'/>
+        </branch>
+      </parallelGateway>
+    </branch>
+    <branch id='branch2'>
+      <activity role='clinician' action='perform physical examination' objects='patient' id='activity4'/>
+    </branch>
+    <branch id='branch3'>
+      <activity role='clinician' action='check patient history' objects='medical history and presenting illness history' id='activity5'/>
+    </branch>
+    <branch id='branch4'>
+      <activity role='clinician or pharmacist' action='document and reconcile medications currently used by patient' objects='current medication list' id='activity6'/>
+    </branch>
+    <branch id='branch5'>
+      <inclusiveGateway id='inclusivegateway_xray'>
+        <branch condition='patient is able to undergo standard chest imaging' id='branch5_1'>
+          <activity role='diagnostic imaging staff' action='perform posteroanterior and lateral chest x-ray' objects='standard chest x-ray views' id='activity7_1'/>
+        </branch>
+        <branch condition='patient is too unwell to leave emergency department' id='branch5_2'>
+          <activity role='diagnostic imaging staff' action='perform portable chest x-ray' objects='portable chest x-ray image' id='activity7_2'/>
+        </branch>
+        <branch condition='there is concern for pneumothorax' id='branch5_3'>
+          <activity role='diagnostic imaging staff' action='perform expiratory chest x-ray' objects='expiratory chest x-ray view' id='activity7_3'/>
+        </branch>
+      </inclusiveGateway>
+    </branch>
+    <branch id='branch6'>
+      <activity role='laboratory staff' action='conduct baseline blood work' objects='complete blood count, electrolytes, creatinine, blood urea nitrogen if available' id='activity8'/>
+    </branch>
+    <branch id='branch7'>
+      <activity role='clinical staff' action='perform electrocardiogram' objects='arrhythmia, myocardial ischemia, right ventricular strain assessment' id='activity9'/>
+    </branch>
+    <branch id='branch8'>
+      <activity role='clinician' action='identify patient wishes with respect to goals of care and limitations of treatment' objects='goals of care and code status' id='activity10'/>
+    </branch>
+  </parallelGateway>
+  <inclusiveGateway id='inclusivegateway1'>
+    <branch condition='low oxygen saturation on oximetry and or acute respiratory failure is suspected' id='branch9'>
+      <activity role='clinician' action='check arterial blood gases where appropriate' objects='arterial blood gases' id='activity11'/>
+    </branch>
+    <branch condition='pneumonia or suspected sepsis' id='branch10'>
+      <activity role='clinical staff' action='draw blood cultures' objects='blood culture specimens' id='activity12'/>
+    </branch>
+    <branch condition='suspected cardiac disorders' id='branch11'>
+      <activity role='clinician' action='examine cardiac markers if appropriate' objects='cardiac marker tests' id='activity13'/>
+    </branch>
+    <branch condition='other suspected diagnoses or comorbidities require further evaluation' id='branch12'>
+      <activity role='clinician' action='perform other diagnostic interventions as appropriate to identify or rule out other suspected diagnoses or comorbidities' objects='additional diagnostic tests and assessments' id='activity14'/>
+    </branch>
+  </inclusiveGateway>
+  <activity role='clinician' action='review response to initial resuscitation and medical management' objects='clinical response and early treatment effect' id='activity17_1'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='patient has no prior objective documentation of COPD through spirometry and has stabilized' id='branch13'>
+      <activity role='respiratory or pulmonary testing staff' action='perform spirometry once the patient has stabilized' objects='spirometry test' id='activity15'/>
+    </branch>
+    <branch condition='patient has prior objective documentation of COPD through spirometry or has not yet stabilized' id='branch14'>
+      <activity role='clinician' action='defer spirometry during the initial assessment of exacerbation' objects='initial assessment workflow' id='activity16'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='clinician' action='assess admission criteria using NICE and or GOLD guidance and local resources' objects='admission criteria, resource availability, and investigation results' id='activity17_2'/>
+  <activity role='clinician' action='determine disposition recommendation' objects='admission versus non-admission recommendation' id='activity17_3'/>
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='clinical judgment and local resources support hospital admission using NICE and or GOLD criteria such as failure to respond to initial medical management, insufficient home support, inability to cope at home, marked breathlessness or resting dyspnea, severe underlying COPD or poor general condition, decreased level of activity, cyanosis, worsening peripheral edema or new physical signs, decreased level of consciousness, long-term oxygen therapy, social circumstances or older age, acute confusion, rapid onset or frequent exacerbations, significant comorbidity, SaO2 less than 90 percent, abnormal pH or PaO2, or changes on chest x-ray' id='branch15'>
+      <activity role='clinician' action='admit patient to hospital' objects='admission decision and inpatient care pathway' id='activity18'/>
+    </branch>
+    <branch condition='clinical judgment and local resources support no hospital admission after re-evaluation' id='branch16'>
+      <activity role='clinician' action='manage patient without hospital admission according to local resources and clinical judgment' objects='disposition plan' id='activity19'/>
+    </branch>
+  </exclusiveGateway>
+</process>

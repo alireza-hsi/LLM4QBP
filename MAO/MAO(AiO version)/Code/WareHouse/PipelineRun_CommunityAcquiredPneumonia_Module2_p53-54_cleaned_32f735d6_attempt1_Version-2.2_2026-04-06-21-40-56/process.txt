@@ -1,0 +1,120 @@
+<process>
+  <activity role='emergency clinician' action='assess patient presenting with symptoms of community-acquired pneumonia' objects='patient clinical presentation' id='activity1'/>
+  <activity role='emergency clinician' action='order chest x-ray to confirm diagnosis of community-acquired pneumonia' objects='chest x-ray' id='activity2'/>
+  <activity role='emergency clinician' action='avoid ordering CT scan for diagnosis of community-acquired pneumonia' objects='CT scan' id='activity3'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='patient has sepsis' id='branch1'>
+      <activity role='clinical team' action='initiate antibiotics without waiting for chest x-ray results' objects='antibiotics' id='activity4'/>
+    </branch>
+    <branch condition='patient does not have sepsis' id='branch2'>
+      <activity role='clinical team' action='wait for chest x-ray results prior to giving antibiotics' objects='chest x-ray results, antibiotics' id='activity5'/>
+    </branch>
+  </exclusiveGateway>
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='patient is admitted to hospital' id='branch3'>
+      <parallelGateway id='parallelgateway1'>
+        <branch id='branch4'>
+          <activity role='clinical team' action='measure oxygen saturation' objects='oxygen saturation' id='activity6'/>
+        </branch>
+        <branch id='branch5'>
+          <parallelGateway id='parallelgateway2'>
+            <branch id='branch26'>
+              <activity role='clinical team' action='order complete blood count' objects='CBC' id='activity24'/>
+            </branch>
+            <branch id='branch27'>
+              <activity role='clinical team' action='order electrolytes' objects='electrolytes' id='activity25'/>
+            </branch>
+            <branch id='branch28'>
+              <activity role='clinical team' action='order renal function tests' objects='renal function tests' id='activity26'/>
+            </branch>
+          </parallelGateway>
+        </branch>
+        <branch id='branch6'>
+          <exclusiveGateway id='exclusivegateway3'>
+            <branch condition='patient meets more than 2 CRB-65 criteria' id='branch7'>
+              <parallelGateway id='parallelgateway3'>
+                <branch id='branch29'>
+                  <activity role='clinical team' action='consider blood gases' objects='blood gases' id='activity27'/>
+                </branch>
+                <branch id='branch30'>
+                  <activity role='clinical team' action='consider lactate test' objects='lactate' id='activity28'/>
+                </branch>
+                <branch id='branch31'>
+                  <activity role='clinical team' action='consider liver assessment tests' objects='liver enzyme tests, liver function tests' id='activity29'/>
+                </branch>
+              </parallelGateway>
+            </branch>
+            <branch condition='patient meets 2 or fewer CRB-65 criteria' id='branch8'>
+              <activity role='clinical team' action='continue without CRB-65-triggered additional tests' objects='' id='activity9'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch id='branch9'>
+          <exclusiveGateway id='exclusivegateway4'>
+            <branch condition='patient meets more than 2 SIRS criteria or requires admission to the ICU' id='branch10'>
+              <activity role='clinical team' action='obtain blood cultures' objects='blood culture specimens' id='activity10'/>
+            </branch>
+            <branch condition='patient meets 2 or fewer SIRS criteria and does not require ICU admission' id='branch11'>
+              <activity role='clinical team' action='do not obtain blood cultures' objects='blood cultures' id='activity11'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch id='branch12'>
+          <exclusiveGateway id='exclusivegateway5'>
+            <branch condition='it is possible to obtain an adequate sputum sample' id='branch13'>
+              <activity role='clinical team' action='assess whether targeted antibiotic strategy increases priority for sputum culture' objects='antibiotic strategy, sputum culture priority' id='activity30'/>
+              <activity role='clinical team' action='consider obtaining sputum culture if an adequate sample is available' objects='adequate sputum sample, sputum culture' id='activity31'/>
+              <exclusiveGateway id='exclusivegateway6'>
+                <branch condition='sputum culture is obtained' id='branch14'>
+                  <activity role='laboratory team' action='consider Gram staining' objects='sputum specimen, Gram stain' id='activity13'/>
+                </branch>
+                <branch condition='sputum culture is not obtained' id='branch15'>
+                  <activity role='clinical team' action='proceed without sputum Gram staining' objects='' id='activity14'/>
+                </branch>
+              </exclusiveGateway>
+            </branch>
+            <branch condition='it is not possible to obtain an adequate sputum sample' id='branch16'>
+              <activity role='clinical team' action='proceed without sputum culture' objects='' id='activity15'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch id='branch22'>
+          <exclusiveGateway id='exclusivegateway7'>
+            <branch condition='patient is intubated' id='branch23'>
+              <activity role='clinical team' action='consider PCR testing for Legionella' objects='Legionella PCR test' id='activity20'/>
+            </branch>
+            <branch condition='patient is not intubated' id='branch24'>
+              <activity role='clinical team' action='continue without Legionella PCR consideration' objects='' id='activity21'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </parallelGateway>
+      <exclusiveGateway id='exclusivegateway9'>
+        <branch condition='at least one indication for urine antigen testing is present' id='branch34'>
+          <inclusiveGateway id='inclusivegateway1'>
+            <branch condition='patient is high severity' id='branch35'>
+              <activity role='clinical team' action='identify high severity as an indication for urine antigen testing' objects='severity assessment' id='activity34'/>
+            </branch>
+            <branch condition='there is an enhanced surveillance directive from Public Health Ontario on Legionella in inpatients' id='branch36'>
+              <activity role='clinical team' action='identify enhanced surveillance directive as an indication for urine antigen testing' objects='Public Health Ontario directive' id='activity35'/>
+            </branch>
+            <branch condition='patient is not responding to drug therapy after 48 to 72 hours' id='branch37'>
+              <activity role='clinical team' action='identify lack of response to drug therapy after 48 to 72 hours as an indication for urine antigen testing' objects='treatment response assessment' id='activity36'/>
+            </branch>
+            <branch condition='patient is an inpatient during peak season from mid-June to early October' id='branch38'>
+              <activity role='clinical team' action='identify peak season inpatient status as an indication for urine antigen testing' objects='admission timing, seasonal risk period' id='activity37'/>
+            </branch>
+          </inclusiveGateway>
+          <activity role='clinical team' action='order urine antigen testing' objects='urine antigen test' id='activity32'/>
+        </branch>
+        <branch condition='none of the indications for urine antigen testing are present' id='branch33'>
+          <activity role='clinical team' action='continue without urine antigen testing' objects='' id='activity33'/>
+        </branch>
+      </exclusiveGateway>
+      <activity role='quality improvement team' action='conduct field evaluation to assess the clinical utility of urine antigen testing in patients with community-acquired pneumonia' objects='urine antigen testing field evaluation' id='activity22'/>
+    </branch>
+    <branch condition='patient is not admitted to hospital' id='branch25'>
+      <activity role='clinical team' action='complete emergency department diagnostic testing pathway based on chest x-ray diagnosis and sepsis status' objects='diagnostic assessment results' id='activity23'/>
+    </branch>
+  </exclusiveGateway>
+</process>

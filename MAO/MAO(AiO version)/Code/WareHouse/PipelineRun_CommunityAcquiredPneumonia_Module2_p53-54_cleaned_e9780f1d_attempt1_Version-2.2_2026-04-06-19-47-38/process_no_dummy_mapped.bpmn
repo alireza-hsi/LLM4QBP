@@ -1,0 +1,579 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
+  <process id="Process_1" name="Stroke Process" isExecutable="true">
+    <startEvent id="StartEvent_1" name="Start">
+      <outgoing>Flow_1</outgoing>
+    </startEvent>
+    <endEvent id="EndEvent_1" name="End">
+      <incoming>Flow_49</incoming>
+    </endEvent>
+    <task id="activity1" name="Assess patient presenting with symptoms of community-acquired pneumonia (CAP) (Role: medical staff; Objects: patient)">
+      <incoming>Flow_1</incoming>
+      <outgoing>Flow_2</outgoing>
+    </task>
+    <task id="activity2" name="oxygen saturation">
+      <incoming>Flow_2</incoming>
+      <outgoing>Flow_3</outgoing>
+    </task>
+    <task id="activity3-1" name="Order chest x-ray (Role: medical staff; Objects: patient, chest x-ray)">
+      <incoming>Flow_3</incoming>
+      <outgoing>Flow_4</outgoing>
+    </task>
+    <task id="activity3-2" name="Perform chest x-ray">
+      <incoming>Flow_4</incoming>
+      <outgoing>Flow_5</outgoing>
+    </task>
+    <task id="activity6" name="Review chest x-ray results to confirm CAP diagnosis (Role: medical staff; Objects: chest x-ray results)">
+      <incoming>Flow_5</incoming>
+      <outgoing>Flow_10</outgoing>
+    </task>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway">
+      <incoming>Flow_10</incoming>
+      <outgoing>Flow_6</outgoing>
+      <outgoing>Flow_8</outgoing>
+    </exclusiveGateway>
+    <task id="activity4" name="Give antibiotics">
+      <incoming>Flow_6</incoming>
+      <outgoing>Flow_7</outgoing>
+    </task>
+    <task id="activity5" name="wait for results of chest x-ray">
+      <incoming>Flow_8</incoming>
+      <outgoing>Flow_9</outgoing>
+    </task>
+    <exclusiveGateway id="exclusivegateway1Join" name="Exclusive Merge">
+      <incoming>Flow_7</incoming>
+      <incoming>Flow_9</incoming>
+      <outgoing>Flow_11</outgoing>
+    </exclusiveGateway>
+    <task id="activity7" name="Routine blood work: CBC,">
+      <incoming>Flow_11</incoming>
+      <outgoing>Flow_16</outgoing>
+    </task>
+    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway">
+      <incoming>Flow_16</incoming>
+      <outgoing>Flow_12</outgoing>
+      <outgoing>Flow_14</outgoing>
+    </exclusiveGateway>
+    <task id="activity8" name="Blood gases">
+      <incoming>Flow_12</incoming>
+      <outgoing>Flow_13</outgoing>
+    </task>
+    <task id="activity9" name="Do not order additional tests for CRB-65 (Role: medical staff)">
+      <incoming>Flow_14</incoming>
+      <outgoing>Flow_15</outgoing>
+    </task>
+    <exclusiveGateway id="exclusivegateway2Join" name="Exclusive Merge">
+      <incoming>Flow_13</incoming>
+      <incoming>Flow_15</incoming>
+      <outgoing>Flow_21</outgoing>
+    </exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway">
+      <incoming>Flow_21</incoming>
+      <outgoing>Flow_17</outgoing>
+      <outgoing>Flow_19</outgoing>
+    </exclusiveGateway>
+    <task id="activity10" name="Order blood cultures (Role: medical staff; Objects: patient, blood culture bottles)">
+      <incoming>Flow_17</incoming>
+      <outgoing>Flow_18</outgoing>
+    </task>
+    <task id="activity11" name="Do not order blood cultures (Role: medical staff)">
+      <incoming>Flow_19</incoming>
+      <outgoing>Flow_20</outgoing>
+    </task>
+    <exclusiveGateway id="exclusivegateway3Join" name="Exclusive Merge">
+      <incoming>Flow_18</incoming>
+      <incoming>Flow_20</incoming>
+      <outgoing>Flow_33</outgoing>
+    </exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway4" name="Exclusive Gateway">
+      <incoming>Flow_33</incoming>
+      <outgoing>Flow_29</outgoing>
+      <outgoing>Flow_31</outgoing>
+    </exclusiveGateway>
+    <task id="activity12" name="Sputum culture">
+      <incoming>Flow_23</incoming>
+      <outgoing>Flow_28</outgoing>
+    </task>
+    <exclusiveGateway id="exclusivegateway5" name="Exclusive Gateway">
+      <incoming>Flow_28</incoming>
+      <outgoing>Flow_24</outgoing>
+      <outgoing>Flow_26</outgoing>
+    </exclusiveGateway>
+    <task id="activity13" name="Gram staining">
+      <incoming>Flow_24</incoming>
+      <outgoing>Flow_25</outgoing>
+    </task>
+    <task id="activity14" name="Skip Gram stain (Role: medical staff)">
+      <incoming>Flow_26</incoming>
+      <outgoing>Flow_27</outgoing>
+    </task>
+    <exclusiveGateway id="exclusivegateway5Join" name="Exclusive Merge">
+      <incoming>Flow_25</incoming>
+      <incoming>Flow_27</incoming>
+      <outgoing>Flow_30</outgoing>
+    </exclusiveGateway>
+    <task id="activity15" name="Do not obtain sputum culture or Gram stain (Role: medical staff)">
+      <incoming>Flow_31</incoming>
+      <outgoing>Flow_32</outgoing>
+    </task>
+    <exclusiveGateway id="exclusivegateway4Join" name="Exclusive Merge">
+      <incoming>Flow_30</incoming>
+      <incoming>Flow_32</incoming>
+      <outgoing>Flow_42</outgoing>
+    </exclusiveGateway>
+    <inclusiveGateway id="inclusivegateway1" name="Inclusive Gateway">
+      <incoming>Flow_42</incoming>
+      <outgoing>Flow_34</outgoing>
+      <outgoing>Flow_36</outgoing>
+      <outgoing>Flow_38</outgoing>
+      <outgoing>Flow_40</outgoing>
+    </inclusiveGateway>
+    <task id="activity16" name="Urine antigen testing">
+      <incoming>Flow_34</incoming>
+      <outgoing>Flow_35</outgoing>
+    </task>
+    <task id="activity17" name="Urine antigen testing">
+      <incoming>Flow_36</incoming>
+      <outgoing>Flow_37</outgoing>
+    </task>
+    <task id="activity18" name="Urine antigen testing">
+      <incoming>Flow_38</incoming>
+      <outgoing>Flow_39</outgoing>
+    </task>
+    <task id="activity19" name="Urine antigen testing">
+      <incoming>Flow_40</incoming>
+      <outgoing>Flow_41</outgoing>
+    </task>
+    <inclusiveGateway id="inclusivegateway1Join" name="Inclusive Merge">
+      <incoming>Flow_35</incoming>
+      <incoming>Flow_37</incoming>
+      <incoming>Flow_39</incoming>
+      <incoming>Flow_41</incoming>
+      <outgoing>Flow_43</outgoing>
+    </inclusiveGateway>
+    <task id="activity20" name="Conduct field evaluation to assess clinical utility of urine antigen testing (Role: medical staff; Objects: urine antigen test results, evaluation protocol)">
+      <incoming>Flow_43</incoming>
+      <outgoing>Flow_48</outgoing>
+    </task>
+    <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway">
+      <incoming>Flow_48</incoming>
+      <outgoing>Flow_44</outgoing>
+      <outgoing>Flow_46</outgoing>
+    </exclusiveGateway>
+    <task id="activity21" name="PCR testing for Legionella">
+      <incoming>Flow_44</incoming>
+      <outgoing>Flow_45</outgoing>
+    </task>
+    <task id="activity22" name="Do not order PCR for Legionella (Role: medical staff)">
+      <incoming>Flow_46</incoming>
+      <outgoing>Flow_47</outgoing>
+    </task>
+    <exclusiveGateway id="exclusivegateway6Join" name="Exclusive Merge">
+      <incoming>Flow_45</incoming>
+      <incoming>Flow_47</incoming>
+      <outgoing>Flow_49</outgoing>
+    </exclusiveGateway>
+    <sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="activity1" />
+    <sequenceFlow id="Flow_2" sourceRef="activity1" targetRef="activity2" />
+    <sequenceFlow id="Flow_3" sourceRef="activity2" targetRef="activity3-1" />
+    <sequenceFlow id="Flow_4" sourceRef="activity3-1" targetRef="activity3-2" />
+    <sequenceFlow id="Flow_5" sourceRef="activity3-2" targetRef="activity6" />
+    <sequenceFlow id="Flow_6" name="Patient has sepsis" sourceRef="exclusivegateway1" targetRef="activity4">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">Patient has sepsis</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_7" sourceRef="activity4" targetRef="exclusivegateway1Join" />
+    <sequenceFlow id="Flow_8" name="Patient does not have sepsis" sourceRef="exclusivegateway1" targetRef="activity5">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">Patient does not have sepsis</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_9" sourceRef="activity5" targetRef="exclusivegateway1Join" />
+    <sequenceFlow id="Flow_10" sourceRef="activity6" targetRef="exclusivegateway1" />
+    <sequenceFlow id="Flow_11" sourceRef="exclusivegateway1Join" targetRef="activity7" />
+    <sequenceFlow id="Flow_12" name="Patient meets &gt;2 CRB-65 criteria" sourceRef="exclusivegateway2" targetRef="activity8">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">Patient meets &gt;2 CRB-65 criteria</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_13" sourceRef="activity8" targetRef="exclusivegateway2Join" />
+    <sequenceFlow id="Flow_14" name="Patient does not meet &gt;2 CRB-65 criteria" sourceRef="exclusivegateway2" targetRef="activity9">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">Patient does not meet &gt;2 CRB-65 criteria</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_15" sourceRef="activity9" targetRef="exclusivegateway2Join" />
+    <sequenceFlow id="Flow_16" sourceRef="activity7" targetRef="exclusivegateway2" />
+    <sequenceFlow id="Flow_17" name="Patient meets &gt;2 SIRS criteria or requires ICU admission" sourceRef="exclusivegateway3" targetRef="activity10">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">Patient meets &gt;2 SIRS criteria or requires ICU admission</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_18" sourceRef="activity10" targetRef="exclusivegateway3Join" />
+    <sequenceFlow id="Flow_19" name="Patient does not meet &gt;2 SIRS criteria and does not require ICU admission" sourceRef="exclusivegateway3" targetRef="activity11">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">Patient does not meet &gt;2 SIRS criteria and does not require ICU admission</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_20" sourceRef="activity11" targetRef="exclusivegateway3Join" />
+    <sequenceFlow id="Flow_21" sourceRef="exclusivegateway2Join" targetRef="exclusivegateway3" />
+    <sequenceFlow id="Flow_24" name="Sputum culture obtained" sourceRef="exclusivegateway5" targetRef="activity13">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">Sputum culture obtained</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_25" sourceRef="activity13" targetRef="exclusivegateway5Join" />
+    <sequenceFlow id="Flow_26" name="Sputum culture not obtained" sourceRef="exclusivegateway5" targetRef="activity14">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">Sputum culture not obtained</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_27" sourceRef="activity14" targetRef="exclusivegateway5Join" />
+    <sequenceFlow id="Flow_28" sourceRef="activity12" targetRef="exclusivegateway5" />
+    <sequenceFlow id="Flow_30" sourceRef="exclusivegateway5Join" targetRef="exclusivegateway4Join" />
+    <sequenceFlow id="Flow_31" name="Patient not admitted or inadequate sputum sample" sourceRef="exclusivegateway4" targetRef="activity15">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">Patient not admitted or inadequate sputum sample</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_32" sourceRef="activity15" targetRef="exclusivegateway4Join" />
+    <sequenceFlow id="Flow_33" sourceRef="exclusivegateway3Join" targetRef="exclusivegateway4" />
+    <sequenceFlow id="Flow_34" name="Patient is high-severity" sourceRef="inclusivegateway1" targetRef="activity16">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">Patient is high-severity</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_35" sourceRef="activity16" targetRef="inclusivegateway1Join" />
+    <sequenceFlow id="Flow_36" name="Enhanced surveillance directive for Legionella in inpatients" sourceRef="inclusivegateway1" targetRef="activity17">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">Enhanced surveillance directive for Legionella in inpatients</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_37" sourceRef="activity17" targetRef="inclusivegateway1Join" />
+    <sequenceFlow id="Flow_38" name="Patient not responding to drug therapy after 48–72 hours" sourceRef="inclusivegateway1" targetRef="activity18">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">Patient not responding to drug therapy after 48–72 hours</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_39" sourceRef="activity18" targetRef="inclusivegateway1Join" />
+    <sequenceFlow id="Flow_40" name="Inpatient during peak season (mid-June to early October)" sourceRef="inclusivegateway1" targetRef="activity19">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">Inpatient during peak season (mid-June to early October)</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_41" sourceRef="activity19" targetRef="inclusivegateway1Join" />
+    <sequenceFlow id="Flow_42" sourceRef="exclusivegateway4Join" targetRef="inclusivegateway1" />
+    <sequenceFlow id="Flow_43" sourceRef="inclusivegateway1Join" targetRef="activity20" />
+    <sequenceFlow id="Flow_44" name="Patient is intubated (e.g., high severity)" sourceRef="exclusivegateway6" targetRef="activity21">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">Patient is intubated (e.g., high severity)</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_45" sourceRef="activity21" targetRef="exclusivegateway6Join" />
+    <sequenceFlow id="Flow_46" name="Patient is not intubated" sourceRef="exclusivegateway6" targetRef="activity22">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">Patient is not intubated</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_47" sourceRef="activity22" targetRef="exclusivegateway6Join" />
+    <sequenceFlow id="Flow_48" sourceRef="activity20" targetRef="exclusivegateway6" />
+    <sequenceFlow id="Flow_49" sourceRef="exclusivegateway6Join" targetRef="EndEvent_1" />
+  <sequenceFlow id="merged_Flow_29_Flow_23" sourceRef="exclusivegateway4" targetRef="activity12" name="Patient admitted to hospital and adequate sputum sample can be obtained"><conditionExpression xsi:type="bpmn:tFormalExpression">Patient admitted to hospital and adequate sputum sample can be obtained</conditionExpression></sequenceFlow></process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Process_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_Process_1" bpmnElement="Process_1">
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="57" y="52" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity1_di" bpmnElement="activity1">
+        <dc:Bounds x="175" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity2_di" bpmnElement="activity2">
+        <dc:Bounds x="325" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity3-1_di" bpmnElement="activity3-1">
+        <dc:Bounds x="475" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity3-2_di" bpmnElement="activity3-2">
+        <dc:Bounds x="625" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity6_di" bpmnElement="activity6">
+        <dc:Bounds x="775" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclusivegateway1_di" bpmnElement="exclusivegateway1" isMarkerVisible="true">
+        <dc:Bounds x="950" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity4_di" bpmnElement="activity4">
+        <dc:Bounds x="1075" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclusivegateway1Join_di" bpmnElement="exclusivegateway1Join" isMarkerVisible="true">
+        <dc:Bounds x="1250" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity7_di" bpmnElement="activity7">
+        <dc:Bounds x="1375" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclusivegateway2_di" bpmnElement="exclusivegateway2" isMarkerVisible="true">
+        <dc:Bounds x="1550" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity8_di" bpmnElement="activity8">
+        <dc:Bounds x="1675" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclusivegateway2Join_di" bpmnElement="exclusivegateway2Join" isMarkerVisible="true">
+        <dc:Bounds x="1850" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclusivegateway3_di" bpmnElement="exclusivegateway3" isMarkerVisible="true">
+        <dc:Bounds x="2000" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity10_di" bpmnElement="activity10">
+        <dc:Bounds x="2125" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclusivegateway3Join_di" bpmnElement="exclusivegateway3Join" isMarkerVisible="true">
+        <dc:Bounds x="2300" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclusivegateway4_di" bpmnElement="exclusivegateway4" isMarkerVisible="true">
+        <dc:Bounds x="2450" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity12_di" bpmnElement="activity12">
+        <dc:Bounds x="2725" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclusivegateway5_di" bpmnElement="exclusivegateway5" isMarkerVisible="true">
+        <dc:Bounds x="2900" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity13_di" bpmnElement="activity13">
+        <dc:Bounds x="3025" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclusivegateway5Join_di" bpmnElement="exclusivegateway5Join" isMarkerVisible="true">
+        <dc:Bounds x="3200" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclusivegateway4Join_di" bpmnElement="exclusivegateway4Join" isMarkerVisible="true">
+        <dc:Bounds x="3350" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="inclusivegateway1_di" bpmnElement="inclusivegateway1">
+        <dc:Bounds x="3500" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity16_di" bpmnElement="activity16">
+        <dc:Bounds x="3625" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="inclusivegateway1Join_di" bpmnElement="inclusivegateway1Join">
+        <dc:Bounds x="3800" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity20_di" bpmnElement="activity20">
+        <dc:Bounds x="3925" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclusivegateway6_di" bpmnElement="exclusivegateway6" isMarkerVisible="true">
+        <dc:Bounds x="4100" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity21_di" bpmnElement="activity21">
+        <dc:Bounds x="4225" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclusivegateway6Join_di" bpmnElement="exclusivegateway6Join" isMarkerVisible="true">
+        <dc:Bounds x="4400" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
+        <dc:Bounds x="4557" y="52" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity5_di" bpmnElement="activity5">
+        <dc:Bounds x="1075" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity9_di" bpmnElement="activity9">
+        <dc:Bounds x="1675" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity11_di" bpmnElement="activity11">
+        <dc:Bounds x="2125" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity15_di" bpmnElement="activity15">
+        <dc:Bounds x="2575" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity14_di" bpmnElement="activity14">
+        <dc:Bounds x="3025" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity17_di" bpmnElement="activity17">
+        <dc:Bounds x="3625" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity22_di" bpmnElement="activity22">
+        <dc:Bounds x="4225" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity18_di" bpmnElement="activity18">
+        <dc:Bounds x="3625" y="310" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity19_di" bpmnElement="activity19">
+        <dc:Bounds x="3625" y="450" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="93" y="70" />
+        <di:waypoint x="175" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="275" y="70" />
+        <di:waypoint x="325" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="425" y="70" />
+        <di:waypoint x="475" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4">
+        <di:waypoint x="575" y="70" />
+        <di:waypoint x="625" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5">
+        <di:waypoint x="725" y="70" />
+        <di:waypoint x="775" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10_di" bpmnElement="Flow_10">
+        <di:waypoint x="875" y="70" />
+        <di:waypoint x="950" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_6_di" bpmnElement="Flow_6">
+        <di:waypoint x="1000" y="70" />
+        <di:waypoint x="1075" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_8_di" bpmnElement="Flow_8">
+        <di:waypoint x="975" y="95" />
+        <di:waypoint x="975" y="210" />
+        <di:waypoint x="1075" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_7_di" bpmnElement="Flow_7">
+        <di:waypoint x="1175" y="70" />
+        <di:waypoint x="1250" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11_di" bpmnElement="Flow_11">
+        <di:waypoint x="1300" y="70" />
+        <di:waypoint x="1375" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16_di" bpmnElement="Flow_16">
+        <di:waypoint x="1475" y="70" />
+        <di:waypoint x="1550" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12_di" bpmnElement="Flow_12">
+        <di:waypoint x="1600" y="70" />
+        <di:waypoint x="1675" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14_di" bpmnElement="Flow_14">
+        <di:waypoint x="1575" y="95" />
+        <di:waypoint x="1575" y="210" />
+        <di:waypoint x="1675" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13_di" bpmnElement="Flow_13">
+        <di:waypoint x="1775" y="70" />
+        <di:waypoint x="1850" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_21_di" bpmnElement="Flow_21">
+        <di:waypoint x="1900" y="70" />
+        <di:waypoint x="2000" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17_di" bpmnElement="Flow_17">
+        <di:waypoint x="2050" y="70" />
+        <di:waypoint x="2125" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19_di" bpmnElement="Flow_19">
+        <di:waypoint x="2025" y="95" />
+        <di:waypoint x="2025" y="210" />
+        <di:waypoint x="2125" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18_di" bpmnElement="Flow_18">
+        <di:waypoint x="2225" y="70" />
+        <di:waypoint x="2300" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_33_di" bpmnElement="Flow_33">
+        <di:waypoint x="2350" y="70" />
+        <di:waypoint x="2450" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_31_di" bpmnElement="Flow_31">
+        <di:waypoint x="2475" y="95" />
+        <di:waypoint x="2475" y="210" />
+        <di:waypoint x="2575" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_28_di" bpmnElement="Flow_28">
+        <di:waypoint x="2825" y="70" />
+        <di:waypoint x="2900" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_24_di" bpmnElement="Flow_24">
+        <di:waypoint x="2950" y="70" />
+        <di:waypoint x="3025" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_26_di" bpmnElement="Flow_26">
+        <di:waypoint x="2925" y="95" />
+        <di:waypoint x="2925" y="210" />
+        <di:waypoint x="3025" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_25_di" bpmnElement="Flow_25">
+        <di:waypoint x="3125" y="70" />
+        <di:waypoint x="3200" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_30_di" bpmnElement="Flow_30">
+        <di:waypoint x="3250" y="70" />
+        <di:waypoint x="3350" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_42_di" bpmnElement="Flow_42">
+        <di:waypoint x="3400" y="70" />
+        <di:waypoint x="3500" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_34_di" bpmnElement="Flow_34">
+        <di:waypoint x="3550" y="70" />
+        <di:waypoint x="3625" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_36_di" bpmnElement="Flow_36">
+        <di:waypoint x="3525" y="95" />
+        <di:waypoint x="3525" y="210" />
+        <di:waypoint x="3625" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_38_di" bpmnElement="Flow_38">
+        <di:waypoint x="3525" y="95" />
+        <di:waypoint x="3525" y="350" />
+        <di:waypoint x="3625" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_40_di" bpmnElement="Flow_40">
+        <di:waypoint x="3525" y="95" />
+        <di:waypoint x="3525" y="490" />
+        <di:waypoint x="3625" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_35_di" bpmnElement="Flow_35">
+        <di:waypoint x="3725" y="70" />
+        <di:waypoint x="3800" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_43_di" bpmnElement="Flow_43">
+        <di:waypoint x="3850" y="70" />
+        <di:waypoint x="3925" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_48_di" bpmnElement="Flow_48">
+        <di:waypoint x="4025" y="70" />
+        <di:waypoint x="4100" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_44_di" bpmnElement="Flow_44">
+        <di:waypoint x="4150" y="70" />
+        <di:waypoint x="4225" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_46_di" bpmnElement="Flow_46">
+        <di:waypoint x="4125" y="95" />
+        <di:waypoint x="4125" y="210" />
+        <di:waypoint x="4225" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_45_di" bpmnElement="Flow_45">
+        <di:waypoint x="4325" y="70" />
+        <di:waypoint x="4400" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_49_di" bpmnElement="Flow_49">
+        <di:waypoint x="4450" y="70" />
+        <di:waypoint x="4557" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_9_di" bpmnElement="Flow_9">
+        <di:waypoint x="1175" y="210" />
+        <di:waypoint x="1275" y="210" />
+        <di:waypoint x="1275" y="95" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15_di" bpmnElement="Flow_15">
+        <di:waypoint x="1775" y="210" />
+        <di:waypoint x="1875" y="210" />
+        <di:waypoint x="1875" y="95" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_20_di" bpmnElement="Flow_20">
+        <di:waypoint x="2225" y="210" />
+        <di:waypoint x="2325" y="210" />
+        <di:waypoint x="2325" y="95" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_32_di" bpmnElement="Flow_32">
+        <di:waypoint x="2675" y="210" />
+        <di:waypoint x="2700" y="210" />
+        <di:waypoint x="2700" y="140" />
+        <di:waypoint x="3300" y="140" />
+        <di:waypoint x="3300" y="70" />
+        <di:waypoint x="3350" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_27_di" bpmnElement="Flow_27">
+        <di:waypoint x="3125" y="210" />
+        <di:waypoint x="3225" y="210" />
+        <di:waypoint x="3225" y="95" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_37_di" bpmnElement="Flow_37">
+        <di:waypoint x="3725" y="210" />
+        <di:waypoint x="3825" y="210" />
+        <di:waypoint x="3825" y="95" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_47_di" bpmnElement="Flow_47">
+        <di:waypoint x="4325" y="210" />
+        <di:waypoint x="4425" y="210" />
+        <di:waypoint x="4425" y="95" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_39_di" bpmnElement="Flow_39">
+        <di:waypoint x="3725" y="350" />
+        <di:waypoint x="3825" y="350" />
+        <di:waypoint x="3825" y="95" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_41_di" bpmnElement="Flow_41">
+        <di:waypoint x="3725" y="490" />
+        <di:waypoint x="3825" y="490" />
+        <di:waypoint x="3825" y="95" />
+      </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="edge_merged_Flow_29_Flow_23" bpmnElement="merged_Flow_29_Flow_23"><di:waypoint x="2500" y="70" /><di:waypoint x="2725" y="70" /></bpmndi:BPMNEdge></bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

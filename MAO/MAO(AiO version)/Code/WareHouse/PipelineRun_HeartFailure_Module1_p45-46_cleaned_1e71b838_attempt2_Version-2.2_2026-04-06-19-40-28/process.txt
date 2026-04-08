@@ -1,0 +1,41 @@
+<process>
+  <activity role='emergency department clinician' action='Obtain patient history and presenting symptoms' objects='patient medical record, patient interview' id='activity1-1'/>
+  <activity role='emergency department clinician' action='Apply standardized risk stratification tool' objects='risk-stratification tool' id='activity1-2'/>
+  <activity role='emergency department clinician' action='Order laboratory and imaging tests' objects='laboratory and imaging test requisitions' id='activity2-1'/>
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1'>
+      <activity role='nursing staff' action='Frequently measure heart rate, blood pressure, and oxygen saturation until patient is stabilized' objects='vital sign monitoring equipment' id='activity3'/>
+    </branch>
+    <branch id='branch2'>
+      <activity role='nursing staff' action='Monitor patient for any acute changes during stabilization' objects='clinical observation tools' id='activity3-2'/>
+    </branch>
+    <branch id='branch3'>
+      <activity role='emergency department clinician' action='Administer diuretic therapy' objects='diuretic medication' id='activity4-1'/>
+    </branch>
+    <branch id='branch4'>
+      <activity role='emergency department clinician' action='Monitor urine output and clinical response' objects='urine output chart, clinical observation' id='activity4-2'/>
+    </branch>
+    <branch id='branch5'>
+      <activity role='emergency department clinician' action='Review results of laboratory and imaging tests' objects='laboratory and imaging test reports' id='activity2-2'/>
+    </branch>
+  </parallelGateway>
+  <activity role='emergency department clinician' action='Calculate acute heart failure risk score (e.g., EHMRG) to predict 7-day mortality risk' objects='EHMRG or equivalent risk score tool' id='activity5'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='Low-risk (EHMRG quintiles 1-2) and responded to initial treatment, no complicating factors' id='branch6'>
+      <activity role='emergency department clinician' action='Discharge patient home' objects='' id='activity6'/>
+      <activity role='emergency department clinician' action='Arrange follow-up visit with primary care provider within days of discharge' objects='discharge instructions, follow-up appointment' id='activity7'/>
+    </branch>
+    <branch condition='High-risk (EHMRG quintiles 3-5) or presence of high-risk markers or complicating factors' id='branch7'>
+      <exclusiveGateway id='exclusivegateway2'>
+        <branch condition='Requires ventilation and/or intensive care' id='branch8'>
+          <activity role='emergency department clinician' action='Admit patient to intensive care unit with higher nurse-to-patient staffing' objects='ICU admission order' id='activity8'/>
+        </branch>
+        <branch condition='Requires inpatient admission but not intensive care' id='branch9'>
+          <activity role='emergency department clinician' action='Admit patient to inpatient care with normal nurse-to-patient staffing' objects='inpatient admission order' id='activity9'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </exclusiveGateway>
+  <activity role='hospital administration' action='Ensure standardized risk stratification tool/process is implemented and consistently applied' objects='risk stratification policy' id='activity10'/>
+  <activity role='hospital administration' action='Maintain pathway or mechanism for transfer to higher level provider as needed' objects='transfer protocols' id='activity11'/>
+</process>

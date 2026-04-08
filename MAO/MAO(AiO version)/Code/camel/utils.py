@@ -84,7 +84,8 @@ def num_tokens_from_messages(
 
     if model in {
         ModelType.GPT_3_5_TURBO, ModelType.GPT_4, ModelType.GPT_4_32k, ModelType.GPT_4o, ModelType.GPT_4o1, 
-        ModelType.GPT_5o2, ModelType.GPT_5o2_low_reasoning, ModelType.GPT_5o2_medium_reasoning, ModelType.GPT_5o2_high_reasoning,
+        ModelType.GPT_5o2, ModelType.GPT_5o2_low_reasoning, ModelType.GPT_5o2_medium_reasoning, ModelType.GPT_5o2_high_reasoning, 
+        ModelType.GPT_5o4, ModelType.GPT_5o4_low_reasoning, ModelType.GPT_5o4_medium_reasoning, ModelType.GPT_5o4_high_reasoning, ModelType.GPT_5o4_xhigh_reasoning,
         ModelType.STUB,
     }:
         return count_tokens_openai_chat_models(messages, encoding)
@@ -126,6 +127,16 @@ def get_model_token_limit(model: ModelType) -> int:
         return 300000
     elif model == ModelType.GPT_5o2_high_reasoning:
         return 300000
+    elif model == ModelType.GPT_5o4:
+        return 128000
+    elif model == ModelType.GPT_5o4_low_reasoning:
+        return 128000
+    elif model == ModelType.GPT_5o4_medium_reasoning:
+        return 128000
+    elif model == ModelType.GPT_5o4_high_reasoning:
+        return 128000
+    elif model == ModelType.GPT_5o4_xhigh_reasoning:
+        return 128000
     elif model == ModelType.STUB:
         return 4096
     else:

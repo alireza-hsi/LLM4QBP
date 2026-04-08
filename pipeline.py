@@ -1,51 +1,55 @@
 #!/usr/bin/env python3
 # pipeline.py
 """
-Unified pipeline for MAO (AiO version) and ProMoAI frameworks,
-including activity mapping, BPMN comparison, and logging results.
+Unified pipeline for MAO (AiO version) and ProMoAI frameworks.
 
-Supports:
-- Batch mode via --batch-manifest (JSON from Streamlit UI)
-- Parallel execution via --max-workers
-- Incremental DB writes (crash-safe; writes as each run completes)
-- Progress output lines for Streamlit parsing: "PROGRESS X/Y"
+Key features:
+  - Batch mode via --batch-manifest (JSON from Streamlit UI)
+  - Parallel execution via --max-workers (dynamic retry-aware)
+  - Dual similarity metrics: pre-dedup AND post-dedup when --use-dedup
+  - Retry logic: --only-successful retries failed runs until target successes reached
+  - Incremental DB writes (crash-safe WAL mode)
+  - Progress lines parsed by Streamlit: PROGRESS X/Y [attempts=Z]
 
-Batch manifest item format (from the Streamlit UI):
-[
-  {
-    "id": "a1b2c3d4",
-    "framework": "ProMoAI" | "MAO (AiO version)",
-    "runs": 5,
-    "name": "PipelineRun",
-    "model": "GPT_5o2",
-    "mapping_model": "gpt-5.2",
-    "config": "Version-3.8",     # MAO only
-    "org": "Version-3.8",        # MAO only
-    "task_file": "/tmp/.../id__QBP1.txt",
-    "gold_bpmn": "/tmp/.../id__QBP1.bpmn" | null,
-    "gold_bpmn_filename": "QBP1.bpmn" | null
-  }
-]
+Manifest item format:
+{
+  "id": "a1b2c3d4",          # experiment id
+  "framework": "ProMoAI" | "MAO (AiO version)",
+  "runs": 5,                 # target runs (successful ones if only_successful)
+  "name": "PipelineRun",
+  "model": "GPT_5o4",
+  "mapping_model": "gpt-5.4",
+  "use_dedup": false,        # compute similarity both before & after dedup
+  "only_successful": false,  # retry failed runs to hit target
+  "max_retry_multiplier": 3.0,
+  "config": "Version-3.8",   # MAO only
+  "org": "Version-3.8",      # MAO only
+  "task_file": "/tmp/id__QBP1.txt",
+  "gold_bpmn": "/tmp/id__QBP1.bpmn" | null,
+  "gold_bpmn_filename": "QBP1.bpmn" | null
+}
 """
+
 import argparse
-import os
-import sys
-import subprocess
-import sqlite3
-import re
+import copy
 import json
+import os
+import re
 import shutil
-import uuid
+import sqlite3
+import subprocess
+import sys
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import uuid
+from collections import deque
+from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
 from queue import Queue
 from threading import Thread
 
-# Conda env names can be set by Streamlit via env vars; defaults provided.
+# ── Env config ────────────────────────────────────────────────────────────────
 PROMOAI_ENV = os.environ.get("PROMOAI_ENV", "promoai")
-MAO_ENV = os.environ.get("MAO_ENV", "mao")
+MAO_ENV     = os.environ.get("MAO_ENV",     "mao")
 
-# Ensure your MAO helpers are on PYTHONPATH
 MAO_HELPER = os.path.join("MAO", "MAO(AiO version)", "Code", "Helper")
 sys.path.insert(0, MAO_HELPER)
 
@@ -59,223 +63,274 @@ from bpmn_compare_similarity import CompareBPMN
 from duplicateHandling import remove_safe_duplicates
 
 
-# ---------------------------
+# ════════════════════════════════════════════════════════════════════════════
 # Args
-# ---------------------------
+# ════════════════════════════════════════════════════════════════════════════
+
 def parse_args():
-    p = argparse.ArgumentParser()
-
-    # Batch mode
+    p = argparse.ArgumentParser(
+        description="BPMN generation + similarity pipeline (batch & single mode)."
+    )
+    # Batch
     p.add_argument("--batch-manifest", default=None,
-                   help="JSON list of experiments (from Streamlit UI).")
+                   help="JSON list of experiment items (from Streamlit UI).")
     p.add_argument("--max-workers", type=int, default=1,
-                   help="Parallel workers for batch jobs.")
+                   help="Parallel worker threads.")
     p.add_argument("--batch-id", default=None,
-                   help="Optional batch id for grouping; if omitted a UUID is generated.")
+                   help="Optional batch grouping id; auto-generated if omitted.")
+    p.add_argument("--results-db", default="resultsDb.sqlite",
+                   help="SQLite database path.")
 
-    # Single mode (backwards compatible)
-    p.add_argument("--framework", choices=["ProMoAI", "MAO (AiO version)"], required=False)
-    p.add_argument("--task-file", required=False)
-    p.add_argument("--gold-bpmn", required=False)
+    # Retry / reliability
+    p.add_argument("--only-successful", action="store_true",
+                   help="Retry failed runs until target successes are reached.")
+    p.add_argument("--max-retry-multiplier", type=float, default=3.0,
+                   help="max_attempts = target_runs * multiplier (default 3.0).")
+
+    # Single-mode (backwards compatible)
+    p.add_argument("--framework", choices=["ProMoAI", "MAO (AiO version)"])
+    p.add_argument("--task-file")
+    p.add_argument("--gold-bpmn")
     p.add_argument("--runs", type=int, default=1)
     p.add_argument("--config", default=None)
-    p.add_argument("--org", default=None)
-    p.add_argument("--name", default="PipelineProject")
-    p.add_argument("--model", default="GPT_5o2")
+    p.add_argument("--org",    default=None)
+    p.add_argument("--name",   default="PipelineProject")
+    p.add_argument("--model",  default="GPT_5o4")
     p.add_argument("--mapped-output", default=None)
-    p.add_argument("--results-db", default="resultsDb.sqlite")
     p.add_argument("--gold-bpmn-filename", default=None)
-    p.add_argument("--mapping-model", default="gpt-5.2")
-    p.add_argument(
-        "--use-dedup",
-        action="store_true",
-        help="Run duplicate handling on the final BPMN artefact before similarity comparison.",
-    )
+    p.add_argument("--mapping-model", default="gpt-5.4")
+    p.add_argument("--use-dedup", action="store_true",
+                   help="Compute similarity both before AND after dedup.")
 
     return p.parse_args()
 
 
-# ---------------------------
-# DB helpers (WAL + create tables)
-# ---------------------------
+# ════════════════════════════════════════════════════════════════════════════
+# Database helpers
+# ════════════════════════════════════════════════════════════════════════════
+
 def db_connect(db_path: str) -> sqlite3.Connection:
     conn = sqlite3.connect(db_path, timeout=30)
-    # Improve robustness under frequent writes
     conn.execute("PRAGMA journal_mode=WAL;")
     conn.execute("PRAGMA synchronous=NORMAL;")
     conn.execute("PRAGMA busy_timeout=30000;")
+    conn.row_factory = sqlite3.Row
     return conn
 
 
 def db_init(conn: sqlite3.Connection):
     c = conn.cursor()
 
-    # Your existing table (kept as-is)
+    # ── runs: one row per generation attempt ─────────────────────────────────
     c.execute("""
-      CREATE TABLE IF NOT EXISTS experiment_results (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        timestamp TEXT,
-        qbp_name TEXT,
-        framework TEXT,
-        node_similarity REAL,
-        structure_similarity REAL,
-        graph_edit_distance INTEGER,
-        gold_bpmn_path TEXT,
-        generated_bpmn_path TEXT,
-        model TEXT,
-        promoai_retries TEXT
-      )
-    """)
+    CREATE TABLE IF NOT EXISTS runs (
+        id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+        batch_id            TEXT    NOT NULL,
+        job_id              TEXT    NOT NULL,
+        timestamp           TEXT,
+        qbp_name            TEXT,
+        framework           TEXT,
+        model               TEXT,
+        attempt_number      INTEGER,
+        status              TEXT,           -- ok | ok_no_gold | failed_generation |
+                                            -- failed_mapping | failed_similarity | failed_error
+        error               TEXT,
+        elapsed_seconds     REAL,
 
-    # Add optional columns for additional artefact paths if they don't exist yet.
-    try:
-        c.execute("ALTER TABLE experiment_results ADD COLUMN mapped_bpmn_path TEXT")
-    except sqlite3.OperationalError:
-        pass
-    try:
-        c.execute("ALTER TABLE experiment_results ADD COLUMN dedup_bpmn_path TEXT")
-    except sqlite3.OperationalError:
-        pass
+        -- Artefact paths
+        gold_bpmn           TEXT,
+        generated_bpmn      TEXT,
+        mapped_bpmn         TEXT,
 
-    # New run-level tracking (for progress/resume/debug)
-    c.execute("""
-      CREATE TABLE IF NOT EXISTS experiment_runs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        batch_id TEXT,
-        job_id TEXT,
-        qbp_name TEXT,
-        framework TEXT,
-        run_index INTEGER,
-        status TEXT,
-        started_at TEXT,
-        finished_at TEXT,
-        error TEXT,
+        -- Pre-dedup similarity (always computed when gold BPMN provided)
+        node_sim            REAL,
+        struct_sim          REAL,
+        ged                 INTEGER,
+
+        -- Post-dedup similarity (only when use_dedup = 1)
+        use_dedup           INTEGER DEFAULT 0,
+        dedup_bpmn          TEXT,
+        node_sim_dedup      REAL,
+        struct_sim_dedup    REAL,
+        ged_dedup           INTEGER,
+
+        promoai_retries     TEXT,
+
         UNIQUE(batch_id, job_id)
-      )
-    """)
+    )""")
+
+    # ── batches: one row per pipeline invocation ─────────────────────────────
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS batches (
+        batch_id        TEXT PRIMARY KEY,
+        started_at      TEXT,
+        finished_at     TEXT,
+        status          TEXT,
+        total_target    INTEGER,
+        total_attempts  INTEGER,
+        total_successes INTEGER,
+        results_db      TEXT
+    )""")
+
+    # Keep the legacy table for any existing tooling.
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS experiment_results (
+        id                      INTEGER PRIMARY KEY AUTOINCREMENT,
+        timestamp               TEXT,
+        qbp_name                TEXT,
+        framework               TEXT,
+        node_similarity         REAL,
+        structure_similarity    REAL,
+        graph_edit_distance     INTEGER,
+        gold_bpmn_path          TEXT,
+        generated_bpmn_path     TEXT,
+        model                   TEXT,
+        promoai_retries         TEXT
+    )""")
 
     conn.commit()
 
 
-def db_mark_started(conn: sqlite3.Connection, batch_id: str, job_id: str,
-                    qbp: str, framework: str, run_index: int):
+def db_upsert_run(conn: sqlite3.Connection, r: dict):
     conn.execute("""
-      INSERT OR IGNORE INTO experiment_runs
-        (batch_id, job_id, qbp_name, framework, run_index, status, started_at, finished_at, error)
-      VALUES
-        (?, ?, ?, ?, ?, 'started', datetime('now'), NULL, NULL)
-    """, (batch_id, job_id, qbp, framework, run_index))
+    INSERT OR REPLACE INTO runs (
+        batch_id, job_id, timestamp,
+        qbp_name, framework, model, attempt_number,
+        status, error, elapsed_seconds,
+        gold_bpmn, generated_bpmn, mapped_bpmn,
+        node_sim, struct_sim, ged,
+        use_dedup, dedup_bpmn, node_sim_dedup, struct_sim_dedup, ged_dedup,
+        promoai_retries
+    ) VALUES (
+        :batch_id, :job_id, datetime('now'),
+        :qbp_name, :framework, :model, :attempt_number,
+        :status, :error, :elapsed_seconds,
+        :gold_bpmn, :generated_bpmn, :mapped_bpmn,
+        :node_sim, :struct_sim, :ged,
+        :use_dedup, :dedup_bpmn, :node_sim_dedup, :struct_sim_dedup, :ged_dedup,
+        :promoai_retries
+    )""", r)
     conn.commit()
 
 
-def db_mark_finished(conn: sqlite3.Connection, batch_id: str, job_id: str,
-                     status: str, error: str | None):
+def db_batch_start(conn: sqlite3.Connection, batch_id: str, total_target: int):
     conn.execute("""
-      UPDATE experiment_runs
-      SET status=?, finished_at=datetime('now'), error=?
-      WHERE batch_id=? AND job_id=?
-    """, (status, error, batch_id, job_id))
+    INSERT OR IGNORE INTO batches (batch_id, started_at, status, total_target)
+    VALUES (?, datetime('now'), 'running', ?)
+    """, (batch_id, total_target))
     conn.commit()
 
 
-def db_insert_result(conn: sqlite3.Connection, qbp: str, framework: str,
-                     node_sim, struct_sim, ged,
-                     gold, gen, mapped, dedup, model, promoai_retries):
+def db_batch_finish(conn: sqlite3.Connection, batch_id: str,
+                    total_attempts: int, total_successes: int):
     conn.execute("""
-      INSERT INTO experiment_results (
-        timestamp, qbp_name, framework,
-        node_similarity, structure_similarity, graph_edit_distance,
-        gold_bpmn_path, generated_bpmn_path, mapped_bpmn_path, dedup_bpmn_path,
-        model, promoai_retries
-      ) VALUES (datetime('now'),?,?,?,?,?,?,?,?,?,?,?)
-    """, (qbp, framework, node_sim, struct_sim, ged, gold, gen, mapped, dedup, model, promoai_retries))
+    UPDATE batches
+    SET status='finished', finished_at=datetime('now'),
+        total_attempts=?, total_successes=?
+    WHERE batch_id=?
+    """, (total_attempts, total_successes, batch_id))
     conn.commit()
 
 
-# ---------------------------
+# ════════════════════════════════════════════════════════════════════════════
 # Misc helpers
-# ---------------------------
+# ════════════════════════════════════════════════════════════════════════════
+
 def _stem(path: str) -> str:
     return os.path.splitext(os.path.basename(path))[0]
 
 
 def _safe_makedirs(path: str):
-    if path and not os.path.exists(path):
-        os.makedirs(path, exist_ok=True)
+    if path:
+        os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
 
 
 def _conda_prefix(env_name: str):
     conda_exe = shutil.which("conda")
     if conda_exe:
-        return [conda_exe, "run", "-n", env_name, "python", "-u"]
+        return [conda_exe, "run", "--no-capture-output", "-n", env_name, "python", "-u"]
     return None
 
 
 def _strip_eid_prefix(filename: str, eid: str) -> str:
-    base = os.path.basename(filename)
+    base   = os.path.basename(filename)
     prefix = f"{eid}__"
     if base.startswith(prefix):
         base = base[len(prefix):]
     return os.path.splitext(base)[0]
 
 
-# ---------------------------
-# Framework runners
-# ---------------------------
-def run_mao(task_file, config, org, name, model, code_root):
+# ════════════════════════════════════════════════════════════════════════════
+# Framework runners  (no logic changes — only robustness / timeout)
+# ════════════════════════════════════════════════════════════════════════════
+
+def run_mao(task_file: str, config: str, org: str,
+            name: str, model: str, code_root: str,
+            timeout: int = 900) -> str:
     script = os.path.join(code_root, "run.py")
-
-    # Prefer MAO conda env if available; otherwise fallback
-    prefix = _conda_prefix(MAO_ENV)
-    if prefix is None:
-        prefix = [sys.executable, "-u"]
-
+    prefix = _conda_prefix(MAO_ENV) or [sys.executable, "-u"]
     cmd = prefix + [
         script,
         "--task-file", task_file,
         "--config", config,
         "--org", org,
-        "--name", name
+        "--name", name,
     ]
     if model:
         cmd += ["--model", model]
 
-    result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-    bpmn_path = result.stdout.strip().splitlines()[-1]
-    return bpmn_path
+    result = subprocess.run(
+        cmd,
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+    )
+    output_lines = result.stdout.strip().splitlines()
+    if not output_lines:
+        raise RuntimeError("MAO produced no output.")
+    return output_lines[-1]
 
 
-def run_promoai(task_file, model, code_root, project_name):
-    script = "ProMoAI_API.py"
+def run_promoai(task_file: str, model: str, code_root: str,
+                project_name: str, timeout: int = 900):
     prefix = _conda_prefix(PROMOAI_ENV)
     if prefix is None:
-        raise RuntimeError("conda not found on PATH, but ProMoAI execution requires conda env.")
+        raise RuntimeError("conda not found on PATH; ProMoAI requires the conda environment.")
 
     cmd = prefix + [
-        script,
-        "--task-file", task_file,
-        "--model", model,
-        "--output-dir", "WareHouse",
-        "--project-name", project_name
+        "ProMoAI_API.py",
+        "--task-file",    task_file,
+        "--model",        model,
+        "--output-dir",   "WareHouse",
+        "--project-name", project_name,
     ]
 
-    result = subprocess.run(cmd, cwd=code_root, check=True, capture_output=True, text=True)
+    result = subprocess.run(
+        cmd,
+        cwd=code_root,
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+    )
 
-    lines = result.stdout.strip().splitlines()
     promoai_retries = None
-    bpmn_path = None
-    for line in lines:
+    bpmn_path       = None
+    for line in result.stdout.strip().splitlines():
         if line.startswith("PROMOAI_RETRIES:"):
             promoai_retries = line.split("PROMOAI_RETRIES:", 1)[1].strip()
         elif line.endswith(".bpmn"):
             bpmn_path = line
+
     return bpmn_path, promoai_retries
 
 
-# ---------------------------
-# Mapping + Compare
-# ---------------------------
-def extract_python_lists(text):
+# ════════════════════════════════════════════════════════════════════════════
+# Activity mapping + similarity comparison
+# ════════════════════════════════════════════════════════════════════════════
+
+def _extract_python_lists(text: str):
     import ast
     set_a = set_c = None
     for var in ("Set_A", "Set_C"):
@@ -292,418 +347,547 @@ def extract_python_lists(text):
     return set_a, set_c
 
 
-def map_activities(generated, gold, mapped_out, mapping_model):
+def map_activities(generated: str, gold: str, mapped_out: str, mapping_model: str):
     a = extract_activity_names(generated)
     b = extract_activity_names(gold)
-    mapping, set_c, table = get_alignment(a, b, model=mapping_model)
+    _mapping, set_c, table = get_alignment(a, b, model=mapping_model)
     revision_raw = get_revision(a, b, table, model=mapping_model)
-    rev_a, rev_c = extract_python_lists(revision_raw)
+    rev_a, rev_c = _extract_python_lists(revision_raw)
     if rev_a is None:
         rev_a = a
     if rev_c is None:
         rev_c = set_c
-    final_map = {x: (x if c.strip().lower().startswith("no") else c) for x, c in zip(rev_a, rev_c)}
+    final_map = {
+        x: (x if c.strip().lower().startswith("no") else c)
+        for x, c in zip(rev_a, rev_c)
+    }
     update_activity_names(generated, mapped_out, final_map)
 
 
-def compare_bpmn(gold, mapped):
+def compare_bpmn(gold: str, candidate: str):
     comp = CompareBPMN(export_csv=False, export_excel=False)
-    return comp.calculate_similarity(gold, mapped)
+    return comp.calculate_similarity(gold, candidate)
 
 
-# ---------------------------
+# ════════════════════════════════════════════════════════════════════════════
 # Job building
-# ---------------------------
-def load_jobs(args):
-    jobs = []
+# ════════════════════════════════════════════════════════════════════════════
+
+def _make_job(eid, qbp, framework, run_idx, task_file, gold_bpmn,
+              gold_bpmn_filename, name, model, mapping_model,
+              use_dedup, only_successful, max_retry_multiplier,
+              target_runs, config, org, mapped_output) -> dict:
+    return {
+        "job_id":               f"{eid}:{qbp}:attempt{run_idx}",
+        "id":                   eid,
+        "qbp":                  qbp,
+        "framework":            framework,
+        "run_idx":              run_idx,
+        "task_file":            task_file,
+        "gold_bpmn":            gold_bpmn,
+        "gold_bpmn_filename":   gold_bpmn_filename,
+        "name":                 name,
+        "model":                model,
+        "mapping_model":        mapping_model,
+        "use_dedup":            use_dedup,
+        "only_successful":      only_successful,
+        "max_retry_multiplier": max_retry_multiplier,
+        "target_runs":          target_runs,
+        "config":               config,
+        "org":                  org,
+        "mapped_output":        mapped_output,
+    }
+
+
+def make_retry_job(original_job: dict, attempt_idx: int) -> dict:
+    j = copy.deepcopy(original_job)
+    j["run_idx"] = attempt_idx
+    j["job_id"]  = f"{original_job['id']}:{original_job['qbp']}:attempt{attempt_idx}"
+    return j
+
+
+def load_jobs(args) -> list:
+    jobs: list = []
 
     if args.batch_manifest:
         with open(args.batch_manifest, "r", encoding="utf-8") as f:
             manifest = json.load(f)
         if not isinstance(manifest, list):
-            raise ValueError("--batch-manifest must be a JSON list")
+            raise ValueError("--batch-manifest must be a JSON array.")
 
         for item in manifest:
-            eid = item.get("id") or "noid"
-            framework = item.get("framework")
+            eid       = item.get("id") or "noid"
+            framework = item.get("framework", "")
             if framework not in ("ProMoAI", "MAO (AiO version)"):
-                raise ValueError(f"Invalid or missing framework in manifest item: {framework}")
+                raise ValueError(f"Invalid framework in manifest: {framework!r}")
 
-            runs = int(item.get("runs", 1))
             task_file = item.get("task_file")
             if not task_file:
                 continue
 
+            target_runs = int(item.get("runs", 1))
             qbp = item.get("qbp") or _strip_eid_prefix(task_file, eid)
 
-            for run_idx in range(1, runs + 1):
-                job_id = f"{eid}:{qbp}:run{run_idx}"
-                jobs.append({
-                    "job_id": job_id,
-                    "id": eid,
-                    "qbp": qbp,
-                    "framework": framework,
-                    "run_idx": run_idx,
-                    "task_file": task_file,
-                    "gold_bpmn": item.get("gold_bpmn"),
-                    "gold_bpmn_filename": item.get("gold_bpmn_filename"),
-                    "name": item.get("name", "PipelineProject"),
-                    "model": item.get("model", "GPT_5o2"),
-                    "mapping_model": item.get("mapping_model", "gpt-5.2"),
-                    "use_dedup": bool(item.get("use_dedup", False)),
-                    "config": item.get("config"),
-                    "org": item.get("org"),
-                    "mapped_output": item.get("mapped_output"),
-                })
+            # Per-manifest item overrides; fall back to global args
+            only_succ = item.get("only_successful", args.only_successful)
+            mult      = item.get("max_retry_multiplier", args.max_retry_multiplier)
 
+            for run_idx in range(1, target_runs + 1):
+                jobs.append(_make_job(
+                    eid=eid, qbp=qbp, framework=framework,
+                    run_idx=run_idx, task_file=task_file,
+                    gold_bpmn=item.get("gold_bpmn"),
+                    gold_bpmn_filename=item.get("gold_bpmn_filename"),
+                    name=item.get("name", "PipelineProject"),
+                    model=item.get("model", "GPT_5o4"),
+                    mapping_model=item.get("mapping_model", "gpt-5.2"),
+                    use_dedup=bool(item.get("use_dedup", False)),
+                    only_successful=only_succ,
+                    max_retry_multiplier=mult,
+                    target_runs=target_runs,
+                    config=item.get("config"),
+                    org=item.get("org"),
+                    mapped_output=item.get("mapped_output"),
+                ))
         return jobs
 
-    # Single mode (old behavior)
+    # ── Single mode ────────────────────────────────────────────────────────
     if not args.framework or not args.task_file:
-        raise ValueError("Single mode requires --framework and --task-file (or use --batch-manifest).")
+        raise ValueError("Single mode requires --framework and --task-file.")
 
-    base = _stem(args.task_file)
-    gold_fn = args.gold_bpmn_filename or (os.path.basename(args.gold_bpmn) if args.gold_bpmn else None)
+    base    = _stem(args.task_file)
+    gold_fn = (args.gold_bpmn_filename
+               or (os.path.basename(args.gold_bpmn) if args.gold_bpmn else None))
 
     for run_idx in range(1, args.runs + 1):
-        jobs.append({
-            "job_id": f"single:{base}:run{run_idx}",
-            "id": "single",
-            "qbp": base,
-            "framework": args.framework,
-            "run_idx": run_idx,
-            "task_file": args.task_file,
-            "gold_bpmn": args.gold_bpmn,
-            "gold_bpmn_filename": gold_fn,
-            "name": args.name,
-            "model": args.model,
-            "mapping_model": args.mapping_model,
-            "use_dedup": bool(args.use_dedup),
-            "config": args.config,
-            "org": args.org,
-            "mapped_output": args.mapped_output,
-        })
+        jobs.append(_make_job(
+            eid="single", qbp=base, framework=args.framework,
+            run_idx=run_idx, task_file=args.task_file,
+            gold_bpmn=args.gold_bpmn, gold_bpmn_filename=gold_fn,
+            name=args.name, model=args.model,
+            mapping_model=args.mapping_model,
+            use_dedup=args.use_dedup,
+            only_successful=args.only_successful,
+            max_retry_multiplier=args.max_retry_multiplier,
+            target_runs=args.runs,
+            config=args.config, org=args.org,
+            mapped_output=args.mapped_output,
+        ))
     return jobs
 
 
-# ---------------------------
-# Execute one job (NO DB writes here)
-# ---------------------------
-def run_one_job(job):
-    eid = job["id"]
-    qbp = job["qbp"]
-    run_idx = job["run_idx"]
-    framework = job["framework"]
-    job_id = job["job_id"]
+# ════════════════════════════════════════════════════════════════════════════
+# Execute one job
+# Returns a result dict; does NOT touch the DB.
+# ════════════════════════════════════════════════════════════════════════════
 
-    jid = f"{job_id}"
+def run_one_job(job: dict) -> dict:
+    t0          = time.time()
+    eid         = job["id"]
+    qbp         = job["qbp"]
+    run_idx     = job["run_idx"]
+    framework   = job["framework"]
+    job_id      = job["job_id"]
+    use_dedup   = bool(job.get("use_dedup"))
 
     def jprint(msg: str):
-        print(f"[{jid}] {msg}", flush=True)
+        print(f"[{job_id}] {msg}", flush=True)
 
-    name_prefix = job.get("name") or "PipelineProject"
-    model = job.get("model") or "GPT_5o2"
-    mapping_model = job.get("mapping_model") or "gpt-5.2"
-    task_file = job["task_file"]
-    gold_bpmn = job.get("gold_bpmn")
-    gold_bpmn_filename = job.get("gold_bpmn_filename")
-    mapped_output_override = job.get("mapped_output")
-    use_dedup = bool(job.get("use_dedup"))
+    name_prefix     = job.get("name")          or "PipelineProject"
+    model           = job.get("model")         or "GPT_5o4"
+    mapping_model   = job.get("mapping_model") or "gpt-5.2"
+    task_file       = job["task_file"]
+    gold_bpmn       = job.get("gold_bpmn")
+    gold_bpmn_fn    = job.get("gold_bpmn_filename")
+    mapped_override = job.get("mapped_output")
+    config          = job.get("config")
+    org             = job.get("org")
 
-    config = job.get("config")
-    org = job.get("org")
+    # DB model label: tag dedup runs so they're distinguishable in results
+    db_model  = f"{model}_dedup" if use_dedup else model
+    run_name  = f"{name_prefix}_{qbp}_{eid}_attempt{run_idx}"
 
-    # Model identifier for DB / dashboard (optionally tag dedup runs)
-    db_model = f"{model}_dedup" if use_dedup else model
-
-    run_name = f"{name_prefix}_{qbp}_{eid}_run{run_idx}"
-    jprint(f"=== Run {run_idx} for {qbp} ({framework}) ===")
+    jprint(f"=== Attempt {run_idx} for '{qbp}' [{framework}] use_dedup={use_dedup} ===")
 
     promoai_retries = None
-    gen_bpmn = None
+    gen_bpmn        = None
 
-    # 1) Generate
+    # ── Scaffold for early-exit returns ─────────────────────────────────────
+    def _result(status: str, error: str = None) -> dict:
+        return {
+            "job_id":           job_id,
+            "qbp_name":         qbp,
+            "framework":        framework,
+            "model":            db_model,
+            "attempt_number":   run_idx,
+            "status":           status,
+            "error":            error,
+            "elapsed_seconds":  round(time.time() - t0, 2),
+            "gold_bpmn":        gold_bpmn_fn or (os.path.basename(gold_bpmn) if gold_bpmn else None),
+            "generated_bpmn":   gen_bpmn,
+            "mapped_bpmn":      None,
+            "node_sim":         None,
+            "struct_sim":       None,
+            "ged":              None,
+            "use_dedup":        int(use_dedup),
+            "dedup_bpmn":       None,
+            "node_sim_dedup":   None,
+            "struct_sim_dedup": None,
+            "ged_dedup":        None,
+            "promoai_retries":  promoai_retries,
+        }
+
+    # ── Step 1: Generate BPMN ─────────────────────────────────────────────
     try:
         if framework == "MAO (AiO version)":
             if not config or not org:
-                raise ValueError("MAO job missing config/org (set them in the UI card).")
+                raise ValueError("MAO experiment is missing 'config' and/or 'org'.")
             code_root = os.path.join("MAO", "MAO(AiO version)", "Code")
-            gen_bpmn = run_mao(task_file, config, org, run_name, model, code_root)
+            gen_bpmn  = run_mao(task_file, config, org, run_name, model, code_root)
         else:
             code_root = os.path.join("ProMoAI")
             gen_bpmn, promoai_retries = run_promoai(task_file, model, code_root, run_name)
 
     except subprocess.CalledProcessError as e:
-        jprint("✗ Generation failed after all retries; skipping.")
-        return {
-            "job_id": job_id,
-            "qbp": qbp,
-            "framework_db": framework,
-            "run_idx": run_idx,
-            "status": "failed_generation",
-            "error": "generation_failed_after_retries",
-            "node_sim": None,
-            "struct_sim": None,
-            "ged": None,
-            "gold_for_db": gold_bpmn_filename or (os.path.basename(gold_bpmn) if gold_bpmn else None),
-            "gen_bpmn": None,
-            "mapped_bpmn": None,
-            "dedup_bpmn": None,
-            "model": db_model,
-            "promoai_retries": "failed" if framework == "ProMoAI" else None,
-        }
+        stderr = (e.stderr or "").strip()
+        jprint(f"✗ Generation subprocess failed: {stderr[:200] or '(no stderr)'}")
+        return _result("failed_generation", f"subprocess_error: {stderr[:200]}")
+    except subprocess.TimeoutExpired:
+        jprint("✗ Generation timed out.")
+        return _result("failed_generation", "timeout")
     except Exception as e:
-        jprint(f"✗ Job error: {e}")
-        return {
-            "job_id": job_id,
-            "qbp": qbp,
-            "framework_db": framework,
-            "run_idx": run_idx,
-            "status": "failed_error",
-            "error": str(e),
-            "node_sim": None,
-            "struct_sim": None,
-            "ged": None,
-            "gold_for_db": gold_bpmn_filename or (os.path.basename(gold_bpmn) if gold_bpmn else None),
-            "gen_bpmn": None,
-            "mapped_bpmn": None,
-            "dedup_bpmn": None,
-            "model": db_model,
-            "promoai_retries": promoai_retries if framework == "ProMoAI" else None,
-        }
+        jprint(f"✗ Generation error: {e}")
+        return _result("failed_generation", str(e))
 
-    # Adjust MAO output
+    # MAO: prefer the no-dummy variant when available
     if framework == "MAO (AiO version)" and gen_bpmn:
-        no_dummy_bpmn = gen_bpmn.replace("process.bpmn", "process_no_dummy.bpmn")
-        if os.path.exists(no_dummy_bpmn):
-            gen_bpmn = no_dummy_bpmn
+        nd = gen_bpmn.replace("process.bpmn", "process_no_dummy.bpmn")
+        if os.path.exists(nd):
+            gen_bpmn = nd
 
-    jprint(f"✔ Generated BPMN: {gen_bpmn}")
+    if not gen_bpmn or not os.path.exists(gen_bpmn):
+        jprint("✗ Generated BPMN path is missing or does not exist.")
+        return _result("failed_generation", "bpmn_file_not_found")
 
-    # No gold: log generation only
+    jprint(f"✔ Generated: {gen_bpmn}")
+
+    # Determine framework label for DB (e.g., "MAO-v3.8")
+    if framework == "MAO (AiO version)" and config:
+        framework_db = "MAO-v" + config.replace("Version-", "")
+    else:
+        framework_db = framework
+
+    # No gold BPMN → log generation only, no similarity
     if not gold_bpmn:
-        return {
-            "job_id": job_id,
-            "qbp": qbp,
-            "framework_db": framework,
-            "run_idx": run_idx,
-            "status": "ok_no_gold",
-            "error": None,
-            "node_sim": None,
-            "struct_sim": None,
-            "ged": None,
-            "gold_for_db": None,
-            "gen_bpmn": gen_bpmn,
-            "mapped_bpmn": None,
-            "dedup_bpmn": None,
-            "model": db_model,
-            "promoai_retries": promoai_retries if framework == "ProMoAI" else None,
-        }
+        r = _result("ok_no_gold")
+        r["framework"]      = framework_db
+        r["generated_bpmn"] = gen_bpmn
+        r["promoai_retries"] = promoai_retries if framework == "ProMoAI" else None
+        return r
 
-    # 2) Map + 3) Optional duplicate handling + 4) Compare
+    # ── Step 2: Activity mapping ──────────────────────────────────────────
+    mapped_bpmn = None
     try:
-        mapped_bpmn_for_db = None
-        dedup_bpmn_for_db = None
-
-        mapped = mapped_output_override or gen_bpmn.replace(".bpmn", "_mapped.bpmn")
-        _safe_makedirs(os.path.dirname(mapped))
+        mapped = mapped_override or gen_bpmn.replace(".bpmn", "_mapped.bpmn")
+        _safe_makedirs(mapped)
         map_activities(gen_bpmn, gold_bpmn, mapped, mapping_model)
-        jprint(f"✔ Mapped  BPMN: {mapped}")
-        mapped_bpmn_for_db = mapped
-
-        mapped_for_compare = mapped
-        if use_dedup:
-            dedup_path = mapped.replace(".bpmn", "_dedup.bpmn")
-            jprint(f"✔ Running duplicate handling on mapped BPMN: {mapped} → {dedup_path}")
-            try:
-                mapped_for_compare = remove_safe_duplicates(mapped, dedup_path)
-                dedup_bpmn_for_db = mapped_for_compare
-            except Exception as e:
-                jprint(f"✗ Duplicate handling failed; continuing with original mapped BPMN. Error: {e}")
-                mapped_for_compare = mapped
-
-        node_sim, struct_sim, ged = compare_bpmn(gold_bpmn, mapped_for_compare)
-        jprint(f"→ NodeSim={node_sim:.3f}, StructSim={struct_sim:.3f}, GED={ged}")
-
-        # Framework formatting like your original code
-        if framework == "ProMoAI":
-            db_framework = "ProMoAI"
-        else:
-            db_framework = "MAO-v" + config.replace("Version-", "") if config else "MAO (AiO version)"
-
-        return {
-            "job_id": job_id,
-            "qbp": qbp,
-            "framework_db": db_framework,
-            "run_idx": run_idx,
-            "status": "ok",
-            "error": None,
-            "node_sim": node_sim,
-            "struct_sim": struct_sim,
-            "ged": ged,
-            "gold_for_db": gold_bpmn_filename or os.path.basename(gold_bpmn),
-            "gen_bpmn": gen_bpmn,
-            "mapped_bpmn": mapped_bpmn_for_db,
-            "dedup_bpmn": dedup_bpmn_for_db,
-            "model": db_model,
-            "promoai_retries": promoai_retries if framework == "ProMoAI" else None,
-        }
-
+        if not os.path.exists(mapped):
+            raise FileNotFoundError(f"Mapped BPMN not created at: {mapped}")
+        mapped_bpmn = mapped
+        jprint(f"✔ Mapped:    {mapped}")
     except Exception as e:
-        jprint(f"✗ Post-process failed: {e}")
+        jprint(f"✗ Activity mapping failed: {e}")
+        r = _result("failed_mapping", str(e))
+        r["framework"]      = framework_db
+        r["generated_bpmn"] = gen_bpmn
+        r["promoai_retries"] = promoai_retries if framework == "ProMoAI" else None
+        return r
 
-        if framework == "MAO (AiO version)" and config:
-            db_framework = "MAO-v" + config.replace("Version-", "")
-        else:
-            db_framework = framework
+    # ── Step 3: Pre-dedup similarity ─────────────────────────────────────
+    node_sim = struct_sim = ged = None
+    try:
+        node_sim, struct_sim, ged = compare_bpmn(gold_bpmn, mapped_bpmn)
+        jprint(f"→ Pre-dedup  : NodeSim={node_sim:.3f}  StructSim={struct_sim:.3f}  GED={ged}")
+    except Exception as e:
+        jprint(f"✗ Pre-dedup similarity failed: {e}")
+        r = _result("failed_similarity", str(e))
+        r["framework"]       = framework_db
+        r["generated_bpmn"]  = gen_bpmn
+        r["mapped_bpmn"]     = mapped_bpmn
+        r["promoai_retries"] = promoai_retries if framework == "ProMoAI" else None
+        return r
 
-        return {
-            "job_id": job_id,
-            "qbp": qbp,
-            "framework_db": db_framework,
-            "run_idx": run_idx,
-            "status": "failed_postprocess",
-            "error": str(e),
-            "node_sim": None,
-            "struct_sim": None,
-            "ged": None,
-            "gold_for_db": gold_bpmn_filename or os.path.basename(gold_bpmn),
-            "gen_bpmn": gen_bpmn,
-            "mapped_bpmn": mapped_bpmn_for_db if 'mapped_bpmn_for_db' in locals() else None,
-            "dedup_bpmn": dedup_bpmn_for_db if 'dedup_bpmn_for_db' in locals() else None,
-            "model": db_model,
-            "promoai_retries": promoai_retries if framework == "ProMoAI" else None,
-        }
+    # ── Step 4 (optional): Dedup + post-dedup similarity ─────────────────
+    dedup_bpmn = node_sim_d = struct_sim_d = ged_d = None
+    if use_dedup:
+        try:
+            dedup_path = mapped_bpmn.replace(".bpmn", "_dedup.bpmn")
+            remove_safe_duplicates(mapped_bpmn, dedup_path)
+            if not os.path.exists(dedup_path):
+                raise FileNotFoundError(f"Dedup BPMN not created at: {dedup_path}")
+            node_sim_d, struct_sim_d, ged_d = compare_bpmn(gold_bpmn, dedup_path)
+            dedup_bpmn = dedup_path
+            jprint(f"→ Post-dedup : NodeSim={node_sim_d:.3f}  StructSim={struct_sim_d:.3f}  GED={ged_d}")
+        except Exception as e:
+            # Dedup failure is non-fatal: we keep pre-dedup scores and note the error
+            jprint(f"⚠ Dedup/post-similarity failed (pre-dedup scores retained): {e}")
+
+    # ── All done ─────────────────────────────────────────────────────────
+    return {
+        "job_id":           job_id,
+        "qbp_name":         qbp,
+        "framework":        framework_db,
+        "model":            db_model,
+        "attempt_number":   run_idx,
+        "status":           "ok",
+        "error":            None,
+        "elapsed_seconds":  round(time.time() - t0, 2),
+        "gold_bpmn":        gold_bpmn_fn or os.path.basename(gold_bpmn),
+        "generated_bpmn":   gen_bpmn,
+        "mapped_bpmn":      mapped_bpmn,
+        "node_sim":         node_sim,
+        "struct_sim":       struct_sim,
+        "ged":              ged,
+        "use_dedup":        int(use_dedup),
+        "dedup_bpmn":       dedup_bpmn,
+        "node_sim_dedup":   node_sim_d,
+        "struct_sim_dedup": struct_sim_d,
+        "ged_dedup":        ged_d,
+        "promoai_retries":  promoai_retries if framework == "ProMoAI" else None,
+    }
 
 
-# ---------------------------
-# DB writer thread (single writer, crash-safe)
-# ---------------------------
-def db_writer_loop(db_path: str, batch_id: str, q: Queue):
+# ════════════════════════════════════════════════════════════════════════════
+# DB writer thread (single serialised writer — crash-safe)
+# ════════════════════════════════════════════════════════════════════════════
+
+def db_writer_loop(db_path: str, batch_id: str, total_target: int, q: Queue):
     conn = db_connect(db_path)
     try:
         db_init(conn)
+        db_batch_start(conn, batch_id, total_target)
+        attempts  = 0
+        successes = 0
         while True:
             item = q.get()
             if item is None:
                 break
-
-            # item contains: {"type": "...", ...}
-            t = item.get("type")
-
-            if t == "started":
-                db_mark_started(
-                    conn,
-                    batch_id=batch_id,
-                    job_id=item["job_id"],
-                    qbp=item["qbp"],
-                    framework=item["framework"],
-                    run_index=item["run_idx"],
-                )
-
-            elif t == "finished":
-                # write the results row first (so it's present even if later update fails)
-                db_insert_result(
-                    conn,
-                    qbp=item["qbp"],
-                    framework=item["framework_db"],
-                    node_sim=item["node_sim"],
-                    struct_sim=item["struct_sim"],
-                    ged=item["ged"],
-                    gold=item["gold_for_db"],
-                    gen=item["gen_bpmn"],
-                    mapped=item.get("mapped_bpmn"),
-                    dedup=item.get("dedup_bpmn"),
-                    model=item["model"],
-                    promoai_retries=item.get("promoai_retries"),
-                )
-                db_mark_finished(
-                    conn,
-                    batch_id=batch_id,
-                    job_id=item["job_id"],
-                    status=item["status"],
-                    error=item.get("error"),
-                )
-            else:
-                # ignore unknown messages
-                pass
-
+            r = item.get("result")
+            if not r:
+                continue
+            r = dict(r)
+            r["batch_id"] = batch_id
+            try:
+                db_upsert_run(conn, r)
+                attempts += 1
+                if r.get("status") == "ok":
+                    successes += 1
+            except Exception as e:
+                print(f"[DB] Write error: {e}", flush=True)
     finally:
+        try:
+            db_batch_finish(conn, batch_id, attempts, successes)
+        except Exception:
+            pass
         conn.close()
 
 
-# ---------------------------
-# Main
-# ---------------------------
-def main():
-    args = parse_args()
+# ════════════════════════════════════════════════════════════════════════════
+# Per-experiment retry state
+# ════════════════════════════════════════════════════════════════════════════
 
-    # batch id for grouping
+def build_exp_state(jobs: list) -> dict:
+    state: dict = {}
+    for job in jobs:
+        eid = job["id"]
+        if eid not in state:
+            target = job["target_runs"]
+            mult   = max(float(job.get("max_retry_multiplier", 3.0)), 1.0)
+            state[eid] = {
+                "qbp":            job["qbp"],
+                "target":         target,
+                "only_succ":      bool(job.get("only_successful", False)),
+                "max_attempts":   max(int(target * mult), target + 1),
+                "successes":      0,
+                "attempts":       0,
+                "next_attempt":   target + 1,   # next run_idx for retry jobs
+                "base_job":       job,
+            }
+    return state
+
+
+def _is_success(r: dict) -> bool:
+    return r.get("status") in ("ok", "ok_no_gold")
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# Progress reporting
+# ════════════════════════════════════════════════════════════════════════════
+
+def _progress_line(exp_state: dict, done_attempts: int, total_attempts: int) -> str:
+    """
+    When any experiment uses only_successful mode, report progress as
+    successes / total-target so the Streamlit bar shows meaningful progress.
+    Otherwise report attempts / total.
+    """
+    any_only_succ = any(s["only_succ"] for s in exp_state.values())
+    if any_only_succ:
+        total_succ = sum(s["successes"] for s in exp_state.values())
+        total_tgt  = sum(s["target"]    for s in exp_state.values())
+        return f"PROGRESS {total_succ}/{total_tgt} attempts={done_attempts}"
+    return f"PROGRESS {done_attempts}/{total_attempts}"
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# Main
+# ════════════════════════════════════════════════════════════════════════════
+
+def main():
+    args     = parse_args()
     batch_id = args.batch_id or uuid.uuid4().hex
     print(f"BATCH_ID {batch_id}", flush=True)
 
-    max_workers = int(args.max_workers or 1)
-    if max_workers < 1:
-        max_workers = 1
+    max_workers = max(int(args.max_workers or 1), 1)
+    jobs        = load_jobs(args)
 
-    jobs = load_jobs(args)
-    total = len(jobs)
-    if total == 0:
-        print("No jobs to run.", flush=True)
+    if not jobs:
+        print("No jobs found — check your manifest.", flush=True)
         return
 
+    total_target = sum(
+        j["target_runs"]
+        for j in {j["id"]: j for j in jobs}.values()  # unique per experiment
+    )
+    total = len(jobs)   # grows if retries are added
+
+    exp_state = build_exp_state(jobs)
+
     print(
-        f"Pipeline → jobs={total}, max_workers={max_workers}, results_db={args.results_db}, "
-        f"PROMOAI_ENV={PROMOAI_ENV}, MAO_ENV={MAO_ENV}",
+        f"Pipeline → initial_jobs={total}  max_workers={max_workers}  "
+        f"db={args.results_db}  only_successful={args.only_successful}",
         flush=True,
     )
 
-    # Start DB writer
-    q = Queue()
-    writer = Thread(target=db_writer_loop, args=(args.results_db, batch_id, q), daemon=True)
+    # Start background DB writer
+    q      = Queue()
+    writer = Thread(
+        target=db_writer_loop,
+        args=(args.results_db, batch_id, total_target, q),
+        daemon=True,
+    )
     writer.start()
 
-    done = 0
-    start_time = time.time()
+    done_attempts = 0
+    wall_start    = time.time()
 
-    # Run jobs
+    # ── Helper: process a completed result ────────────────────────────────
+    def handle_result(job: dict, r: dict) -> "dict | None":
+        """
+        Emit result to DB queue, update exp_state.
+        Returns a retry job if one is needed, else None.
+        """
+        nonlocal done_attempts, total
+        q.put({"result": r})
+        done_attempts += 1
+
+        eid   = job["id"]
+        state = exp_state.get(eid)
+        if not state:
+            return None
+
+        state["attempts"] += 1
+        success = _is_success(r)
+        if success:
+            state["successes"] += 1
+
+        print(_progress_line(exp_state, done_attempts, total), flush=True)
+
+        # Should we retry?
+        if (state["only_succ"]
+                and not success
+                and state["successes"] < state["target"]
+                and state["attempts"]  < state["max_attempts"]):
+
+            attempt_idx = state["next_attempt"]
+            state["next_attempt"] += 1
+            retry = make_retry_job(state["base_job"], attempt_idx)
+            total += 1
+            print(
+                f"RETRY {state['qbp']} "
+                f"(successes={state['successes']}/{state['target']} "
+                f" attempts={state['attempts']}/{state['max_attempts']} "
+                f" queuing attempt {attempt_idx})",
+                flush=True,
+            )
+            return retry
+        return None
+
+    # ── Serial execution ──────────────────────────────────────────────────
     if max_workers == 1:
-        for job in jobs:
-            # mark started (in DB)
-            q.put({"type": "started", "job_id": job["job_id"], "qbp": job["qbp"],
-                   "framework": job["framework"], "run_idx": job["run_idx"]})
+        pending = deque(jobs)
+        while pending:
+            job   = pending.popleft()
+            r     = run_one_job(job)
+            retry = handle_result(job, r)
+            if retry:
+                pending.append(retry)
 
-            r = run_one_job(job)
-            q.put({"type": "finished", **r})
-
-            done += 1
-            print(f"PROGRESS {done}/{total}", flush=True)
-
+    # ── Parallel execution ────────────────────────────────────────────────
     else:
         with ThreadPoolExecutor(max_workers=max_workers) as ex:
-            future_to_job = {}
+            futures: dict = {ex.submit(run_one_job, job): job for job in jobs}
 
-            # submit all jobs; mark started in DB as they are submitted
-            for job in jobs:
-                q.put({"type": "started", "job_id": job["job_id"], "qbp": job["qbp"],
-                       "framework": job["framework"], "run_idx": job["run_idx"]})
-                fut = ex.submit(run_one_job, job)
-                future_to_job[fut] = job
+            while futures:
+                # wait() supports dynamically-added futures correctly
+                done_set, _ = wait(list(futures.keys()), return_when=FIRST_COMPLETED)
 
-            # as jobs finish, write to DB + progress
-            for fut in as_completed(future_to_job):
-                r = fut.result()
-                q.put({"type": "finished", **r})
+                for done_fut in done_set:
+                    job = futures.pop(done_fut)
+                    try:
+                        r = done_fut.result()
+                    except Exception as exc:
+                        # Wrap unexpected thread-level exceptions
+                        r = {
+                            "job_id":           job["job_id"],
+                            "qbp_name":         job["qbp"],
+                            "framework":        job["framework"],
+                            "model":            job.get("model", ""),
+                            "attempt_number":   job["run_idx"],
+                            "status":           "failed_error",
+                            "error":            str(exc),
+                            "elapsed_seconds":  0,
+                            "gold_bpmn":        None,
+                            "generated_bpmn":   None,
+                            "mapped_bpmn":      None,
+                            "node_sim":         None,
+                            "struct_sim":       None,
+                            "ged":              None,
+                            "use_dedup":        int(job.get("use_dedup", False)),
+                            "dedup_bpmn":       None,
+                            "node_sim_dedup":   None,
+                            "struct_sim_dedup": None,
+                            "ged_dedup":        None,
+                            "promoai_retries":  None,
+                        }
 
-                done += 1
-                print(f"PROGRESS {done}/{total}", flush=True)
+                    retry = handle_result(job, r)
+                    if retry:
+                        new_fut = ex.submit(run_one_job, retry)
+                        futures[new_fut] = retry
 
-    # stop writer
+    # ── Shutdown ──────────────────────────────────────────────────────────
     q.put(None)
     writer.join()
 
-    elapsed = time.time() - start_time
-    print(f"DONE {done}/{total} in {elapsed:.2f}s", flush=True)
+    elapsed       = time.time() - wall_start
+    total_succ    = sum(s["successes"] for s in exp_state.values())
+    total_tgt_all = sum(s["target"]    for s in exp_state.values())
+
+    print(
+        f"DONE successes={total_succ}/{total_tgt_all} "
+        f"attempts={done_attempts} elapsed={elapsed:.2f}s",
+        flush=True,
+    )
 
 
 if __name__ == "__main__":

@@ -192,6 +192,11 @@ class OpenAIModel(ModelBackend):
             "gpt-5.2-low-reasoning": 30000,
             "gpt-5.2-medium-reasoning": 30000,
             "gpt-5.2-high-reasoning": 30000,
+            "gpt-5.4": 128000,
+            "gpt-5.4-low-reasoning": 128000,
+            "gpt-5.4-medium-reasoning": 128000,
+            "gpt-5.4-high-reasoning": 128000,
+            "gpt-5.4-xhigh-reasoning": 128000,
         }
         # messages = [{"role": "user", "content": "Hello"}]
         response = client.chat.completions.create(messages = messages,

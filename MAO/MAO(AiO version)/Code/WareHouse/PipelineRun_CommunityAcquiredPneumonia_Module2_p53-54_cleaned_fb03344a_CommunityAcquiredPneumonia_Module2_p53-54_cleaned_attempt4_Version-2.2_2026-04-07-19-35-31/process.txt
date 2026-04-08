@@ -1,0 +1,148 @@
+<process>
+  <activity role='clinician' action='assess patient presenting with symptoms of community-acquired pneumonia in the ED, inpatient ward, or ICU' objects='clinical presentation' id='activity1'/>
+  <activity role='clinician' action='measure oxygen saturation' objects='oxygen saturation' id='activity2'/>
+  <activity role='clinician' action='order chest x-ray to confirm the diagnosis of CAP' objects='chest x-ray' id='activity3'/>
+  <activity role='clinician' action='not order CT scan for diagnosis of CAP' objects='CT scan' id='activity4'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='patient has sepsis' id='branch1'>
+      <activity role='clinician' action='proceed without waiting for chest x-ray result before giving antibiotics' objects='antibiotics,chest x-ray result' id='activity5'/>
+    </branch>
+    <branch condition='patient does not have sepsis' id='branch2'>
+      <activity role='clinician' action='wait for chest x-ray results prior to giving antibiotics' objects='chest x-ray result,antibiotics' id='activity6'/>
+    </branch>
+  </exclusiveGateway>
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='patient is admitted to hospital' id='branch3'>
+      <parallelGateway id='parallelgateway1'>
+        <branch id='branch4'>
+          <parallelGateway id='parallelgateway2'>
+            <branch id='branch25'>
+              <activity role='clinician' action='order complete blood count' objects='CBC' id='activity7_1'/>
+            </branch>
+            <branch id='branch26'>
+              <activity role='clinician' action='order electrolytes test' objects='electrolytes' id='activity7_2'/>
+            </branch>
+            <branch id='branch27'>
+              <activity role='clinician' action='order renal function tests' objects='renal function tests' id='activity7_3'/>
+            </branch>
+          </parallelGateway>
+        </branch>
+        <branch id='branch5'>
+          <parallelGateway id='parallelgateway3'>
+            <branch id='branch28'>
+              <activity role='clinician' action='assess confusion' objects='mental status' id='activity8_1'/>
+            </branch>
+            <branch id='branch29'>
+              <activity role='clinician' action='assess respiratory rate criterion' objects='respiratory rate' id='activity8_2'/>
+            </branch>
+            <branch id='branch30'>
+              <activity role='clinician' action='assess blood pressure criterion' objects='blood pressure' id='activity8_3'/>
+            </branch>
+            <branch id='branch31'>
+              <activity role='clinician' action='assess age older than 65 years criterion' objects='patient age' id='activity8_4'/>
+            </branch>
+          </parallelGateway>
+          <activity role='clinician' action='determine CRB-65 criteria count' objects='CRB-65 criteria' id='activity8_5'/>
+          <exclusiveGateway id='exclusivegateway3'>
+            <branch condition='CRB-65 criteria count > 2' id='branch6'>
+              <activity role='clinician' action='consider additional tests' objects='blood gases,lactate,liver enzyme tests,liver function tests' id='activity9'/>
+            </branch>
+            <branch condition='CRB-65 criteria count <= 2' id='branch7'>
+              <activity role='clinician' action='continue without additional CRB-65-triggered tests' objects='' id='activity10'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch id='branch11'>
+          <exclusiveGateway id='exclusivegateway5'>
+            <branch condition='adequate sputum sample can be obtained' id='branch12'>
+              <activity role='clinician' action='consider obtaining sputum culture, with greater priority if using a targeted antibiotic instead of a non-targeted antibiotic' objects='sputum culture,adequate sputum sample,antibiotic strategy' id='activity14'/>
+              <exclusiveGateway id='exclusivegateway6'>
+                <branch condition='sputum culture is obtained' id='branch13'>
+                  <activity role='laboratory staff' action='consider performing Gram stain' objects='sputum specimen,Gram stain' id='activity15'/>
+                </branch>
+                <branch condition='sputum culture is not obtained' id='branch14'>
+                  <activity role='clinician' action='continue without Gram stain' objects='' id='activity16'/>
+                </branch>
+              </exclusiveGateway>
+            </branch>
+            <branch condition='adequate sputum sample cannot be obtained' id='branch15'>
+              <activity role='clinician' action='continue without sputum culture' objects='' id='activity17'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch id='branch16'>
+          <exclusiveGateway id='exclusivegateway8'>
+            <branch condition='at least one admission-time urine antigen indication is present' id='branch37'>
+              <inclusiveGateway id='inclusivegateway1'>
+                <branch condition='patient is high severity' id='branch17'>
+                  <activity role='clinician' action='identify high-severity indication for urine antigen testing' objects='severity assessment' id='activity18_new'/>
+                </branch>
+                <branch condition='enhanced surveillance directive from Public Health Ontario on Legionella applies to the inpatient' id='branch18'>
+                  <activity role='clinician' action='identify surveillance directive indication for urine antigen testing' objects='public health directive' id='activity19_new'/>
+                </branch>
+                <branch condition='inpatient presentation occurs during peak season from mid-June to early October' id='branch20'>
+                  <activity role='clinician' action='identify peak season indication for urine antigen testing' objects='seasonal presentation timing' id='activity21_new'/>
+                </branch>
+              </inclusiveGateway>
+              <activity role='clinician' action='order urine antigen testing' objects='urine antigen test' id='activity18_final'/>
+            </branch>
+            <branch condition='no admission-time urine antigen indication is present' id='branch38'>
+              <activity role='clinician' action='continue without urine antigen testing at admission' objects='' id='activity26'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch id='branch21'>
+          <exclusiveGateway id='exclusivegateway7'>
+            <branch condition='patient is intubated' id='branch22'>
+              <activity role='clinician' action='consider PCR testing for Legionella' objects='Legionella PCR test' id='activity22'/>
+            </branch>
+            <branch condition='patient is not intubated' id='branch23'>
+              <activity role='clinician' action='continue without Legionella PCR consideration for intubation indication' objects='' id='activity23'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch id='branch46'>
+          <parallelGateway id='parallelgateway5'>
+            <branch id='branch41'>
+              <activity role='clinician' action='assess temperature criterion' objects='temperature' id='activity11_1'/>
+            </branch>
+            <branch id='branch42'>
+              <activity role='clinician' action='assess heart rate criterion' objects='heart rate' id='activity11_2'/>
+            </branch>
+            <branch id='branch43'>
+              <activity role='clinician' action='assess respiratory rate or PaCO2 criterion' objects='respiratory rate,PaCO2' id='activity11_3'/>
+            </branch>
+            <branch id='branch44'>
+              <activity role='clinician' action='assess white blood cell count criterion' objects='white blood cell count,bands' id='activity11_4'/>
+            </branch>
+            <branch id='branch45'>
+              <activity role='clinician' action='assess ICU admission requirement' objects='ICU admission status' id='activity11_5'/>
+            </branch>
+          </parallelGateway>
+          <activity role='clinician' action='determine whether blood culture indication is present' objects='SIRS criteria count,ICU admission status' id='activity11_6'/>
+          <exclusiveGateway id='exclusivegateway4'>
+            <branch condition='SIRS criteria count > 2 or ICU admission is required' id='branch9'>
+              <activity role='clinician' action='obtain blood cultures' objects='blood cultures' id='activity12'/>
+            </branch>
+            <branch condition='SIRS criteria count <= 2 and ICU admission is not required' id='branch10'>
+              <activity role='clinician' action='do not routinely obtain blood cultures' objects='blood cultures' id='activity13'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </parallelGateway>
+    </branch>
+    <branch condition='patient is not admitted to hospital' id='branch24'>
+      <activity role='clinician' action='complete ED diagnostic testing with oxygen saturation and chest x-ray based assessment' objects='oxygen saturation,chest x-ray result' id='activity24'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='clinician' action='reassess response to drug therapy after 48–72 hours' objects='treatment response' id='activity27'/>
+  <exclusiveGateway id='exclusivegateway9'>
+    <branch condition='patient is not responding to drug therapy after 48–72 hours' id='branch39'>
+      <activity role='clinician' action='order urine antigen testing' objects='urine antigen test' id='activity28'/>
+    </branch>
+    <branch condition='patient is responding to drug therapy after 48–72 hours' id='branch40'>
+      <activity role='clinician' action='continue without urine antigen testing for non-response indication' objects='' id='activity29'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='quality improvement team' action='conduct field evaluation to assess the clinical utility of urine antigen testing in patients with CAP' objects='urine antigen testing evaluation data' id='activity25'/>
+</process>

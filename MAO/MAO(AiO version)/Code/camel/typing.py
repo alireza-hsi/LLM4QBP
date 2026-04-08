@@ -53,6 +53,11 @@ class ModelType(Enum):
     GPT_5o2_low_reasoning = "gpt-5.2-low-reasoning"
     GPT_5o2_medium_reasoning = "gpt-5.2-medium-reasoning"
     GPT_5o2_high_reasoning = "gpt-5.2-high-reasoning"
+    GPT_5o4 = "gpt-5.4"
+    GPT_5o4_low_reasoning = "gpt-5.4-low-reasoning"
+    GPT_5o4_medium_reasoning = "gpt-5.4-medium-reasoning"
+    GPT_5o4_high_reasoning = "gpt-5.4-high-reasoning"
+    GPT_5o4_xhigh_reasoning = "gpt-5.4-xhigh-reasoning"
     STUB = "stub"
 
     @property
