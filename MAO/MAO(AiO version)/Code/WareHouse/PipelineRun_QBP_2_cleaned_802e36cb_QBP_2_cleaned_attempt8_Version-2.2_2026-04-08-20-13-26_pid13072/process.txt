@@ -1,0 +1,249 @@
+<process>
+  <activity role='ED triage nurse' action='triage the patient as suspected TIA or minor (nondisabling) stroke under the standardized priority protocol' objects='triage assessment, patient presentation' id='activity1_1'/>
+  <activity role='ED team' action='prioritize immediate assessment and treatment initiation' objects='standardized priority protocol, urgent treatment pathway' id='activity1_2'/>
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1'>
+      <activity role='ED nurse' action='measure random blood glucose on presentation' objects='blood glucose sample' id='activity2'/>
+      <exclusiveGateway id='exclusivegateway1'>
+        <branch condition='hypoglycemia is present' id='branch2'>
+          <activity role='ED clinician' action='correct hypoglycemia immediately' objects='hypoglycemia treatment' id='activity3'/>
+        </branch>
+        <branch condition='first random glucose value is > 11 mmol/L' id='branch3'>
+          <activity role='ED nurse' action='repeat blood glucose measurement' objects='repeat blood glucose sample' id='activity4'/>
+        </branch>
+        <branch condition='first random glucose value is not hypoglycemic and is <= 11 mmol/L' id='branch4'>
+          <activity role='ED clinician' action='document glucose result and continue routine monitoring' objects='glucose result' id='activity5'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch11'>
+      <activity role='ED clinician' action='assess TIA or minor stroke risk features and symptom pattern' objects='history, neurological examination' id='activity11_1'/>
+      <activity role='ED clinician' action='determine time since symptom onset' objects='symptom onset history' id='activity11_2'/>
+      <activity role='ED clinician' action='review current antiplatelet use and contraindications' objects='medication history, contraindication assessment' id='activity11_3'/>
+      <activity role='ED nurse' action='perform swallowing screening' objects='swallowing screening result' id='activity11_4'/>
+      <exclusiveGateway id='exclusivegateway3'>
+        <branch condition='fluctuating or crescendo hemibody motor weakness, sensory loss, or speech difficulty is present' id='branch12'>
+          <activity role='ED clinician' action='perform focused ED reassessment for fluctuating or crescendo neurologic symptoms' objects='ED reassessment findings' id='activity12_1'/>
+          <exclusiveGateway id='exclusivegateway3_1'>
+            <branch condition='admission to hospital is warranted based on ED reassessment' id='branch12_1'>
+              <activity role='ED clinician' action='admit the patient to hospital for inpatient evaluation and management for stroke prevention' objects='admission order, inpatient management plan' id='activity12_2'/>
+            </branch>
+            <branch condition='admission to hospital is not warranted based on ED reassessment' id='branch12_2'>
+              <activity role='ED clinician' action='continue urgent TIA or minor stroke management without admission' objects='urgent ambulatory management plan' id='activity12_3'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch condition='fluctuating or crescendo hemibody motor weakness, sensory loss, or speech difficulty is not present' id='branch13'>
+          <activity role='ED clinician' action='continue ambulatory TIA or minor stroke pathway assessment' objects='risk-stratified care plan' id='activity13'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exclusivegateway3_2'>
+        <branch condition='the patient was admitted to hospital for inpatient evaluation and management for stroke prevention' id='branch28'>
+          <parallelGateway id='parallelgateway2'>
+            <branch id='branch66'>
+              <activity role='inpatient stroke team' action='perform brain CT scan as soon as possible and no later than 24 hours after symptom onset' objects='brain CT scan' id='activity12_4'/>
+              <exclusiveGateway id='exclusivegateway10'>
+                <branch condition='brain imaging has excluded intracranial hemorrhage and the patient is not on an antiplatelet agent at presentation and antiplatelet therapy is not contraindicated' id='branch30'>
+                  <activity role='inpatient stroke clinician' action='determine the appropriate antiplatelet regimen and initiate treatment immediately after CT has excluded intracranial hemorrhage' objects='antiplatelet regimen decision' id='activity37'/>
+                  <exclusiveGateway id='exclusivegateway11'>
+                    <branch condition='ASA regimen is selected' id='branch31'>
+                      <exclusiveGateway id='exclusivegateway12'>
+                        <branch condition='patient fails swallowing screening or cannot take oral ASA' id='branch32'>
+                          <activity role='inpatient stroke clinician' action='offer rectal or gastric ASA 160 mg loading dose' objects='rectal ASA, gastric ASA' id='activity38'/>
+                        </branch>
+                        <branch condition='patient passes swallowing screening and can take oral ASA' id='branch33'>
+                          <activity role='inpatient stroke clinician' action='administer ASA 160 mg loading dose' objects='ASA' id='activity39'/>
+                        </branch>
+                      </exclusiveGateway>
+                      <activity role='inpatient stroke clinician' action='prescribe enteric coated ASA 81 to 325 mg daily, with most patients receiving 81 mg per day' objects='enteric coated ASA maintenance therapy' id='activity40'/>
+                    </branch>
+                    <branch condition='clopidogrel regimen is selected' id='branch34'>
+                      <activity role='inpatient stroke clinician' action='administer clopidogrel 300 mg loading dose followed by 75 mg per day' objects='clopidogrel therapy' id='activity41'/>
+                    </branch>
+                    <branch condition='extended-release dipyridamole plus ASA regimen is selected' id='branch35'>
+                      <exclusiveGateway id='exclusivegateway13'>
+                        <branch condition='patient fails swallowing screening or cannot take oral ASA loading dose' id='branch36'>
+                          <activity role='inpatient stroke clinician' action='offer rectal or gastric ASA 160 mg loading dose before extended-release dipyridamole plus ASA therapy' objects='rectal ASA, gastric ASA' id='activity42'/>
+                        </branch>
+                        <branch condition='patient passes swallowing screening and can take oral ASA loading dose' id='branch37'>
+                          <activity role='inpatient stroke clinician' action='administer ASA 160 mg loading dose before extended-release dipyridamole plus ASA therapy' objects='ASA' id='activity43'/>
+                        </branch>
+                      </exclusiveGateway>
+                      <activity role='inpatient stroke clinician' action='prescribe extended-release dipyridamole 200 mg plus ASA 25 mg twice daily' objects='extended-release dipyridamole, ASA' id='activity44'/>
+                    </branch>
+                  </exclusiveGateway>
+                </branch>
+                <branch condition='brain imaging does not exclude intracranial hemorrhage or the patient is already on an antiplatelet agent or antiplatelet therapy is contraindicated' id='branch38'>
+                  <activity role='inpatient stroke clinician' action='withhold new antiplatelet initiation and manage according to imaging findings, current therapy, and contraindications' objects='imaging result, current antiplatelet regimen, contraindications' id='activity45'/>
+                </branch>
+              </exclusiveGateway>
+              <activity role='inpatient stroke team' action='continue inpatient evaluation and management and initiate other stroke-prevention treatments tailored to the patient' objects='inpatient evaluation findings, tailored stroke-prevention treatments' id='activity12_5'/>
+            </branch>
+            <branch id='branch67'>
+              <activity role='inpatient nurse' action='evaluate temperature as part of routine vital signs every 4 hours for the first 48 hours' objects='temperature observations' id='activity6'/>
+              <exclusiveGateway id='exclusivegateway2'>
+                <branch condition='temperature > 37.5 C' id='branch6'>
+                  <inclusiveGateway id='inclusivegateway1'>
+                    <branch condition='temperature-reducing measures are indicated' id='branch7'>
+                      <activity role='inpatient team' action='initiate temperature-reducing measures' objects='temperature-reducing measures' id='activity7'/>
+                    </branch>
+                    <branch condition='infection evaluation is indicated' id='branch8'>
+                      <activity role='inpatient team' action='investigate potential infection' objects='infection assessment' id='activity8'/>
+                    </branch>
+                    <branch condition='antipyretic or antimicrobial therapy is required' id='branch9'>
+                      <activity role='inpatient clinician' action='initiate antipyretic and antimicrobial therapy as required' objects='antipyretic therapy, antimicrobial therapy' id='activity9'/>
+                    </branch>
+                  </inclusiveGateway>
+                </branch>
+                <branch condition='temperature <= 37.5 C' id='branch10'>
+                  <activity role='inpatient nurse' action='continue scheduled temperature monitoring' objects='routine vital signs' id='activity10'/>
+                </branch>
+              </exclusiveGateway>
+            </branch>
+          </parallelGateway>
+        </branch>
+        <branch condition='the patient was not admitted to hospital and continues on the ambulatory TIA or minor stroke pathway' id='branch29'>
+          <exclusiveGateway id='exclusivegateway4'>
+            <branch condition='TIA with high-risk features or minor stroke and medical attention was sought within 48 hours from symptom onset' id='branch14'>
+              <exclusiveGateway id='exclusivegateway5'>
+                <branch condition='a specialized TIA or minor stroke clinic is immediately accessible without harmful delay' id='branch15'>
+                  <activity role='specialized TIA or minor stroke clinic team' action='provide immediate care in the specialized clinic' objects='specialized clinic resources' id='activity14'/>
+                  <activity role='clinic team' action='perform brain CT scan as soon as possible and no later than 24 hours after symptom onset' objects='brain CT scan' id='activity15'/>
+                  <exclusiveGateway id='exclusivegateway14'>
+                    <branch condition='brain imaging has excluded intracranial hemorrhage and the patient is not on an antiplatelet agent at presentation and antiplatelet therapy is not contraindicated' id='branch39'>
+                      <activity role='clinic clinician' action='determine the appropriate antiplatelet regimen and initiate treatment immediately after CT has excluded intracranial hemorrhage' objects='antiplatelet regimen decision' id='activity46'/>
+                      <exclusiveGateway id='exclusivegateway15'>
+                        <branch condition='ASA regimen is selected' id='branch40'>
+                          <exclusiveGateway id='exclusivegateway16'>
+                            <branch condition='patient fails swallowing screening or cannot take oral ASA' id='branch41'>
+                              <activity role='clinic clinician' action='offer rectal or gastric ASA 160 mg loading dose' objects='rectal ASA, gastric ASA' id='activity47'/>
+                            </branch>
+                            <branch condition='patient passes swallowing screening and can take oral ASA' id='branch42'>
+                              <activity role='clinic clinician' action='administer ASA 160 mg loading dose' objects='ASA' id='activity48'/>
+                            </branch>
+                          </exclusiveGateway>
+                          <activity role='clinic clinician' action='prescribe enteric coated ASA 81 to 325 mg daily, with most patients receiving 81 mg per day' objects='enteric coated ASA maintenance therapy' id='activity49'/>
+                        </branch>
+                        <branch condition='clopidogrel regimen is selected' id='branch43'>
+                          <activity role='clinic clinician' action='administer clopidogrel 300 mg loading dose followed by 75 mg per day' objects='clopidogrel therapy' id='activity50'/>
+                        </branch>
+                        <branch condition='extended-release dipyridamole plus ASA regimen is selected' id='branch44'>
+                          <exclusiveGateway id='exclusivegateway17'>
+                            <branch condition='patient fails swallowing screening or cannot take oral ASA loading dose' id='branch45'>
+                              <activity role='clinic clinician' action='offer rectal or gastric ASA 160 mg loading dose before extended-release dipyridamole plus ASA therapy' objects='rectal ASA, gastric ASA' id='activity51'/>
+                            </branch>
+                            <branch condition='patient passes swallowing screening and can take oral ASA loading dose' id='branch46'>
+                              <activity role='clinic clinician' action='administer ASA 160 mg loading dose before extended-release dipyridamole plus ASA therapy' objects='ASA' id='activity52'/>
+                            </branch>
+                          </exclusiveGateway>
+                          <activity role='clinic clinician' action='prescribe extended-release dipyridamole 200 mg plus ASA 25 mg twice daily' objects='extended-release dipyridamole, ASA' id='activity53'/>
+                        </branch>
+                      </exclusiveGateway>
+                    </branch>
+                    <branch condition='brain imaging does not exclude intracranial hemorrhage or the patient is already on an antiplatelet agent or antiplatelet therapy is contraindicated' id='branch47'>
+                      <activity role='clinic clinician' action='withhold new antiplatelet initiation and manage according to imaging findings, current therapy, and contraindications' objects='imaging result, current antiplatelet regimen, contraindications' id='activity54'/>
+                    </branch>
+                  </exclusiveGateway>
+                  <activity role='clinic team' action='initiate other stroke-prevention treatments tailored to the patient' objects='tailored stroke-prevention treatments' id='activity17'/>
+                </branch>
+                <branch condition='delay in accessing a specialized TIA or minor stroke clinic poses risks to patient health' id='branch16'>
+                  <activity role='ED team' action='perform evaluation in an appropriately resourced ED' objects='ED stroke-prevention evaluation' id='activity18'/>
+                  <activity role='ED team' action='perform brain CT scan as soon as possible and no later than 24 hours after symptom onset' objects='brain CT scan' id='activity19'/>
+                  <exclusiveGateway id='exclusivegateway18'>
+                    <branch condition='brain imaging has excluded intracranial hemorrhage and the patient is not on an antiplatelet agent at presentation and antiplatelet therapy is not contraindicated' id='branch48'>
+                      <activity role='ED clinician' action='determine the appropriate antiplatelet regimen and initiate treatment immediately after CT has excluded intracranial hemorrhage' objects='antiplatelet regimen decision' id='activity55'/>
+                      <exclusiveGateway id='exclusivegateway19'>
+                        <branch condition='ASA regimen is selected' id='branch49'>
+                          <exclusiveGateway id='exclusivegateway20'>
+                            <branch condition='patient fails swallowing screening or cannot take oral ASA' id='branch50'>
+                              <activity role='ED clinician' action='offer rectal or gastric ASA 160 mg loading dose' objects='rectal ASA, gastric ASA' id='activity56'/>
+                            </branch>
+                            <branch condition='patient passes swallowing screening and can take oral ASA' id='branch51'>
+                              <activity role='ED clinician' action='administer ASA 160 mg loading dose' objects='ASA' id='activity57'/>
+                            </branch>
+                          </exclusiveGateway>
+                          <activity role='ED clinician' action='prescribe enteric coated ASA 81 to 325 mg daily, with most patients receiving 81 mg per day' objects='enteric coated ASA maintenance therapy' id='activity58'/>
+                        </branch>
+                        <branch condition='clopidogrel regimen is selected' id='branch52'>
+                          <activity role='ED clinician' action='administer clopidogrel 300 mg loading dose followed by 75 mg per day' objects='clopidogrel therapy' id='activity59'/>
+                        </branch>
+                        <branch condition='extended-release dipyridamole plus ASA regimen is selected' id='branch53'>
+                          <exclusiveGateway id='exclusivegateway21'>
+                            <branch condition='patient fails swallowing screening or cannot take oral ASA loading dose' id='branch54'>
+                              <activity role='ED clinician' action='offer rectal or gastric ASA 160 mg loading dose before extended-release dipyridamole plus ASA therapy' objects='rectal ASA, gastric ASA' id='activity60'/>
+                            </branch>
+                            <branch condition='patient passes swallowing screening and can take oral ASA loading dose' id='branch55'>
+                              <activity role='ED clinician' action='administer ASA 160 mg loading dose before extended-release dipyridamole plus ASA therapy' objects='ASA' id='activity61'/>
+                            </branch>
+                          </exclusiveGateway>
+                          <activity role='ED clinician' action='prescribe extended-release dipyridamole 200 mg plus ASA 25 mg twice daily' objects='extended-release dipyridamole, ASA' id='activity62'/>
+                        </branch>
+                      </exclusiveGateway>
+                    </branch>
+                    <branch condition='brain imaging does not exclude intracranial hemorrhage or the patient is already on an antiplatelet agent or antiplatelet therapy is contraindicated' id='branch56'>
+                      <activity role='ED clinician' action='withhold new antiplatelet initiation and manage according to imaging findings, current therapy, and contraindications' objects='imaging result, current antiplatelet regimen, contraindications' id='activity63'/>
+                    </branch>
+                  </exclusiveGateway>
+                  <activity role='ED or stroke team' action='consider inpatient evaluation and management for stroke prevention' objects='inpatient evaluation and management plan' id='activity21'/>
+                  <activity role='ED or stroke team' action='initiate other stroke-prevention treatments tailored to the patient' objects='tailored stroke-prevention treatments' id='activity22'/>
+                </branch>
+              </exclusiveGateway>
+            </branch>
+            <branch condition='TIA with high-risk features or minor stroke and medical attention was sought after 48 hours from symptom onset' id='branch17'>
+              <exclusiveGateway id='exclusivegateway4_1'>
+                <branch condition='a specialized TIA or minor stroke clinic is available for evaluation within 24 hours of initial presentation' id='branch17_1'>
+                  <activity role='ED clinician' action='refer the patient within 24 hours of initial presentation to a specialized TIA or minor stroke clinic' objects='specialized clinic referral' id='activity23_1'/>
+                </branch>
+                <branch condition='a specialized TIA or minor stroke clinic is not available for evaluation within 24 hours of initial presentation' id='branch17_2'>
+                  <activity role='ED clinician' action='refer the patient within 24 hours of initial presentation to an outpatient clinic with stroke-prevention services' objects='outpatient stroke-prevention referral' id='activity23_2'/>
+                </branch>
+              </exclusiveGateway>
+            </branch>
+            <branch condition='TIA without high-risk features' id='branch18'>
+              <activity role='ED team' action='perform brain CT scan as soon as possible and no later than 24 hours after initial presentation' objects='brain CT scan' id='activity24'/>
+              <exclusiveGateway id='exclusivegateway22'>
+                <branch condition='brain imaging has excluded intracranial hemorrhage and the patient is not on an antiplatelet agent at presentation and antiplatelet therapy is not contraindicated' id='branch57'>
+                  <activity role='ED clinician' action='determine the appropriate antiplatelet regimen and initiate treatment immediately after CT has excluded intracranial hemorrhage' objects='antiplatelet regimen decision' id='activity64'/>
+                  <exclusiveGateway id='exclusivegateway23'>
+                    <branch condition='ASA regimen is selected' id='branch58'>
+                      <exclusiveGateway id='exclusivegateway24'>
+                        <branch condition='patient fails swallowing screening or cannot take oral ASA' id='branch59'>
+                          <activity role='ED clinician' action='offer rectal or gastric ASA 160 mg loading dose' objects='rectal ASA, gastric ASA' id='activity65'/>
+                        </branch>
+                        <branch condition='patient passes swallowing screening and can take oral ASA' id='branch60'>
+                          <activity role='ED clinician' action='administer ASA 160 mg loading dose' objects='ASA' id='activity66'/>
+                        </branch>
+                      </exclusiveGateway>
+                      <activity role='ED clinician' action='prescribe enteric coated ASA 81 to 325 mg daily, with most patients receiving 81 mg per day' objects='enteric coated ASA maintenance therapy' id='activity67'/>
+                    </branch>
+                    <branch condition='clopidogrel regimen is selected' id='branch61'>
+                      <activity role='ED clinician' action='administer clopidogrel 300 mg loading dose followed by 75 mg per day' objects='clopidogrel therapy' id='activity68'/>
+                    </branch>
+                    <branch condition='extended-release dipyridamole plus ASA regimen is selected' id='branch62'>
+                      <exclusiveGateway id='exclusivegateway25'>
+                        <branch condition='patient fails swallowing screening or cannot take oral ASA loading dose' id='branch63'>
+                          <activity role='ED clinician' action='offer rectal or gastric ASA 160 mg loading dose before extended-release dipyridamole plus ASA therapy' objects='rectal ASA, gastric ASA' id='activity69'/>
+                        </branch>
+                        <branch condition='patient passes swallowing screening and can take oral ASA loading dose' id='branch64'>
+                          <activity role='ED clinician' action='administer ASA 160 mg loading dose before extended-release dipyridamole plus ASA therapy' objects='ASA' id='activity70'/>
+                        </branch>
+                      </exclusiveGateway>
+                      <activity role='ED clinician' action='prescribe extended-release dipyridamole 200 mg plus ASA 25 mg twice daily' objects='extended-release dipyridamole, ASA' id='activity71'/>
+                    </branch>
+                  </exclusiveGateway>
+                </branch>
+                <branch condition='brain imaging does not exclude intracranial hemorrhage or the patient is already on an antiplatelet agent or antiplatelet therapy is contraindicated' id='branch65'>
+                  <activity role='ED clinician' action='withhold new antiplatelet initiation and manage according to imaging findings, current therapy, and contraindications' objects='imaging result, current antiplatelet regimen, contraindications' id='activity72'/>
+                </branch>
+              </exclusiveGateway>
+              <activity role='ED clinician' action='refer the patient to an outpatient clinic with stroke-prevention services for comprehensive evaluation and management within 1 month of symptom onset' objects='outpatient stroke-prevention referral' id='activity26'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </parallelGateway>
+  <activity role='ED or stroke-prevention team' action='perform cross-continuum secondary prevention assessment for all patients whether admitted to hospital or discharged' objects='secondary prevention risk assessment' id='activity35_1'/>
+  <activity role='ED or stroke-prevention team' action='initiate or reconcile indicated secondary prevention therapies before admission or discharge' objects='secondary prevention medications, therapy plan' id='activity35_2'/>
+  <activity role='ED or stroke-prevention team' action='communicate the prevention plan and arrange follow-up across care settings' objects='discharge instructions, referral and follow-up plan' id='activity35_3'/>
+</process>

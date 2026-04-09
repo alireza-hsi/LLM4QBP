@@ -1,0 +1,103 @@
+<process>
+  <activity role='admitting clinician' action='confirm whether the presentation is' objects='acute stroke or TIA/minor nondisabling stroke' id='a1_1'/>
+  <activity role='admitting clinician' action='determine and document' objects='stroke severity and Module 3a applicability' id='a1_2'/>
+  <exclusiveGateway id='eg1'>
+    <branch condition='Patient has acute stroke' id='br1'>
+      <activity role='hospital' action='admit patient to a specialized geographically defined stroke unit' objects='identifiable co-located stroke unit beds occupied by stroke patients most of the time' id='a2'/>
+      <activity role='stroke unit manager' action='assemble the core stroke unit team with stroke expertise in medicine, nursing, occupational therapy, physiotherapy, speech-language pathology, social work, and clinical nutrition' objects='interprofessional stroke unit team roster' id='a3'/>
+      <activity role='stroke program' action='verify that core stroke unit professionals spend the vast majority of their time treating stroke patients and regularly complete stroke care education' objects='team expertise and stroke education records' id='a4'/>
+      <activity role='hospital' action='provide access to the specialized interprofessional stroke team 7 days a week' objects='7 day stroke unit coverage' id='a5'/>
+      <parallelGateway id='pg1'>
+        <branch id='br2'>
+          <parallelGateway id='pg1_1'>
+            <branch id='br2_1'>
+              <activity role='physiotherapist' action='assess patient within 48 hours of hospital admission' objects='physiotherapy needs' id='a6_1'/>
+            </branch>
+            <branch id='br2_2'>
+              <activity role='speech-language pathologist' action='assess patient within 48 hours of hospital admission' objects='speech-language pathology needs' id='a6_2'/>
+            </branch>
+            <branch id='br2_3'>
+              <activity role='occupational therapist' action='assess patient within 48 hours of hospital admission' objects='occupational therapy needs' id='a6_3'/>
+            </branch>
+          </parallelGateway>
+          <activity role='physiotherapy, speech-language pathology, and occupational therapy team members' action='formulate' objects='interprofessional stroke management plan' id='a6_4'/>
+        </branch>
+        <branch id='br3'>
+          <parallelGateway id='pg1_2'>
+            <branch id='br3_1'>
+              <activity role='clinicians' action='evaluate' objects='stroke-related impairments using standardized valid assessment tools' id='a7_1'/>
+            </branch>
+            <branch id='br3_2'>
+              <activity role='clinicians' action='evaluate' objects='functional status using standardized valid assessment tools, preferably in electronic format linked to the EHR when possible' id='a7_2'/>
+            </branch>
+          </parallelGateway>
+          <activity role='clinicians' action='complete AlphaFIM on or by day 3 after admission with admission day counted as day 1' objects='AlphaFIM assessment' id='a8'/>
+        </branch>
+        <branch id='br4'>
+          <activity role='clinicians' action='assess patient for risk of developing' objects='venous thromboembolism' id='a9'/>
+          <activity role='acute care team' action='encourage adequate hydration to help prevent' objects='venous thromboembolism' id='a10'/>
+        </branch>
+        <branch id='br5'>
+          <activity role='nursing staff' action='screen within the first 48 hours of admission using' objects='valid nutrition screening tool' id='a11_1'/>
+          <activity role='nursing staff' action='screen within the first 48 hours of admission using' objects='valid hydration screening tool' id='a11_2'/>
+          <exclusiveGateway id='eg4'>
+            <branch condition='No nutritional concerns, hydration deficits, dysphagia, or other relevant comorbidities are identified' id='br16'>
+              <activity role='acute care team' action='continue routine nutrition and hydration monitoring' objects='ongoing nutrition and hydration status' id='a11_3'/>
+            </branch>
+            <branch condition='Nutritional concerns, hydration deficits, dysphagia, or other comorbidities are identified' id='br17'>
+              <activity role='acute care team' action='refer patient to a dietitian within 7 days of admission for recommendations' objects='dietitian referral' id='a12'/>
+              <exclusiveGateway id='eg5'>
+                <branch condition='Patient is unable to meet nutritional and fluid requirements' id='br18'>
+                  <activity role='dietitian' action='provide recommendations and consider' objects='enteral nutrition support plan' id='a13'/>
+                </branch>
+                <branch condition='Patient is able to meet nutritional and fluid requirements' id='br19'>
+                  <activity role='dietitian' action='provide' objects='nutrition and hydration recommendations' id='a13_1'/>
+                </branch>
+              </exclusiveGateway>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch id='br8'>
+          <activity role='acute care team' action='assess' objects='contraindications to mobilization' id='a14_1'/>
+          <exclusiveGateway id='eg2a'>
+            <branch condition='Mobilization is contraindicated' id='br9'>
+              <activity role='acute care team' action='defer mobilization and document' objects='mobilization contraindication' id='a15'/>
+            </branch>
+            <branch condition='Mobilization is not contraindicated' id='br9_1'>
+              <activity role='acute care team' action='determine' objects='time since stroke onset for mobilization planning' id='a14_2'/>
+              <exclusiveGateway id='eg2b'>
+                <branch condition='Stroke onset is within 24 hours and clinician judges mobilization reasonable' id='br10'>
+                  <activity role='acute care team' action='initiate cautious mobilization within 24 hours using clinical judgement and avoid' objects='frequent out-of-bed activity' id='a16'/>
+                </branch>
+                <branch condition='Stroke onset is within 24 hours and clinician judges mobilization not reasonable' id='br11'>
+                  <activity role='acute care team' action='avoid frequent out-of-bed activity within 24 hours and reassess for mobilization at 24 to 48 hours from stroke onset' objects='mobilization readiness' id='a17'/>
+                </branch>
+                <branch condition='Stroke onset is between 24 hours and 48 hours' id='br12'>
+                  <activity role='acute care team' action='mobilize patient early between 24 hours and 48 hours of stroke onset to help prevent' objects='venous thromboembolism' id='a18'/>
+                </branch>
+                <branch condition='Stroke onset is more than 48 hours' id='br12_1'>
+                  <activity role='acute care team' action='mobilize patient as soon as clinically feasible and document' objects='post-48-hour mobilization plan' id='a18_1'/>
+                </branch>
+              </exclusiveGateway>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </parallelGateway>
+      <exclusiveGateway id='eg3'>
+        <branch condition='Patient is admitted to in-hospital rehabilitation' id='br13'>
+          <activity role='acute care team' action='complete' objects='cross-continuum secondary prevention assessment using Modules 5 and 10' id='a19_1'/>
+          <activity role='acute care team' action='communicate and arrange' objects='secondary prevention transfer plan to in-hospital rehabilitation' id='a19_2'/>
+        </branch>
+        <branch condition='Patient is discharged from acute care' id='br14'>
+          <activity role='acute care team' action='complete' objects='cross-continuum secondary prevention assessment using Modules 5 and 10' id='a20_1'/>
+          <activity role='acute care team' action='provide' objects='discharge referrals, education, and follow-up arrangements for secondary prevention' id='a20_2'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch condition='Patient has TIA or minor nondisabling stroke' id='br15'>
+      <activity role='acute care team' action='document that Module 3a acute care treatment recommendations are not applicable to' objects='TIA or minor nondisabling stroke case' id='a21'/>
+      <activity role='acute care team' action='identify' objects='needed secondary prevention assessments and therapies using Modules 5 and 10' id='a22_1'/>
+      <activity role='acute care team' action='arrange' objects='follow-up plan for outpatient or TIA clinic management' id='a22_2'/>
+    </branch>
+  </exclusiveGateway>
+</process>

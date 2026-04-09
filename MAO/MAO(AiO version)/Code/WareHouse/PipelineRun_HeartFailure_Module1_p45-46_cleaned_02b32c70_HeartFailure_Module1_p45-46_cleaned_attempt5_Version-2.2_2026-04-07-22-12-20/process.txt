@@ -1,0 +1,93 @@
+<process>
+  <activity role='ED clinician' action='perform an initial emergency department assessment of the patient presenting with acute heart failure' objects='patient, presenting symptoms, clinical status' id='activity3_1'/>
+  <activity role='ED clinician' action='apply the standardized risk-stratification process' objects='patient, standardized risk-stratification tool' id='activity3_2'/>
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1'>
+      <activity role='ED clinician' action='order serum creatinine and electrolyte levels' objects='serum creatinine test, electrolyte tests' id='activity4'/>
+    </branch>
+    <branch id='branch2'>
+      <activity role='ED clinician' action='order troponin measurements' objects='troponin tests' id='activity5'/>
+    </branch>
+    <branch id='branch3'>
+      <activity role='ED clinician' action='order a complete blood count' objects='complete blood count' id='activity6'/>
+    </branch>
+    <branch id='branch4'>
+      <activity role='ED clinician' action='perform an electrocardiogram' objects='electrocardiogram' id='activity7'/>
+    </branch>
+    <branch id='branch5'>
+      <activity role='ED clinician' action='perform a chest x-ray examination' objects='chest x-ray' id='activity8'/>
+    </branch>
+    <branch id='branch6'>
+      <exclusiveGateway id='exclusivegateway1'>
+        <branch condition='no recent echocardiogram is available' id='branch6a'>
+          <activity role='ED clinician' action='order an echocardiogram' objects='echocardiogram' id='activity9'/>
+        </branch>
+        <branch condition='a recent echocardiogram is available' id='branch6b'>
+          <activity role='ED clinician' action='review the recent echocardiogram findings' objects='recent echocardiogram' id='activity10'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch7'>
+      <activity role='nursing staff' action='frequently measure heart rate, blood pressure, and oxygen saturation during emergency department assessment and treatment' objects='heart rate, blood pressure, oxygen saturation' id='activity11'/>
+    </branch>
+    <branch id='branch8'>
+      <activity role='ED clinician' action='administer initial emergency department treatment including furosemide' objects='furosemide, initial treatment' id='activity12_1'/>
+      <activity role='ED clinician' action='reassess the patient to determine responsiveness to diuresis' objects='urine output, symptoms, treatment response' id='activity12_2'/>
+    </branch>
+  </parallelGateway>
+  <parallelGateway id='parallelgateway2'>
+    <branch id='branch18'>
+      <activity role='ED clinician' action='assess respiratory distress, hypoxemia, and severity of pulmonary edema' objects='respiratory status, oxygen saturation, chest x-ray, clinical findings' id='activity13_1'/>
+    </branch>
+    <branch id='branch19'>
+      <activity role='ED clinician' action='assess for hemodynamic compromise' objects='blood pressure, perfusion status, clinical findings' id='activity13_2'/>
+    </branch>
+    <branch id='branch20'>
+      <activity role='ED clinician' action='review arrhythmias, troponin result, and response to furosemide' objects='electrocardiogram, troponin result, diuresis response' id='activity13_3'/>
+    </branch>
+  </parallelGateway>
+  <activity role='ED clinician' action='calculate the acute heart failure risk score to assist clinical decision-making and predict 7-day mortality risk' objects='EHMRG score' id='activity14'/>
+  <activity role='ED clinician' action='classify the patient into a low-intensity, average-intensity, or high-intensity risk-stratification group using assessment findings and the heart failure risk score' objects='assessment findings, EHMRG score' id='activity15'/>
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='high-intensity care is required because ventilation and or intensive care unit care is needed or high-risk markers indicate critical instability' id='branch9'>
+      <inclusiveGateway id='inclusivegateway1'>
+        <branch condition='ventilation is indicated' id='branch10'>
+          <exclusiveGateway id='exclusivegateway5'>
+            <branch condition='noninvasive ventilation is indicated' id='branch10a'>
+              <activity role='critical care team' action='start noninvasive ventilation' objects='noninvasive ventilation' id='activity16'/>
+            </branch>
+            <branch condition='invasive ventilation is indicated' id='branch10b'>
+              <activity role='critical care team' action='start invasive ventilation' objects='invasive ventilation' id='activity17'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch condition='intensive care unit admission is indicated' id='branch12'>
+          <activity role='critical care team' action='admit the patient to an intensive care unit with higher nurse-to-patient staffing' objects='ICU bed, higher nurse-to-patient staffing' id='activity18'/>
+        </branch>
+      </inclusiveGateway>
+      <exclusiveGateway id='exclusivegateway3'>
+        <branch condition='a higher level provider is required and not available locally' id='branch13'>
+          <activity role='hospital transfer team' action='activate the pathway to transfer the patient to a higher level provider' objects='transfer pathway' id='activity19'/>
+        </branch>
+        <branch condition='the required higher level provider is available locally' id='branch14'>
+          <activity role='critical care team' action='continue high-intensity management at the current hospital' objects='critical care resources' id='activity20'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch condition='average-intensity care is required' id='branch15a'>
+      <activity role='inpatient care team' action='admit the patient to inpatient care with normal nurse-to-patient staffing for average-intensity care' objects='inpatient bed, normal nurse-to-patient staffing' id='activity23'/>
+    </branch>
+    <branch condition='low-intensity care is sufficient' id='branch15b'>
+      <exclusiveGateway id='exclusivegateway4'>
+        <branch condition='the patient responded to initial treatment in the emergency department and there are no other considerations affecting discharge home' id='branch16'>
+          <activity role='ED clinician' action='complete discharge home planning and provide discharge instructions' objects='ED or outpatient treatment plan, discharge instructions' id='activity21_1'/>
+          <activity role='ED clinician' action='arrange follow-up with the primary care provider within days of emergency department discharge' objects='follow-up appointment, discharge plan' id='activity21_2'/>
+          <activity role='primary care provider' action='see the patient for follow-up within days of discharge from the emergency department' objects='follow-up visit' id='activity22'/>
+        </branch>
+        <branch condition='other considerations support hospital admission despite low-intensity classification' id='branch17'>
+          <activity role='inpatient care team' action='admit the patient to inpatient care with normal nurse-to-patient staffing' objects='inpatient bed, normal nurse-to-patient staffing' id='activity24'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </exclusiveGateway>
+</process>

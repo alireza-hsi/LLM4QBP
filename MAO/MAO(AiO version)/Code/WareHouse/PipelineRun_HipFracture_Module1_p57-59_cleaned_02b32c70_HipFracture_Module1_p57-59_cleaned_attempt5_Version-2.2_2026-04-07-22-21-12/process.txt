@@ -1,0 +1,133 @@
+<process>
+  <activity role='triage nurse or receiving clinician' action='identify suspected hip fracture presentation and apply the same emergency assessment pathway' objects='patient in the ED, outpatient clinic, or direct acute admission setting' id='activity_identify_presentation'/>
+  <activity role='hospital or ED team' action='activate the hip fracture care pathway' objects='perioperative patient goals by day of stay for the identified patient' id='activity_activate_pathway'/>
+  <exclusiveGateway id='exclusivegateway_hospital_capability'>
+    <branch condition='presenting hospital has surgical capability' id='branch_surgical_hospital'>
+      <activity role='receiving clinician' action='confirm management at a surgical-capable hospital and continue the emergency hip fracture pathway' objects='suspected hip fracture patient' id='activity_confirm_surgical_site'/>
+      <parallelGateway id='parallelgateway_surgical_assessment'>
+        <branch id='branch_surgical_physician'>
+          <activity role='ED physician' action='see and medically assess the patient within 1 hour of arrival' objects='suspected hip fracture patient' id='activity_surgical_physician_assessment'/>
+          <activity role='ED physician' action='document reason for the fall, temperature, other collateral injuries, comorbid conditions, and current drug therapy including anticoagulants' objects='patient assessment record' id='activity_surgical_physician_documentation'/>
+        </branch>
+        <branch id='branch_surgical_orthopedic'>
+          <activity role='orthopedic surgeon' action='provide consultation within 2 hours of arrival' objects='suspected hip fracture patient' id='activity_surgical_orthopedic_consult'/>
+          <activity role='ED team' action='make the anesthesiologist and internist aware of the patient' objects='patient status and consultation request' id='activity_surgical_notify_consultants'/>
+          <inclusiveGateway id='inclusivegateway_surgical_consultation_need'>
+            <branch condition='anesthesiology consultation is needed' id='branch_surgical_anesthesiology_needed'>
+              <activity role='anesthesiologist' action='assess the patient and provide consultation' objects='anesthesia and perioperative risk recommendations' id='activity_surgical_anesthesiology_consult'/>
+            </branch>
+            <branch condition='internal medicine consultation is needed' id='branch_surgical_internal_medicine_needed'>
+              <activity role='internist' action='assess the patient and provide consultation' objects='medical optimization recommendations' id='activity_surgical_internal_medicine_consult'/>
+            </branch>
+          </inclusiveGateway>
+        </branch>
+        <branch id='branch_surgical_nursing'>
+          <activity role='nursing staff' action='assess and document fluid balance, pressure sore risk, hydration and nutrition, pain, and continence' objects='ED nursing assessment record' id='activity_surgical_nursing_assessment'/>
+        </branch>
+        <branch id='branch_surgical_diagnostics'>
+          <activity role='diagnostic team' action='initiate diagnostic testing for suspected hip fracture' objects='laboratory and imaging requests' id='activity_surgical_diagnostic_initiation'/>
+          <parallelGateway id='parallelgateway_surgical_diagnostics'>
+            <branch id='branch_surgical_bloodwork'>
+              <activity role='diagnostic team' action='order and complete appropriate blood work tests' objects='laboratory requests and results' id='activity_surgical_bloodwork'/>
+            </branch>
+            <branch id='branch_surgical_xray'>
+              <activity role='diagnostic team' action='order and complete x-rays' objects='imaging requests and results' id='activity_surgical_xray'/>
+            </branch>
+          </parallelGateway>
+        </branch>
+        <branch id='branch_surgical_functional_social'>
+          <activity role='allied health or geriatric assessment team' action='assess and document pre-fracture functional ability and mobility and physical and functional level' objects='functional assessment record' id='activity_surgical_functional_assessment'/>
+          <activity role='allied health or geriatric assessment team' action='assess and document mental state based on pre-morbid functioning level using MMSE, MOCA, or CAM' objects='cognitive assessment record' id='activity_surgical_cognitive_assessment'/>
+          <activity role='allied health or geriatric assessment team' action='assess and document social circumstances including caregiver status, existing community supports, and family involvement' objects='social assessment record' id='activity_surgical_social_assessment'/>
+        </branch>
+        <branch id='branch_surgical_medication_management'>
+          <activity role='pharmacist or nurse' action='complete medication reconciliation within the ED using a standardized form' objects='standardized medication reconciliation form' id='activity_surgical_medication_reconciliation'/>
+          <parallelGateway id='parallelgateway_surgical_management'>
+            <branch id='branch_surgical_hydration_pain'>
+              <activity role='ED team' action='manage hydration and pain within the ED' objects='hydration treatment and pain management measures' id='activity_surgical_hydration_pain_management'/>
+            </branch>
+            <branch id='branch_surgical_delirium_pressure'>
+              <activity role='ED team' action='implement delirium prevention and pressure sore prevention measures within the ED' objects='delirium risk management and pressure sore prevention measures' id='activity_surgical_delirium_pressure_management'/>
+            </branch>
+          </parallelGateway>
+        </branch>
+      </parallelGateway>
+      <activity role='ED team' action='record the comprehensive baseline assessment to inform clinical decision-making, pathway trajectory, discharge planning, and performance measurement' objects='integrated hip fracture assessment record' id='activity_surgical_record_baseline'/>
+      <activity role='admitting team' action='admit 90% of patients within 4 hours spent in the ED' objects='inpatient admission order and bed request' id='activity_surgical_admission'/>
+      <activity role='surgical hospital team' action='continue the inpatient hip fracture pathway toward operation' objects='admitted patient and perioperative goals by day of stay' id='activity_surgical_continue_inpatient_pathway'/>
+    </branch>
+    <branch condition='presenting hospital is a non-surgical hospital' id='branch_nonsurgical_hospital'>
+      <activity role='receiving clinician' action='identify the non-surgical setting and initiate the transfer pathway as early as possible' objects='suspected hip fracture patient' id='activity_identify_nonsurgical_site'/>
+      <parallelGateway id='parallelgateway_nonsurgical_transfer_and_assessment'>
+        <branch id='branch_nonsurgical_transfer'>
+          <activity role='receiving clinician' action='start simultaneous stabilization and transfer coordination' objects='non-surgical hospital response for suspected hip fracture patient' id='activity_nonsurgical_start_transfer_work'/>
+          <parallelGateway id='parallelgateway_nonsurgical_transfer_work'>
+            <branch id='branch_nonsurgical_stabilization'>
+              <activity role='medical team' action='medically stabilize the patient while waiting for expeditious transfer to a surgical hospital for operation' objects='stabilization measures and monitoring' id='activity_nonsurgical_stabilization'/>
+            </branch>
+            <branch id='branch_nonsurgical_transfer_protocol'>
+              <activity role='transfer coordinator and hospitals' action='activate the formal protocol for timely transfer to a surgical hospital' objects='interhospital transfer protocol' id='activity_nonsurgical_activate_transfer_protocol'/>
+              <activity role='transfer coordinator and hospitals' action='arrange receiving hospital acceptance and patient transport' objects='accepted transfer request and transport arrangement' id='activity_nonsurgical_arrange_transfer'/>
+              <activity role='transfer coordinator and hospitals' action='document the repatriation plan to the local hospital after surgery' objects='repatriation plan' id='activity_nonsurgical_document_repatriation'/>
+            </branch>
+          </parallelGateway>
+        </branch>
+        <branch id='branch_nonsurgical_assessment'>
+          <activity role='receiving clinician' action='continue the same emergency hip fracture assessment pathway during transfer planning' objects='suspected hip fracture patient' id='activity_nonsurgical_continue_assessment'/>
+          <parallelGateway id='parallelgateway_nonsurgical_assessment'>
+            <branch id='branch_nonsurgical_physician'>
+              <activity role='ED physician' action='see and medically assess the patient within 1 hour of arrival' objects='suspected hip fracture patient' id='activity_nonsurgical_physician_assessment'/>
+              <activity role='ED physician' action='document reason for the fall, temperature, other collateral injuries, comorbid conditions, and current drug therapy including anticoagulants' objects='patient assessment record' id='activity_nonsurgical_physician_documentation'/>
+            </branch>
+            <branch id='branch_nonsurgical_orthopedic'>
+              <activity role='orthopedic surgeon' action='provide consultation within 2 hours of arrival' objects='suspected hip fracture patient' id='activity_nonsurgical_orthopedic_consult'/>
+              <activity role='ED team' action='make the anesthesiologist and internist aware of the patient' objects='patient status and consultation request' id='activity_nonsurgical_notify_consultants'/>
+              <inclusiveGateway id='inclusivegateway_nonsurgical_consultation_need'>
+                <branch condition='anesthesiology consultation is needed' id='branch_nonsurgical_anesthesiology_needed'>
+                  <activity role='anesthesiologist' action='assess the patient and provide consultation' objects='anesthesia and perioperative risk recommendations' id='activity_nonsurgical_anesthesiology_consult'/>
+                </branch>
+                <branch condition='internal medicine consultation is needed' id='branch_nonsurgical_internal_medicine_needed'>
+                  <activity role='internist' action='assess the patient and provide consultation' objects='medical optimization recommendations' id='activity_nonsurgical_internal_medicine_consult'/>
+                </branch>
+              </inclusiveGateway>
+            </branch>
+            <branch id='branch_nonsurgical_nursing'>
+              <activity role='nursing staff' action='assess and document fluid balance, pressure sore risk, hydration and nutrition, pain, and continence' objects='ED nursing assessment record' id='activity_nonsurgical_nursing_assessment'/>
+            </branch>
+            <branch id='branch_nonsurgical_diagnostics'>
+              <activity role='diagnostic team' action='initiate diagnostic testing for suspected hip fracture' objects='laboratory and imaging requests' id='activity_nonsurgical_diagnostic_initiation'/>
+              <parallelGateway id='parallelgateway_nonsurgical_diagnostics'>
+                <branch id='branch_nonsurgical_bloodwork'>
+                  <activity role='diagnostic team' action='order and complete appropriate blood work tests' objects='laboratory requests and results' id='activity_nonsurgical_bloodwork'/>
+                </branch>
+                <branch id='branch_nonsurgical_xray'>
+                  <activity role='diagnostic team' action='order and complete x-rays' objects='imaging requests and results' id='activity_nonsurgical_xray'/>
+                </branch>
+              </parallelGateway>
+            </branch>
+            <branch id='branch_nonsurgical_functional_social'>
+              <activity role='allied health or geriatric assessment team' action='assess and document pre-fracture functional ability and mobility and physical and functional level' objects='functional assessment record' id='activity_nonsurgical_functional_assessment'/>
+              <activity role='allied health or geriatric assessment team' action='assess and document mental state based on pre-morbid functioning level using MMSE, MOCA, or CAM' objects='cognitive assessment record' id='activity_nonsurgical_cognitive_assessment'/>
+              <activity role='allied health or geriatric assessment team' action='assess and document social circumstances including caregiver status, existing community supports, and family involvement' objects='social assessment record' id='activity_nonsurgical_social_assessment'/>
+            </branch>
+            <branch id='branch_nonsurgical_medication_management'>
+              <activity role='pharmacist or nurse' action='complete medication reconciliation within the ED using a standardized form' objects='standardized medication reconciliation form' id='activity_nonsurgical_medication_reconciliation'/>
+              <parallelGateway id='parallelgateway_nonsurgical_management'>
+                <branch id='branch_nonsurgical_hydration_pain'>
+                  <activity role='ED team' action='manage hydration and pain within the ED' objects='hydration treatment and pain management measures' id='activity_nonsurgical_hydration_pain_management'/>
+                </branch>
+                <branch id='branch_nonsurgical_delirium_pressure'>
+                  <activity role='ED team' action='implement delirium prevention and pressure sore prevention measures within the ED' objects='delirium risk management and pressure sore prevention measures' id='activity_nonsurgical_delirium_pressure_management'/>
+                </branch>
+              </parallelGateway>
+            </branch>
+          </parallelGateway>
+          <activity role='ED team' action='record the comprehensive baseline assessment to inform clinical decision-making, pathway trajectory, discharge planning, and performance measurement' objects='integrated hip fracture assessment record' id='activity_nonsurgical_record_baseline'/>
+        </branch>
+      </parallelGateway>
+      <activity role='acute care team' action='admit or maintain the patient in acute care while transfer arrangements proceed' objects='bed request and ongoing monitoring plan' id='activity_nonsurgical_acute_care'/>
+      <activity role='surgical hospital team' action='receive the transferred patient and perform surgery within 48 hours of the initial presentation' objects='transferred patient' id='activity_nonsurgical_surgery'/>
+      <activity role='care team' action='repatriate the patient to the local hospital after surgery when appropriate' objects='postoperative transfer plan' id='activity_nonsurgical_repatriation'/>
+    </branch>
+  </exclusiveGateway>
+</process>

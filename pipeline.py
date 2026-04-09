@@ -17,8 +17,8 @@ Manifest item format:
   "framework": "ProMoAI" | "MAO (AiO version)",
   "runs": 5,                 # target runs (successful ones if only_successful)
   "name": "PipelineRun",
-  "model": "GPT_5o4",
-  "mapping_model": "gpt-5.4",
+  "model": "GPT_5o2",
+  "mapping_model": "gpt-5.2",
   "use_dedup": false,        # compute similarity both before & after dedup
   "only_successful": false,  # retry failed runs to hit target
   "max_retry_multiplier": 3.0,
@@ -95,10 +95,10 @@ def parse_args():
     p.add_argument("--config", default=None)
     p.add_argument("--org",    default=None)
     p.add_argument("--name",   default="PipelineProject")
-    p.add_argument("--model",  default="GPT_5o4")
+    p.add_argument("--model",  default="GPT_5o2")
     p.add_argument("--mapped-output", default=None)
     p.add_argument("--gold-bpmn-filename", default=None)
-    p.add_argument("--mapping-model", default="gpt-5.4")
+    p.add_argument("--mapping-model", default="gpt-5.2")
     p.add_argument("--use-dedup", action="store_true",
                    help="Compute similarity both before AND after dedup.")
 
@@ -266,7 +266,7 @@ def _strip_eid_prefix(filename: str, eid: str) -> str:
 
 def run_mao(task_file: str, config: str, org: str,
             name: str, model: str, code_root: str,
-            timeout: int = 900) -> str:
+            timeout: int = 1200) -> str:
     script = os.path.join(code_root, "run.py")
     prefix = _conda_prefix(MAO_ENV) or [sys.executable, "-u"]
     cmd = prefix + [
@@ -293,7 +293,7 @@ def run_mao(task_file: str, config: str, org: str,
 
 
 def run_promoai(task_file: str, model: str, code_root: str,
-                project_name: str, timeout: int = 900):
+                project_name: str, timeout: int = 1200):
     prefix = _conda_prefix(PROMOAI_ENV)
     if prefix is None:
         raise RuntimeError("conda not found on PATH; ProMoAI requires the conda environment.")
@@ -439,7 +439,7 @@ def load_jobs(args) -> list:
                     gold_bpmn=item.get("gold_bpmn"),
                     gold_bpmn_filename=item.get("gold_bpmn_filename"),
                     name=item.get("name", "PipelineProject"),
-                    model=item.get("model", "GPT_5o4"),
+                    model=item.get("model", "GPT_5o2"),
                     mapping_model=item.get("mapping_model", "gpt-5.2"),
                     use_dedup=bool(item.get("use_dedup", False)),
                     only_successful=only_succ,
@@ -494,7 +494,7 @@ def run_one_job(job: dict) -> dict:
         print(f"[{job_id}] {msg}", flush=True)
 
     name_prefix     = job.get("name")          or "PipelineProject"
-    model           = job.get("model")         or "GPT_5o4"
+    model           = job.get("model")         or "GPT_5o2"
     mapping_model   = job.get("mapping_model") or "gpt-5.2"
     task_file       = job["task_file"]
     gold_bpmn       = job.get("gold_bpmn")
@@ -550,8 +550,8 @@ def run_one_job(job: dict) -> dict:
 
     except subprocess.CalledProcessError as e:
         stderr = (e.stderr or "").strip()
-        jprint(f"✗ Generation subprocess failed: {stderr[:200] or '(no stderr)'}")
-        return _result("failed_generation", f"subprocess_error: {stderr[:200]}")
+        jprint(f"✗ Generation subprocess failed: {stderr[:500] or '(no stderr)'}")
+        return _result("failed_generation", f"subprocess_error: {stderr[:800]}")
     except subprocess.TimeoutExpired:
         jprint("✗ Generation timed out.")
         return _result("failed_generation", "timeout")
