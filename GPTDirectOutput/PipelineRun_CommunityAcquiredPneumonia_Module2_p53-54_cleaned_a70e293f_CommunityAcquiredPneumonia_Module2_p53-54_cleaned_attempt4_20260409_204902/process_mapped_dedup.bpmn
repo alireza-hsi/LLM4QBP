@@ -1,0 +1,527 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" targetNamespace="http://www.example.com/bpmn" id="Definitions_CAP_Diagnostic_Testing">
+  <process id="Process_Diagnostic_Testing_CAP" name="Module 2 Diagnostic Testing for Community-Acquired Pneumonia" isExecutable="false">
+    <documentation>Recommendations apply in the ED, inpatient ward, or ICU. Chest x-ray is recommended for patients presenting to the ED with symptoms of CAP; CT scan is not recommended. Obtaining a sputum culture is more important when targeted antibiotics are used. A field evaluation was suggested to assess the clinical utility of urine antigen testing.</documentation>
+
+    <startEvent id="StartEvent_Diagnostic_Testing" name="Suspected CAP patient requires diagnostic testing">
+      <outgoing>Flow_1</outgoing>
+    </startEvent>
+
+    <task id="Task_Chest_Xray" name="Perform chest x-ray">
+      <incoming>Flow_1</incoming>
+      <outgoing>Flow_2</outgoing>
+    </task>
+
+    <exclusiveGateway id="Gateway_Sepsis" name="Sepsis present?" gatewayDirection="Diverging">
+      <incoming>Flow_2</incoming>
+      <outgoing>Flow_3</outgoing>
+      <outgoing>Flow_4</outgoing>
+    </exclusiveGateway>
+
+    <task id="Task_Review_Chest_Xray_Results" name="wait for results of&#10;chest x-ray">
+      <incoming>Flow_3</incoming>
+      <outgoing>Flow_5</outgoing>
+    </task>
+
+    <exclusiveGateway id="Gateway_Antibiotic_Timing_Merge" gatewayDirection="Converging">
+      <incoming>Flow_4</incoming>
+      <incoming>Flow_5</incoming>
+      <outgoing>Flow_6</outgoing>
+    </exclusiveGateway>
+
+    <task id="Task_Administer_Antibiotics" name="Give antibiotics">
+      <incoming>Flow_6</incoming>
+      <outgoing>Flow_7</outgoing>
+    </task>
+
+    <exclusiveGateway id="Gateway_Hospital_Admission" name="Admitted to hospital?" gatewayDirection="Diverging">
+      <incoming>Flow_7</incoming>
+      <outgoing>Flow_8</outgoing>
+      <outgoing>Flow_9</outgoing>
+    </exclusiveGateway>
+
+    <endEvent id="EndEvent_No_Admission" name="Diagnostic testing complete without admission">
+      <incoming>Flow_8</incoming>
+    </endEvent>
+
+    <parallelGateway id="Gateway_Admitted_Tests_Split" name="Perform admitted diagnostic tests" gatewayDirection="Diverging">
+      <incoming>Flow_9</incoming>
+      <outgoing>Flow_10</outgoing>
+      <outgoing>Flow_12</outgoing>
+      <outgoing>Flow_14</outgoing>
+      <outgoing>Flow_19</outgoing>
+      <outgoing>Flow_24</outgoing>
+      <outgoing>Flow_32</outgoing>
+      <outgoing>Flow_37</outgoing>
+    </parallelGateway>
+
+    <task id="Task_Measure_Oxygen_Saturation" name="oxygen saturation">
+      <incoming>Flow_10</incoming>
+      <outgoing>Flow_11</outgoing>
+    </task>
+
+    <task id="Task_Routine_Blood_Work" name="Routine blood work: CBC,">
+      <incoming>Flow_12</incoming>
+      <outgoing>Flow_13</outgoing>
+    </task>
+
+    <exclusiveGateway id="Gateway_CRB65_Check" name="More than 2 CRB-65 criteria?" gatewayDirection="Diverging">
+      <incoming>Flow_14</incoming>
+      <outgoing>Flow_15</outgoing>
+      <outgoing>Flow_16</outgoing>
+    </exclusiveGateway>
+
+    <task id="Task_Consider_Blood_Gases_Lactate_Liver_Tests" name="Blood gases">
+      <incoming>Flow_15</incoming>
+      <outgoing>Flow_17</outgoing>
+    </task>
+
+    <exclusiveGateway id="Gateway_CRB65_Merge" gatewayDirection="Converging">
+      <incoming>Flow_16</incoming>
+      <incoming>Flow_17</incoming>
+      <outgoing>Flow_18</outgoing>
+    </exclusiveGateway>
+
+    <inclusiveGateway id="Gateway_Blood_Culture_Indication" name="More than 2 SIRS criteria or ICU admission?" gatewayDirection="Diverging">
+      <incoming>Flow_19</incoming>
+      <outgoing>Flow_20</outgoing>
+      <outgoing>Flow_21</outgoing>
+    </inclusiveGateway>
+
+    <task id="Task_Perform_Blood_Cultures" name="Obtain blood cultures">
+      <incoming>Flow_20</incoming>
+      <outgoing>Flow_22</outgoing>
+    </task>
+
+    <inclusiveGateway id="Gateway_Blood_Culture_Merge" gatewayDirection="Converging">
+      <incoming>Flow_21</incoming>
+      <incoming>Flow_22</incoming>
+      <outgoing>Flow_23</outgoing>
+    </inclusiveGateway>
+
+    <exclusiveGateway id="Gateway_Adequate_Sputum_Sample" name="Adequate sputum sample possible?" gatewayDirection="Diverging">
+      <incoming>Flow_24</incoming>
+      <outgoing>Flow_25</outgoing>
+      <outgoing>Flow_26</outgoing>
+    </exclusiveGateway>
+
+    <task id="Task_Consider_Sputum_Culture" name="Sputum culture">
+      <incoming>Flow_25</incoming>
+      <outgoing>Flow_27</outgoing>
+    </task>
+
+    <exclusiveGateway id="Gateway_Sputum_Culture_Obtained" name="Sputum culture obtained?" gatewayDirection="Diverging">
+      <incoming>Flow_27</incoming>
+      <outgoing>Flow_28</outgoing>
+      <outgoing>Flow_29</outgoing>
+    </exclusiveGateway>
+
+    <task id="Task_Consider_Gram_Stain" name="Gram staining">
+      <incoming>Flow_28</incoming>
+      <outgoing>Flow_30</outgoing>
+    </task>
+
+    <exclusiveGateway id="Gateway_Sputum_Merge" gatewayDirection="Converging">
+      <incoming>Flow_26</incoming>
+      <incoming>Flow_29</incoming>
+      <incoming>Flow_30</incoming>
+      <outgoing>Flow_31</outgoing>
+    </exclusiveGateway>
+
+    <inclusiveGateway id="Gateway_Urine_Antigen_Indication" name="High severity, Legionella surveillance directive, non-response after 48-72 hours, or peak season?" gatewayDirection="Diverging">
+      <incoming>Flow_32</incoming>
+      <outgoing>Flow_33</outgoing>
+      <outgoing>Flow_34</outgoing>
+    </inclusiveGateway>
+
+    <task id="Task_Perform_Urine_Antigen_Test" name="Urine antigen testing">
+      <incoming>Flow_33</incoming>
+      <outgoing>Flow_35</outgoing>
+    </task>
+
+    <inclusiveGateway id="Gateway_Urine_Antigen_Merge" gatewayDirection="Converging">
+      <incoming>Flow_34</incoming>
+      <incoming>Flow_35</incoming>
+      <outgoing>Flow_36</outgoing>
+    </inclusiveGateway>
+
+    <exclusiveGateway id="Gateway_Intubated" name="Intubated patient?" gatewayDirection="Diverging">
+      <incoming>Flow_37</incoming>
+      <outgoing>Flow_38</outgoing>
+      <outgoing>Flow_39</outgoing>
+    </exclusiveGateway>
+
+    <task id="Task_Consider_Legionella_PCR" name="PCR testing for Legionella">
+      <incoming>Flow_38</incoming>
+      <outgoing>Flow_40</outgoing>
+    </task>
+
+    <exclusiveGateway id="Gateway_PCR_Merge" gatewayDirection="Converging">
+      <incoming>Flow_39</incoming>
+      <incoming>Flow_40</incoming>
+      <outgoing>Flow_41</outgoing>
+    </exclusiveGateway>
+
+    <parallelGateway id="Gateway_Admitted_Tests_Join" gatewayDirection="Converging">
+      <incoming>Flow_11</incoming>
+      <incoming>Flow_13</incoming>
+      <incoming>Flow_18</incoming>
+      <incoming>Flow_23</incoming>
+      <incoming>Flow_31</incoming>
+      <incoming>Flow_36</incoming>
+      <incoming>Flow_41</incoming>
+      <outgoing>Flow_42</outgoing>
+    </parallelGateway>
+
+    <endEvent id="EndEvent_Admission_Tests_Complete" name="Inpatient diagnostic testing complete">
+      <incoming>Flow_42</incoming>
+    </endEvent>
+
+    <sequenceFlow id="Flow_1" sourceRef="StartEvent_Diagnostic_Testing" targetRef="Task_Chest_Xray" />
+    <sequenceFlow id="Flow_2" sourceRef="Task_Chest_Xray" targetRef="Gateway_Sepsis" />
+    <sequenceFlow id="Flow_3" name="No" sourceRef="Gateway_Sepsis" targetRef="Task_Review_Chest_Xray_Results" />
+    <sequenceFlow id="Flow_4" name="Yes" sourceRef="Gateway_Sepsis" targetRef="Gateway_Antibiotic_Timing_Merge" />
+    <sequenceFlow id="Flow_5" sourceRef="Task_Review_Chest_Xray_Results" targetRef="Gateway_Antibiotic_Timing_Merge" />
+    <sequenceFlow id="Flow_6" sourceRef="Gateway_Antibiotic_Timing_Merge" targetRef="Task_Administer_Antibiotics" />
+    <sequenceFlow id="Flow_7" sourceRef="Task_Administer_Antibiotics" targetRef="Gateway_Hospital_Admission" />
+    <sequenceFlow id="Flow_8" name="No" sourceRef="Gateway_Hospital_Admission" targetRef="EndEvent_No_Admission" />
+    <sequenceFlow id="Flow_9" name="Yes" sourceRef="Gateway_Hospital_Admission" targetRef="Gateway_Admitted_Tests_Split" />
+    <sequenceFlow id="Flow_10" sourceRef="Gateway_Admitted_Tests_Split" targetRef="Task_Measure_Oxygen_Saturation" />
+    <sequenceFlow id="Flow_11" sourceRef="Task_Measure_Oxygen_Saturation" targetRef="Gateway_Admitted_Tests_Join" />
+    <sequenceFlow id="Flow_12" sourceRef="Gateway_Admitted_Tests_Split" targetRef="Task_Routine_Blood_Work" />
+    <sequenceFlow id="Flow_13" sourceRef="Task_Routine_Blood_Work" targetRef="Gateway_Admitted_Tests_Join" />
+    <sequenceFlow id="Flow_14" sourceRef="Gateway_Admitted_Tests_Split" targetRef="Gateway_CRB65_Check" />
+    <sequenceFlow id="Flow_15" name="Yes" sourceRef="Gateway_CRB65_Check" targetRef="Task_Consider_Blood_Gases_Lactate_Liver_Tests" />
+    <sequenceFlow id="Flow_16" name="No" sourceRef="Gateway_CRB65_Check" targetRef="Gateway_CRB65_Merge" />
+    <sequenceFlow id="Flow_17" sourceRef="Task_Consider_Blood_Gases_Lactate_Liver_Tests" targetRef="Gateway_CRB65_Merge" />
+    <sequenceFlow id="Flow_18" sourceRef="Gateway_CRB65_Merge" targetRef="Gateway_Admitted_Tests_Join" />
+    <sequenceFlow id="Flow_19" sourceRef="Gateway_Admitted_Tests_Split" targetRef="Gateway_Blood_Culture_Indication" />
+    <sequenceFlow id="Flow_20" name="Yes" sourceRef="Gateway_Blood_Culture_Indication" targetRef="Task_Perform_Blood_Cultures" />
+    <sequenceFlow id="Flow_21" name="No" sourceRef="Gateway_Blood_Culture_Indication" targetRef="Gateway_Blood_Culture_Merge" />
+    <sequenceFlow id="Flow_22" sourceRef="Task_Perform_Blood_Cultures" targetRef="Gateway_Blood_Culture_Merge" />
+    <sequenceFlow id="Flow_23" sourceRef="Gateway_Blood_Culture_Merge" targetRef="Gateway_Admitted_Tests_Join" />
+    <sequenceFlow id="Flow_24" sourceRef="Gateway_Admitted_Tests_Split" targetRef="Gateway_Adequate_Sputum_Sample" />
+    <sequenceFlow id="Flow_25" name="Yes" sourceRef="Gateway_Adequate_Sputum_Sample" targetRef="Task_Consider_Sputum_Culture" />
+    <sequenceFlow id="Flow_26" name="No" sourceRef="Gateway_Adequate_Sputum_Sample" targetRef="Gateway_Sputum_Merge" />
+    <sequenceFlow id="Flow_27" sourceRef="Task_Consider_Sputum_Culture" targetRef="Gateway_Sputum_Culture_Obtained" />
+    <sequenceFlow id="Flow_28" name="Yes" sourceRef="Gateway_Sputum_Culture_Obtained" targetRef="Task_Consider_Gram_Stain" />
+    <sequenceFlow id="Flow_29" name="No" sourceRef="Gateway_Sputum_Culture_Obtained" targetRef="Gateway_Sputum_Merge" />
+    <sequenceFlow id="Flow_30" sourceRef="Task_Consider_Gram_Stain" targetRef="Gateway_Sputum_Merge" />
+    <sequenceFlow id="Flow_31" sourceRef="Gateway_Sputum_Merge" targetRef="Gateway_Admitted_Tests_Join" />
+    <sequenceFlow id="Flow_32" sourceRef="Gateway_Admitted_Tests_Split" targetRef="Gateway_Urine_Antigen_Indication" />
+    <sequenceFlow id="Flow_33" name="Yes" sourceRef="Gateway_Urine_Antigen_Indication" targetRef="Task_Perform_Urine_Antigen_Test" />
+    <sequenceFlow id="Flow_34" name="No" sourceRef="Gateway_Urine_Antigen_Indication" targetRef="Gateway_Urine_Antigen_Merge" />
+    <sequenceFlow id="Flow_35" sourceRef="Task_Perform_Urine_Antigen_Test" targetRef="Gateway_Urine_Antigen_Merge" />
+    <sequenceFlow id="Flow_36" sourceRef="Gateway_Urine_Antigen_Merge" targetRef="Gateway_Admitted_Tests_Join" />
+    <sequenceFlow id="Flow_37" sourceRef="Gateway_Admitted_Tests_Split" targetRef="Gateway_Intubated" />
+    <sequenceFlow id="Flow_38" name="Yes" sourceRef="Gateway_Intubated" targetRef="Task_Consider_Legionella_PCR" />
+    <sequenceFlow id="Flow_39" name="No" sourceRef="Gateway_Intubated" targetRef="Gateway_PCR_Merge" />
+    <sequenceFlow id="Flow_40" sourceRef="Task_Consider_Legionella_PCR" targetRef="Gateway_PCR_Merge" />
+    <sequenceFlow id="Flow_41" sourceRef="Gateway_PCR_Merge" targetRef="Gateway_Admitted_Tests_Join" />
+    <sequenceFlow id="Flow_42" sourceRef="Gateway_Admitted_Tests_Join" targetRef="EndEvent_Admission_Tests_Complete" />
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_CAP_Diagnostic_Testing">
+    <bpmndi:BPMNPlane id="BPMNPlane_CAP_Diagnostic_Testing" bpmnElement="Process_Diagnostic_Testing_CAP">
+      <bpmndi:BPMNShape id="Shape_StartEvent_Diagnostic_Testing" bpmnElement="StartEvent_Diagnostic_Testing">
+        <dc:Bounds x="50" y="232" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Chest_Xray" bpmnElement="Task_Chest_Xray">
+        <dc:Bounds x="120" y="210" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Sepsis" bpmnElement="Gateway_Sepsis">
+        <dc:Bounds x="310" y="225" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Review_Chest_Xray_Results" bpmnElement="Task_Review_Chest_Xray_Results">
+        <dc:Bounds x="400" y="210" width="190" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Antibiotic_Timing_Merge" bpmnElement="Gateway_Antibiotic_Timing_Merge">
+        <dc:Bounds x="630" y="225" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Administer_Antibiotics" bpmnElement="Task_Administer_Antibiotics">
+        <dc:Bounds x="720" y="210" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Hospital_Admission" bpmnElement="Gateway_Hospital_Admission">
+        <dc:Bounds x="910" y="225" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_No_Admission" bpmnElement="EndEvent_No_Admission">
+        <dc:Bounds x="1020" y="232" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Admitted_Tests_Split" bpmnElement="Gateway_Admitted_Tests_Split">
+        <dc:Bounds x="910" y="390" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Measure_Oxygen_Saturation" bpmnElement="Task_Measure_Oxygen_Saturation">
+        <dc:Bounds x="1020" y="330" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Routine_Blood_Work" bpmnElement="Task_Routine_Blood_Work">
+        <dc:Bounds x="1020" y="440" width="260" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_CRB65_Check" bpmnElement="Gateway_CRB65_Check">
+        <dc:Bounds x="1020" y="575" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Consider_Blood_Gases_Lactate_Liver_Tests" bpmnElement="Task_Consider_Blood_Gases_Lactate_Liver_Tests">
+        <dc:Bounds x="1120" y="560" width="300" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_CRB65_Merge" bpmnElement="Gateway_CRB65_Merge">
+        <dc:Bounds x="1460" y="575" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Blood_Culture_Indication" bpmnElement="Gateway_Blood_Culture_Indication">
+        <dc:Bounds x="1020" y="695" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Perform_Blood_Cultures" bpmnElement="Task_Perform_Blood_Cultures">
+        <dc:Bounds x="1120" y="680" width="190" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Blood_Culture_Merge" bpmnElement="Gateway_Blood_Culture_Merge">
+        <dc:Bounds x="1350" y="695" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Adequate_Sputum_Sample" bpmnElement="Gateway_Adequate_Sputum_Sample">
+        <dc:Bounds x="1020" y="815" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Consider_Sputum_Culture" bpmnElement="Task_Consider_Sputum_Culture">
+        <dc:Bounds x="1120" y="800" width="230" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Sputum_Culture_Obtained" bpmnElement="Gateway_Sputum_Culture_Obtained">
+        <dc:Bounds x="1390" y="815" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Consider_Gram_Stain" bpmnElement="Task_Consider_Gram_Stain">
+        <dc:Bounds x="1490" y="800" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Sputum_Merge" bpmnElement="Gateway_Sputum_Merge">
+        <dc:Bounds x="1710" y="815" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Urine_Antigen_Indication" bpmnElement="Gateway_Urine_Antigen_Indication">
+        <dc:Bounds x="1020" y="935" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Perform_Urine_Antigen_Test" bpmnElement="Task_Perform_Urine_Antigen_Test">
+        <dc:Bounds x="1120" y="920" width="190" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Urine_Antigen_Merge" bpmnElement="Gateway_Urine_Antigen_Merge">
+        <dc:Bounds x="1350" y="935" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Intubated" bpmnElement="Gateway_Intubated">
+        <dc:Bounds x="1020" y="1055" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Consider_Legionella_PCR" bpmnElement="Task_Consider_Legionella_PCR">
+        <dc:Bounds x="1120" y="1040" width="220" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_PCR_Merge" bpmnElement="Gateway_PCR_Merge">
+        <dc:Bounds x="1380" y="1055" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Admitted_Tests_Join" bpmnElement="Gateway_Admitted_Tests_Join">
+        <dc:Bounds x="1850" y="695" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_Admission_Tests_Complete" bpmnElement="EndEvent_Admission_Tests_Complete">
+        <dc:Bounds x="1960" y="702" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Edge_Flow_1" bpmnElement="Flow_1">
+        <di:waypoint x="86" y="250" />
+        <di:waypoint x="120" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_2" bpmnElement="Flow_2">
+        <di:waypoint x="270" y="250" />
+        <di:waypoint x="310" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_3" bpmnElement="Flow_3">
+        <di:waypoint x="360" y="250" />
+        <di:waypoint x="400" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_4" bpmnElement="Flow_4">
+        <di:waypoint x="360" y="250" />
+        <di:waypoint x="360" y="170" />
+        <di:waypoint x="655" y="170" />
+        <di:waypoint x="655" y="225" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_5" bpmnElement="Flow_5">
+        <di:waypoint x="590" y="250" />
+        <di:waypoint x="630" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_6" bpmnElement="Flow_6">
+        <di:waypoint x="680" y="250" />
+        <di:waypoint x="720" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_7" bpmnElement="Flow_7">
+        <di:waypoint x="870" y="250" />
+        <di:waypoint x="910" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_8" bpmnElement="Flow_8">
+        <di:waypoint x="960" y="250" />
+        <di:waypoint x="1020" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_9" bpmnElement="Flow_9">
+        <di:waypoint x="935" y="275" />
+        <di:waypoint x="935" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_10" bpmnElement="Flow_10">
+        <di:waypoint x="960" y="415" />
+        <di:waypoint x="990" y="415" />
+        <di:waypoint x="990" y="370" />
+        <di:waypoint x="1020" y="370" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_11" bpmnElement="Flow_11">
+        <di:waypoint x="1200" y="370" />
+        <di:waypoint x="1800" y="370" />
+        <di:waypoint x="1800" y="720" />
+        <di:waypoint x="1850" y="720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_12" bpmnElement="Flow_12">
+        <di:waypoint x="960" y="415" />
+        <di:waypoint x="990" y="415" />
+        <di:waypoint x="990" y="480" />
+        <di:waypoint x="1020" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_13" bpmnElement="Flow_13">
+        <di:waypoint x="1280" y="480" />
+        <di:waypoint x="1800" y="480" />
+        <di:waypoint x="1800" y="720" />
+        <di:waypoint x="1850" y="720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_14" bpmnElement="Flow_14">
+        <di:waypoint x="960" y="415" />
+        <di:waypoint x="990" y="415" />
+        <di:waypoint x="990" y="600" />
+        <di:waypoint x="1020" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_15" bpmnElement="Flow_15">
+        <di:waypoint x="1070" y="600" />
+        <di:waypoint x="1120" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_16" bpmnElement="Flow_16">
+        <di:waypoint x="1070" y="600" />
+        <di:waypoint x="1070" y="650" />
+        <di:waypoint x="1460" y="650" />
+        <di:waypoint x="1460" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_17" bpmnElement="Flow_17">
+        <di:waypoint x="1420" y="600" />
+        <di:waypoint x="1460" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_18" bpmnElement="Flow_18">
+        <di:waypoint x="1510" y="600" />
+        <di:waypoint x="1800" y="600" />
+        <di:waypoint x="1800" y="720" />
+        <di:waypoint x="1850" y="720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_19" bpmnElement="Flow_19">
+        <di:waypoint x="960" y="415" />
+        <di:waypoint x="990" y="415" />
+        <di:waypoint x="990" y="720" />
+        <di:waypoint x="1020" y="720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_20" bpmnElement="Flow_20">
+        <di:waypoint x="1070" y="720" />
+        <di:waypoint x="1120" y="720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_21" bpmnElement="Flow_21">
+        <di:waypoint x="1070" y="720" />
+        <di:waypoint x="1070" y="770" />
+        <di:waypoint x="1350" y="770" />
+        <di:waypoint x="1350" y="720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_22" bpmnElement="Flow_22">
+        <di:waypoint x="1310" y="720" />
+        <di:waypoint x="1350" y="720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_23" bpmnElement="Flow_23">
+        <di:waypoint x="1400" y="720" />
+        <di:waypoint x="1850" y="720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_24" bpmnElement="Flow_24">
+        <di:waypoint x="960" y="415" />
+        <di:waypoint x="990" y="415" />
+        <di:waypoint x="990" y="840" />
+        <di:waypoint x="1020" y="840" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_25" bpmnElement="Flow_25">
+        <di:waypoint x="1070" y="840" />
+        <di:waypoint x="1120" y="840" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_26" bpmnElement="Flow_26">
+        <di:waypoint x="1070" y="840" />
+        <di:waypoint x="1070" y="895" />
+        <di:waypoint x="1710" y="895" />
+        <di:waypoint x="1710" y="840" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_27" bpmnElement="Flow_27">
+        <di:waypoint x="1350" y="840" />
+        <di:waypoint x="1390" y="840" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_28" bpmnElement="Flow_28">
+        <di:waypoint x="1440" y="840" />
+        <di:waypoint x="1490" y="840" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_29" bpmnElement="Flow_29">
+        <di:waypoint x="1440" y="840" />
+        <di:waypoint x="1440" y="895" />
+        <di:waypoint x="1710" y="895" />
+        <di:waypoint x="1710" y="840" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_30" bpmnElement="Flow_30">
+        <di:waypoint x="1670" y="840" />
+        <di:waypoint x="1710" y="840" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_31" bpmnElement="Flow_31">
+        <di:waypoint x="1760" y="840" />
+        <di:waypoint x="1800" y="840" />
+        <di:waypoint x="1800" y="720" />
+        <di:waypoint x="1850" y="720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_32" bpmnElement="Flow_32">
+        <di:waypoint x="960" y="415" />
+        <di:waypoint x="990" y="415" />
+        <di:waypoint x="990" y="960" />
+        <di:waypoint x="1020" y="960" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_33" bpmnElement="Flow_33">
+        <di:waypoint x="1070" y="960" />
+        <di:waypoint x="1120" y="960" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_34" bpmnElement="Flow_34">
+        <di:waypoint x="1070" y="960" />
+        <di:waypoint x="1070" y="1010" />
+        <di:waypoint x="1350" y="1010" />
+        <di:waypoint x="1350" y="960" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_35" bpmnElement="Flow_35">
+        <di:waypoint x="1310" y="960" />
+        <di:waypoint x="1350" y="960" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_36" bpmnElement="Flow_36">
+        <di:waypoint x="1400" y="960" />
+        <di:waypoint x="1800" y="960" />
+        <di:waypoint x="1800" y="720" />
+        <di:waypoint x="1850" y="720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_37" bpmnElement="Flow_37">
+        <di:waypoint x="960" y="415" />
+        <di:waypoint x="990" y="415" />
+        <di:waypoint x="990" y="1080" />
+        <di:waypoint x="1020" y="1080" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_38" bpmnElement="Flow_38">
+        <di:waypoint x="1070" y="1080" />
+        <di:waypoint x="1120" y="1080" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_39" bpmnElement="Flow_39">
+        <di:waypoint x="1070" y="1080" />
+        <di:waypoint x="1070" y="1130" />
+        <di:waypoint x="1380" y="1130" />
+        <di:waypoint x="1380" y="1080" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_40" bpmnElement="Flow_40">
+        <di:waypoint x="1340" y="1080" />
+        <di:waypoint x="1380" y="1080" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_41" bpmnElement="Flow_41">
+        <di:waypoint x="1430" y="1080" />
+        <di:waypoint x="1800" y="1080" />
+        <di:waypoint x="1800" y="720" />
+        <di:waypoint x="1850" y="720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_42" bpmnElement="Flow_42">
+        <di:waypoint x="1900" y="720" />
+        <di:waypoint x="1960" y="720" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

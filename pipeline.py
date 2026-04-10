@@ -266,7 +266,7 @@ def _strip_eid_prefix(filename: str, eid: str) -> str:
 
 def run_mao(task_file: str, config: str, org: str,
             name: str, model: str, code_root: str,
-            timeout: int = 1200) -> str:
+            timeout: int = 900) -> str:
     script = os.path.join(code_root, "run.py")
     prefix = _conda_prefix(MAO_ENV) or [sys.executable, "-u"]
     cmd = prefix + [
@@ -292,8 +292,56 @@ def run_mao(task_file: str, config: str, org: str,
     return output_lines[-1]
 
 
+def run_gpt_direct(task_file: str, model: str, code_root: str,
+                   project_name: str, retry_mode: str = "full",
+                   timeout: int = None):
+    """
+    Run the GPT Direct framework — calls gpt_direct_api.py as a subprocess.
+    retry_mode ∈ {"none", "repair", "full"}.
+    Returns (bpmn_path: str, retries_summary: str).
+
+    timeout is intentionally None by default: gpt_direct_api.py applies its
+    own per-call API timeout (1 hour) which is the correct governing limit.
+    Reasoning models (gpt-5.4 xhigh) can legitimately take 20–60 min per call,
+    so a subprocess-level timeout would fire before the model finishes.
+    """
+    script = os.path.join(code_root, "gpt_direct_api.py")
+    if not os.path.exists(script):
+        raise FileNotFoundError(
+            f"gpt_direct_api.py not found at {script}. "
+            "Place gpt_direct_api.py in the repo root."
+        )
+
+    cmd = [
+        sys.executable, "-u", script,
+        "--task-file",    task_file,
+        "--model",        model,
+        "--output-dir",   "GPTDirectOutput",
+        "--project-name", project_name,
+        "--retry-mode",   retry_mode,
+    ]
+
+    result = subprocess.run(
+        cmd,
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=timeout,   # None = no subprocess-level timeout
+    )
+
+    gpt_retries = None
+    bpmn_path   = None
+    for line in result.stdout.strip().splitlines():
+        if line.startswith("GPT_DIRECT_RETRIES:"):
+            gpt_retries = line.split("GPT_DIRECT_RETRIES:", 1)[1].strip()
+        elif line.endswith(".bpmn"):
+            bpmn_path = line.strip()
+
+    return bpmn_path, gpt_retries
+
+
 def run_promoai(task_file: str, model: str, code_root: str,
-                project_name: str, timeout: int = 1200):
+                project_name: str, timeout: int = 900):
     prefix = _conda_prefix(PROMOAI_ENV)
     if prefix is None:
         raise RuntimeError("conda not found on PATH; ProMoAI requires the conda environment.")
@@ -376,26 +424,28 @@ def compare_bpmn(gold: str, candidate: str):
 def _make_job(eid, qbp, framework, run_idx, task_file, gold_bpmn,
               gold_bpmn_filename, name, model, mapping_model,
               use_dedup, only_successful, max_retry_multiplier,
-              target_runs, config, org, mapped_output) -> dict:
+              target_runs, config, org, mapped_output,
+              gpt_direct_retry_mode="full") -> dict:
     return {
-        "job_id":               f"{eid}:{qbp}:attempt{run_idx}",
-        "id":                   eid,
-        "qbp":                  qbp,
-        "framework":            framework,
-        "run_idx":              run_idx,
-        "task_file":            task_file,
-        "gold_bpmn":            gold_bpmn,
-        "gold_bpmn_filename":   gold_bpmn_filename,
-        "name":                 name,
-        "model":                model,
-        "mapping_model":        mapping_model,
-        "use_dedup":            use_dedup,
-        "only_successful":      only_successful,
-        "max_retry_multiplier": max_retry_multiplier,
-        "target_runs":          target_runs,
-        "config":               config,
-        "org":                  org,
-        "mapped_output":        mapped_output,
+        "job_id":                   f"{eid}:{qbp}:attempt{run_idx}",
+        "id":                       eid,
+        "qbp":                      qbp,
+        "framework":                framework,
+        "run_idx":                  run_idx,
+        "task_file":                task_file,
+        "gold_bpmn":                gold_bpmn,
+        "gold_bpmn_filename":       gold_bpmn_filename,
+        "name":                     name,
+        "model":                    model,
+        "mapping_model":            mapping_model,
+        "use_dedup":                use_dedup,
+        "only_successful":          only_successful,
+        "max_retry_multiplier":     max_retry_multiplier,
+        "target_runs":              target_runs,
+        "config":                   config,
+        "org":                      org,
+        "mapped_output":            mapped_output,
+        "gpt_direct_retry_mode":    gpt_direct_retry_mode,
     }
 
 
@@ -418,7 +468,7 @@ def load_jobs(args) -> list:
         for item in manifest:
             eid       = item.get("id") or "noid"
             framework = item.get("framework", "")
-            if framework not in ("ProMoAI", "MAO (AiO version)"):
+            if framework not in ("ProMoAI", "MAO (AiO version)", "GPT Direct"):
                 raise ValueError(f"Invalid framework in manifest: {framework!r}")
 
             task_file = item.get("task_file")
@@ -448,12 +498,16 @@ def load_jobs(args) -> list:
                     config=item.get("config"),
                     org=item.get("org"),
                     mapped_output=item.get("mapped_output"),
+                    gpt_direct_retry_mode=item.get("gpt_direct_retry_mode", "full"),
                 ))
         return jobs
 
     # ── Single mode ────────────────────────────────────────────────────────
     if not args.framework or not args.task_file:
         raise ValueError("Single mode requires --framework and --task-file.")
+
+    if args.framework not in ("ProMoAI", "MAO (AiO version)", "GPT Direct"):
+        raise ValueError(f"Unknown framework: {args.framework!r}")
 
     base    = _stem(args.task_file)
     gold_fn = (args.gold_bpmn_filename
@@ -472,6 +526,7 @@ def load_jobs(args) -> list:
             target_runs=args.runs,
             config=args.config, org=args.org,
             mapped_output=args.mapped_output,
+            gpt_direct_retry_mode=getattr(args, "gpt_direct_retry_mode", "full"),
         ))
     return jobs
 
@@ -544,14 +599,20 @@ def run_one_job(job: dict) -> dict:
                 raise ValueError("MAO experiment is missing 'config' and/or 'org'.")
             code_root = os.path.join("MAO", "MAO(AiO version)", "Code")
             gen_bpmn  = run_mao(task_file, config, org, run_name, model, code_root)
+        elif framework == "GPT Direct":
+            retry_mode = job.get("gpt_direct_retry_mode", "full")
+            code_root  = os.path.dirname(os.path.abspath(__file__))
+            gen_bpmn, promoai_retries = run_gpt_direct(
+                task_file, model, code_root, run_name, retry_mode=retry_mode
+            )
         else:
             code_root = os.path.join("ProMoAI")
             gen_bpmn, promoai_retries = run_promoai(task_file, model, code_root, run_name)
 
     except subprocess.CalledProcessError as e:
         stderr = (e.stderr or "").strip()
-        jprint(f"✗ Generation subprocess failed: {stderr[:500] or '(no stderr)'}")
-        return _result("failed_generation", f"subprocess_error: {stderr[:800]}")
+        jprint(f"✗ Generation subprocess failed:\n{stderr or '(no stderr)'}")
+        return _result("failed_generation", f"subprocess_error: {stderr}")
     except subprocess.TimeoutExpired:
         jprint("✗ Generation timed out.")
         return _result("failed_generation", "timeout")
@@ -571,18 +632,21 @@ def run_one_job(job: dict) -> dict:
 
     jprint(f"✔ Generated: {gen_bpmn}")
 
-    # Determine framework label for DB (e.g., "MAO-v3.8")
+    # Determine framework label for DB
     if framework == "MAO (AiO version)" and config:
         framework_db = "MAO-v" + config.replace("Version-", "")
+    elif framework == "GPT Direct":
+        retry_mode   = job.get("gpt_direct_retry_mode", "full")
+        framework_db = f"GPT-Direct-{retry_mode}"
     else:
         framework_db = framework
 
     # No gold BPMN → log generation only, no similarity
     if not gold_bpmn:
         r = _result("ok_no_gold")
-        r["framework"]      = framework_db
-        r["generated_bpmn"] = gen_bpmn
-        r["promoai_retries"] = promoai_retries if framework == "ProMoAI" else None
+        r["framework"]       = framework_db
+        r["generated_bpmn"]  = gen_bpmn
+        r["promoai_retries"] = promoai_retries if framework in ("ProMoAI", "GPT Direct") else None
         return r
 
     # ── Step 2: Activity mapping ──────────────────────────────────────────
@@ -598,9 +662,9 @@ def run_one_job(job: dict) -> dict:
     except Exception as e:
         jprint(f"✗ Activity mapping failed: {e}")
         r = _result("failed_mapping", str(e))
-        r["framework"]      = framework_db
-        r["generated_bpmn"] = gen_bpmn
-        r["promoai_retries"] = promoai_retries if framework == "ProMoAI" else None
+        r["framework"]       = framework_db
+        r["generated_bpmn"]  = gen_bpmn
+        r["promoai_retries"] = promoai_retries if framework in ("ProMoAI", "GPT Direct") else None
         return r
 
     # ── Step 3: Pre-dedup similarity ─────────────────────────────────────

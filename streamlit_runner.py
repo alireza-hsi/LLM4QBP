@@ -596,7 +596,7 @@ with tab_batch:
             col_l, col_r = st.columns(2)
             with col_l:
                 fw = st.selectbox(
-                    "Framework", ["ProMoAI", "MAO (AiO version)"],
+                    "Framework", ["ProMoAI", "MAO (AiO version)", "GPT Direct"],
                     key=f"framework_{eid}",
                 )
                 runs_label = "Target *successful* runs per QBP" if only_successful else "Runs per QBP"
@@ -610,6 +610,25 @@ with tab_batch:
                     st.selectbox("MAO Version", MAO_CONFIG_OPTIONS, key=f"config_{eid}")
                     cfg_val = st.session_state.get(f"config_{eid}", MAO_CONFIG_OPTIONS[0])
                     st.text_input("MAO Organisation", value=cfg_val, key=f"org_{eid}")
+                elif fw == "GPT Direct":
+                    st.info(
+                        "GPT is prompted directly to produce BPMN 2.0 XML from the "
+                        "task description. No extra configuration needed.",
+                        icon="🤖",
+                    )
+                    st.selectbox(
+                        "Retry mode",
+                        ["none", "repair", "full"],
+                        key=f"gpt_retry_mode_{eid}",
+                        help=(
+                            "**none** — single API call, accept whatever comes back. "
+                            "Pure zero-shot baseline, no validation retries.\n\n"
+                            "**repair** — one generation + up to 3 repair rounds "
+                            "where validation errors are fed back to the model.\n\n"
+                            "**full** — up to 3 fresh generations × 3 repairs each. "
+                            "Most robust, but uses more API calls."
+                        ),
+                    )
 
             # ── File uploaders ───────────────────────────────────────────
             st.divider()
@@ -814,6 +833,8 @@ with tab_batch:
             dedup    = bool(st.session_state.get(f"use_dedup_{eid}", False))
             config   = st.session_state.get(f"config_{eid}") if fw == "MAO (AiO version)" else None
             org      = st.session_state.get(f"org_{eid}")    if fw == "MAO (AiO version)" else None
+            gpt_retry = st.session_state.get(f"gpt_retry_mode_{eid}", "full") \
+                        if fw == "GPT Direct" else "full"
 
             # Shared manifest entry fields
             shared = dict(
@@ -822,6 +843,7 @@ with tab_batch:
                 only_successful=only_successful,
                 max_retry_multiplier=max_retry_multiplier,
                 config=config, org=org,
+                gpt_direct_retry_mode=gpt_retry,
             )
 
             if st.session_state.get(f"multi_mode_{eid}", False):
