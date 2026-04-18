@@ -1,0 +1,189 @@
+<process>
+  <parallelGateway id='parallelgateway_initial_concurrent_1'>
+    <branch id='branch_initial_assessment_1'>
+      <parallelGateway id='parallelgateway_vitals_1'>
+        <branch id='branch_vitals_1'>
+          <activity role='clinician' action='Assess for hypoventilation' objects='' id='activity1_1'/>
+        </branch>
+        <branch id='branch_vitals_2'>
+          <activity role='clinician' action='Check level of consciousness/cognition' objects='' id='activity1_2'/>
+        </branch>
+        <branch id='branch_vitals_3'>
+          <activity role='clinician' action='Check blood-oxygen saturation level via pulse oximetry' objects='pulse oximetry' id='activity1_3'/>
+        </branch>
+        <branch id='branch_vitals_4'>
+          <activity role='clinician' action='Assess whether patient has purulent sputum' objects='purulent sputum' id='activity1_4'/>
+        </branch>
+      </parallelGateway>
+
+      <activity role='clinician' action='Perform a physical examination' objects='' id='activity2'/>
+      <activity role='clinician' action='Check patient history' objects='' id='activity3'/>
+      <activity role='clinician' action='Document and reconcile medications currently used by patient' objects='current medications' id='activity4'/>
+
+      <parallelGateway id='parallelgateway_tests_interpret_1'>
+        <branch id='branch_tests_interpret_ecg_1'>
+          <activity role='clinician' action='Perform an electrocardiogram' objects='check for arrhythmias, myocardial ischemia, right ventricular strain, etc.' id='activity10'/>
+          <activity role='healthcare expert' action='Interpret test result' objects='electrocardiogram (ECG) result' id='activity10_interpret'/>
+        </branch>
+
+        <branch id='branch_tests_interpret_cxr_1_mod'>
+          <exclusiveGateway id='exclusivegateway_cxr_required_1'>
+            <branch condition='chest x-ray is required' id='branch_cxr_required_yes_1'>
+              <parallelGateway id='parallelgateway_cxr_options_join_1_mod'>
+                <branch id='branch_cxr_view_1_mod'>
+                  <exclusiveGateway id='exclusivegateway_cxr_portable_vs_standard_1_mod'>
+                    <branch condition='patient is too unwell to leave emergency department' id='branch_cxr_portable_1_mod'>
+                      <activity role='clinician' action='Perform a chest x-ray' objects='portable x-ray' id='activity_cxr_portable_1_mod'/>
+                    </branch>
+                    <branch condition='patient is not too unwell to leave emergency department' id='branch_cxr_standard_1_mod'>
+                      <activity role='clinician' action='Perform a chest x-ray' objects='posteroanterior and lateral' id='activity_cxr_standard_1_mod'/>
+                    </branch>
+                  </exclusiveGateway>
+                </branch>
+                <branch id='branch_cxr_expiratory_optional_1_mod'>
+                  <exclusiveGateway id='exclusivegateway_cxr_expiratory_optional_1_mod'>
+                    <branch condition='concerned with pneumothorax' id='branch_cxr_expiratory_yes_1_mod'>
+                      <activity role='clinician' action='Perform a chest x-ray' objects='expiratory view' id='activity_cxr_expiratory_1_mod'/>
+                    </branch>
+                    <branch condition='not concerned with pneumothorax' id='branch_cxr_expiratory_no_1_mod'>
+                      <activity role='clinician' action='Proceed without expiratory view' objects='' id='activity_cxr_no_expiratory_1_mod'/>
+                    </branch>
+                  </exclusiveGateway>
+                </branch>
+              </parallelGateway>
+              <activity role='healthcare expert' action='Interpret test result' objects='chest x-ray result (including any expiratory view if performed)' id='activity_cxr_interpret_1_mod'/>
+            </branch>
+            <branch condition='chest x-ray is not required / deferred to avoid delaying assessment' id='branch_cxr_required_no_1'>
+              <activity role='clinician' action='Skip chest x-ray and continue assessment' objects='' id='activity_cxr_skip_1'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+
+        <branch id='branch_tests_interpret_labs_1'>
+          <parallelGateway id='parallelgateway10_1'>
+            <branch id='branch10_1'>
+              <activity role='clinician' action='Conduct complete blood count' objects='complete blood count' id='activity9_1'/>
+            </branch>
+            <branch id='branch10_2'>
+              <activity role='clinician' action='Conduct electrolytes' objects='electrolytes' id='activity9_2'/>
+            </branch>
+            <branch id='branch10_3'>
+              <activity role='clinician' action='Conduct creatinine' objects='creatinine' id='activity9_3'/>
+            </branch>
+            <branch id='branch10_4'>
+              <activity role='clinician' action='Conduct blood urea nitrogen (if available)' objects='blood urea nitrogen' id='activity9_4'/>
+            </branch>
+          </parallelGateway>
+          <activity role='healthcare expert' action='Interpret test result' objects='baseline blood work results (complete blood count, electrolytes, creatinine, blood urea nitrogen)' id='activity_labs_interpret'/>
+        </branch>
+      </parallelGateway>
+
+      <exclusiveGateway id='exclusivegateway3'>
+        <branch condition='low oxygen saturation on oximetry and/or acute respiratory failure is suspected' id='branch13'>
+          <activity role='clinician' action='Check arterial blood gases where appropriate' objects='arterial blood gases' id='activity11'/>
+          <activity role='healthcare expert' action='Interpret test result' objects='arterial blood gases (ABG) result' id='activity11_interpret_1'/>
+        </branch>
+        <branch condition='low oxygen saturation on oximetry and/or acute respiratory failure is not suspected' id='branch14'>
+          <activity role='clinician' action='No additional test required' objects='' id='activity_noop_3'/>
+        </branch>
+      </exclusiveGateway>
+
+      <exclusiveGateway id='exclusivegateway4'>
+        <branch condition='pneumonia or suspected sepsis' id='branch16'>
+          <activity role='clinician' action='Draw blood cultures' objects='blood cultures' id='activity13'/>
+          <activity role='healthcare expert' action='Interpret test result' objects='blood culture result' id='activity13_interpret_1'/>
+        </branch>
+        <branch condition='not pneumonia or suspected sepsis' id='branch17'>
+          <activity role='clinician' action='No additional test required' objects='' id='activity_noop_4'/>
+        </branch>
+      </exclusiveGateway>
+
+      <exclusiveGateway id='exclusivegateway5'>
+        <branch condition='suspected cardiac disorders (if appropriate)' id='branch19'>
+          <activity role='clinician' action='Examine cardiac markers' objects='cardiac markers' id='activity15'/>
+          <activity role='healthcare expert' action='Interpret test result' objects='cardiac markers result' id='activity15_interpret_1'/>
+        </branch>
+        <branch condition='cardiac disorders not suspected / not appropriate' id='branch20'>
+          <activity role='clinician' action='No additional test required' objects='' id='activity_noop_5'/>
+        </branch>
+      </exclusiveGateway>
+
+      <activity role='clinician' action='Identify patient wishes with respect to goals of care and/or limitations of treatment (code status)' objects='goals of care; limitations of treatment' id='activity17'/>
+      <activity role='clinician' action='Perform other diagnostic interventions as appropriate to identify and/or rule out other suspected diagnoses or comorbidities' objects='other diagnostic interventions' id='activity18'/>
+
+      <exclusiveGateway id='exclusivegateway6'>
+        <branch condition='patient has stabilized AND patient has no prior objective documentation of COPD through spirometry' id='branch23'>
+          <activity role='clinician' action='Perform spirometry once the patient has stabilized' objects='spirometry' id='activity21'/>
+          <activity role='healthcare expert' action='Interpret test result' objects='spirometry result' id='activity21_interpret_1'/>
+        </branch>
+        <branch condition='otherwise' id='branch24'>
+          <activity role='clinician' action='No spirometry required' objects='' id='activity_noop_6'/>
+        </branch>
+      </exclusiveGateway>
+
+      <parallelGateway id='parallelgateway23_1'>
+        <branch id='branch23_1'>
+          <activity role='clinician' action='Use clinical judgment' objects='' id='activity23_1'/>
+        </branch>
+        <branch id='branch23_2'>
+          <activity role='clinician' action='Consider availability of local resources' objects='local resources' id='activity23_2'/>
+        </branch>
+        <branch id='branch23_3'>
+          <activity role='clinician' action='Use NICE and/or GOLD criteria as a guide' objects='NICE and/or GOLD criteria' id='activity23_3'/>
+          <parallelGateway id='parallelgateway23_2'>
+            <branch id='branch23_3_1'>
+              <activity role='clinician' action='Assess failure of an exacerbation to respond to initial medical management' objects='' id='activity23_4'/>
+            </branch>
+            <branch id='branch23_3_2'>
+              <activity role='clinician' action='Assess insufficient home support/inability to cope at home' objects='' id='activity23_5'/>
+            </branch>
+            <branch id='branch23_3_3'>
+              <activity role='clinician' action='Assess breathlessness or marked increase in intensity of symptoms (development of resting dyspnea)' objects='' id='activity23_6'/>
+            </branch>
+            <branch id='branch23_3_4'>
+              <activity role='clinician' action='Assess general condition and severe underlying COPD' objects='' id='activity23_7'/>
+            </branch>
+            <branch id='branch23_3_5'>
+              <activity role='clinician' action='Assess decreased level of activity' objects='' id='activity23_8'/>
+            </branch>
+            <branch id='branch23_3_6'>
+              <activity role='clinician' action='Assess cyanosis' objects='' id='activity23_9'/>
+            </branch>
+            <branch id='branch23_3_7'>
+              <activity role='clinician' action='Assess worsening peripheral edema or onset of new physical signs (cyanosis, fatigue, inability to stand)' objects='' id='activity23_10'/>
+            </branch>
+            <branch id='branch23_3_8'>
+              <activity role='clinician' action='Assess decreased level of consciousness' objects='' id='activity23_11'/>
+            </branch>
+            <branch id='branch23_3_9'>
+              <activity role='clinician' action='Assess whether patient is already receiving long-term oxygen therapy' objects='long-term oxygen therapy' id='activity23_12'/>
+            </branch>
+            <branch id='branch23_3_10'>
+              <activity role='clinician' action='Assess social circumstances/older age' objects='' id='activity23_13'/>
+            </branch>
+            <branch id='branch23_3_11'>
+              <activity role='clinician' action='Assess acute confusion' objects='' id='activity23_14'/>
+            </branch>
+            <branch id='branch23_3_12'>
+              <activity role='clinician' action='Assess rapid rate of onset or frequent exacerbations' objects='' id='activity23_15'/>
+            </branch>
+            <branch id='branch23_3_13'>
+              <activity role='clinician' action='Assess significant comorbidity (heart failure, newly occurring arrhythmias)' objects='' id='activity23_16'/>
+            </branch>
+            <branch id='branch23_3_14'>
+              <activity role='clinician' action='Assess arterial oxygen saturation (SaO2) &lt; 90%, pH level, and partial pressure of oxygen (PaO2)' objects='SaO2; pH level; PaO2' id='activity23_17'/>
+            </branch>
+            <branch id='branch23_3_15'>
+              <activity role='clinician' action='Assess changes on chest x-ray' objects='chest x-ray' id='activity23_18'/>
+            </branch>
+          </parallelGateway>
+        </branch>
+      </parallelGateway>
+    </branch>
+
+    <branch id='branch_ed_admission_eval_1'>
+      <activity role='clinician' action='Trial immediate resuscitation on initial presentation at the ED' objects='' id='activity19'/>
+      <activity role='clinician' action='Re-evaluate for admission' objects='' id='activity20'/>
+    </branch>
+  </parallelGateway>
+</process>

@@ -1,0 +1,94 @@
+<process>
+  <parallelGateway id='parallelgateway1-1'>
+    <branch id='branch1-1'>
+      <activity role='ED/Clinic/Acuity Nurse' action='Assess airway' objects='patient' id='activity1-1'/>
+    </branch>
+    <branch id='branch1-2'>
+      <activity role='ED/Clinic/Acuity Nurse' action='Assess breathing' objects='patient' id='activity1-2'/>
+    </branch>
+    <branch id='branch1-3'>
+      <activity role='ED/Clinic/Acuity Nurse' action='Assess circulation' objects='patient' id='activity1-3'/>
+    </branch>
+  </parallelGateway>
+  <activity role='ED/Clinic Physician or Stroke Team' action='Perform neurological examination and assess stroke severity using NIHSS or CNS' objects='patient' id='activity2'/>
+  <activity role='ED/Clinic Physician or Stroke Team' action='Assess for disabling, acute neurological symptoms suggestive of acute stroke within 6 hours of onset and eligibility for endovascular therapy (treatment within 12 hours)' objects='patient, clinical criteria, imaging criteria' id='activity3'/>
+  <activity role='ED/Clinic Physician or Stroke Team' action='Order non-contrast CT' objects='patient, imaging equipment' id='activity4-1'/>
+  <exclusiveGateway id='exclusivegateway2-1'>
+    <branch condition='CTA indicated' id='branch2-1'>
+      <activity role='ED/Clinic Physician or Stroke Team' action='Order CTA' objects='patient, imaging equipment' id='activity4-2'/>
+    </branch>
+    <branch condition='CTA not indicated' id='branch2-2'>
+      <activity role='ED/Clinic Physician or Stroke Team' action='No CTA performed' objects='patient' id='activity4-2b'/>
+    </branch>
+  </exclusiveGateway>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='MRI indicated' id='branch2-3-1'>
+      <activity role='ED/Clinic Physician or Stroke Team' action='Order MRI' objects='patient, imaging equipment' id='activity4-3'/>
+    </branch>
+    <branch condition='MRI not indicated' id='branch2-3-2'>
+      <activity role='ED/Clinic Physician or Stroke Team' action='No MRI performed' objects='patient' id='activity4-4'/>
+    </branch>
+  </exclusiveGateway>
+  <parallelGateway id='parallelgateway2'>
+    <branch id='branch2-4'>
+      <activity role='ED/Clinic Physician or Stroke Team' action='Order and perform ECG to detect atrial fibrillation and other acute arrhythmias (do not delay acute treatment)' objects='patient, ECG' id='activity5'/>
+    </branch>
+    <branch id='branch2-5'>
+      <activity role='ED/Clinic Physician or Stroke Team' action='Order chest x-ray (do not delay assessment for thrombolysis)' objects='patient, chest x-ray' id='activity6'/>
+    </branch>
+    <branch id='branch2-6'>
+      <parallelGateway id='parallelgateway2-6'>
+        <branch id='branch2-6-1'>
+          <activity role='ED/Clinic Physician or Stroke Team' action='Order standard blood work (CBC, electrolytes, creatinine, glucose, INR, partial thromboplastin time)' objects='patient, lab tests' id='activity7-1'/>
+        </branch>
+        <branch id='branch2-6-2'>
+          <activity role='ED/Clinic Physician or Stroke Team' action='Order troponin test (if clinically indicated)' objects='patient, lab tests' id='activity7-2'/>
+        </branch>
+      </parallelGateway>
+    </branch>
+    <branch id='branch2-7'>
+      <activity role='Nurse or Trained Screener' action='Make patient NPO and screen swallowing ability using valid bedside protocol before oral medication, fluid, or food' objects='patient, screening protocol' id='activity8'/>
+    </branch>
+    <branch id='branch2-8'>
+      <activity role='Nurse or Trained Screener' action='Monitor level of alertness' objects='patient' id='activity9-1'/>
+      <activity role='Nurse or Trained Screener' action='Screen swallowing ability when clinically appropriate' objects='patient, screening protocol' id='activity9-2'/>
+    </branch>
+    <branch id='branch2-9'>
+      <activity role='Speech-Language Pathologist or Specialist' action='For patients with dysphagia/pulmonary aspiration features, perform full clinical swallowing assessment and advise on diet/fluid consistency' objects='patient' id='activity10'/>
+    </branch>
+    <branch id='branch2-10'>
+      <activity role='ED/Clinic Physician or Stroke Team' action='Provide cross-continuum secondary prevention assessments and therapies to all patients (admitted or discharged)' objects='patient, prevention protocols' id='activity11'/>
+    </branch>
+  </parallelGateway>
+  <activity role='Radiologist/Stroke Physician' action='Interpret brain imaging (CT/CTA and/or MRI) immediately' objects='imaging results' id='activity12'/>
+  <exclusiveGateway id='exclusivegateway3'>
+    <branch condition='Clinically eligible acute ischemic stroke patient' id='branch3-2-1'>
+      <activity role='ED/Clinic Physician or Stroke Team' action='Consider advanced CT imaging (CT, multiphase CTA, or Perfusion CT)' objects='patient, imaging equipment' id='activity13'/>
+    </branch>
+    <branch condition='Not clinically eligible for advanced imaging' id='branch3-2-2'>
+      <activity role='ED/Clinic Physician or Stroke Team' action='No advanced imaging performed' objects='patient' id='activity14'/>
+    </branch>
+  </exclusiveGateway>
+  <exclusiveGateway id='exclusivegateway4'>
+    <branch condition='Patient presenting beyond 48 hours with TIA or ischemic stroke' id='branch4-1'>
+      <activity role='ED/Clinic Physician or Stroke Team' action='Order vascular imaging of brain and neck arteries as soon as possible' objects='patient, imaging equipment' id='activity15'/>
+    </branch>
+    <branch condition='Patient with acute ICH' id='branch4-2'>
+      <parallelGateway id='parallelgateway4'>
+        <branch id='branch4-2-1'>
+          <activity role='ED/Clinic Physician or Stroke Team' action='Recognize ICH as medical emergency' objects='patient' id='activity16-1'/>
+          <activity role='ED/Clinic Physician or Stroke Team' action='Evaluate immediately by stroke expert' objects='patient' id='activity16-2'/>
+        </branch>
+        <branch id='branch4-2-2'>
+          <activity role='ED/Clinic Physician or Stroke Team' action='Evaluate for anticoagulant therapy history, measure platelet count, PTT, and INR' objects='patient, lab tests' id='activity17'/>
+        </branch>
+        <branch id='branch4-2-3'>
+          <activity role='ED/Clinic Physician or Stroke Team' action='For select ICH patients, order CTA or MRA as soon as possible' objects='patient, imaging equipment' id='activity18'/>
+        </branch>
+      </parallelGateway>
+    </branch>
+    <branch condition='Other patients' id='branch4-3'>
+      <activity role='ED/Clinic Physician or Stroke Team' action='Continue standard acute stroke assessment and management' objects='patient' id='activity19'/>
+    </branch>
+  </exclusiveGateway>
+</process>

@@ -1,0 +1,99 @@
+<process>
+  <activity role='ED and admitting clinician' action='identify the admitted patient as acute stroke, admitted TIA, or minor nondisabling stroke and initiate acute care admission' objects='admission data, stroke diagnosis, severity information' id='act1'/>
+  <parallelGateway id='pg2'>
+    <branch id='br14'>
+      <activity role='ED clinicians' action='screen the patient upon ED presentation for diabetes' objects='diabetes screening result' id='act17_1'/>
+    </branch>
+    <branch id='br15'>
+      <activity role='ED clinicians' action='screen the patient upon ED presentation for dental issues' objects='dental screening result' id='act17_2'/>
+    </branch>
+    <branch id='br16'>
+      <activity role='ED clinicians' action='screen the patient upon ED presentation for cognitive impairment' objects='cognitive screening result' id='act17_3'/>
+    </branch>
+    <branch id='br17'>
+      <activity role='ED clinicians' action='screen the patient upon ED presentation for depression' objects='depression screening result' id='act17_4'/>
+    </branch>
+  </parallelGateway>
+  <activity role='ED clinicians' action='document consolidated ED screening results in the patient record' objects='ED screening results' id='act17_5'/>
+  <exclusiveGateway id='eg1'>
+    <branch condition='patient has acute stroke requiring acute inpatient treatment' id='br1'>
+      <activity role='admitting clinician and bed manager' action='admit the patient to a specialized geographically defined stroke unit dedicated to stroke management' objects='co located stroke unit beds occupied by stroke patients at least 75 percent of the time' id='act2'/>
+      <parallelGateway id='pg1'>
+        <branch id='br2'>
+          <activity role='stroke unit coordinator' action='assign the core stroke unit team with stroke expertise in medicine, nursing, occupational therapy, physiotherapy, speech language pathology, social work, and clinical nutrition' objects='stroke unit team roster' id='act3'/>
+          <activity role='stroke unit coordinator' action='ensure core team members spend the vast majority of their time treating stroke patients and regularly complete stroke care education' objects='staff competency and education records' id='act4'/>
+          <activity role='hospital and stroke unit manager' action='ensure access to the specialized interprofessional stroke team and adequate staffing 7 days per week' objects='7 day staffing schedule' id='act5'/>
+        </branch>
+        <branch id='br3'>
+          <activity role='clinicians' action='use standardized valid assessment tools, preferably electronic tools linked to the EHR, to evaluate stroke related impairments and functional status' objects='standardized assessment tools, EHR' id='act6'/>
+          <activity role='clinicians' action='complete AlphaFIM on or by day 3 after admission with target day 3 and admission day as day 1' objects='AlphaFIM assessment' id='act7'/>
+          <activity role='clinicians' action='assess the patient for risk of developing venous thromboembolism' objects='venous thromboembolism risk assessment' id='act8'/>
+        </branch>
+        <branch id='br4'>
+          <parallelGateway id='pg_act9_1'>
+            <branch id='br_act9_1'>
+              <activity role='physiotherapist' action='perform a physiotherapy assessment within 48 hours of hospital admission' objects='physiotherapy assessment findings' id='act9_1'/>
+            </branch>
+            <branch id='br_act9_2'>
+              <activity role='speech language pathologist' action='perform a speech language pathology assessment within 48 hours of hospital admission' objects='speech language pathology assessment findings' id='act9_2'/>
+            </branch>
+            <branch id='br_act9_3'>
+              <activity role='occupational therapist' action='perform an occupational therapy assessment within 48 hours of hospital admission' objects='occupational therapy assessment findings' id='act9_3'/>
+            </branch>
+          </parallelGateway>
+          <activity role='physiotherapy, speech language pathology, and occupational therapy team members' action='formulate and document an interprofessional management plan' objects='integrated therapy management plan' id='act9_4'/>
+        </branch>
+        <branch id='br5'>
+          <activity role='nursing staff and dietitian' action='assess nutrition and hydration status within the first 48 hours of admission using a valid screening tool' objects='nutrition screening tool, hydration assessment' id='act10'/>
+          <exclusiveGateway id='eg_nutrition1'>
+            <branch condition='nutritional concerns, hydration deficits, dysphagia, or other comorbidities are identified' id='br_nutrition1'>
+              <activity role='clinicians' action='refer the patient to a dietitian within 7 days of admission for recommendations' objects='dietitian referral' id='act11'/>
+              <exclusiveGateway id='eg_nutrition2'>
+                <branch condition='the patient is unable to meet nutritional and fluid requirements' id='br_nutrition2'>
+                  <activity role='dietitian' action='consider enteral nutrition support and provide recommendations' objects='enteral nutrition support plan' id='act12'/>
+                </branch>
+                <branch condition='the patient is able to meet nutritional and fluid requirements' id='br_nutrition3'>
+                  <activity role='dietitian' action='provide nutrition and hydration recommendations without enteral nutrition support' objects='nutrition and hydration recommendations' id='act12_new'/>
+                </branch>
+              </exclusiveGateway>
+            </branch>
+            <branch condition='no nutritional concerns, hydration deficits, dysphagia, or other comorbidities are identified' id='br_nutrition4'>
+              <activity role='clinical team' action='continue routine nutrition and hydration monitoring' objects='ongoing nutrition and hydration monitoring record' id='act10_new'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch id='br8'>
+          <exclusiveGateway id='eg2a'>
+            <branch condition='mobilization is contraindicated' id='br9_new'>
+              <activity role='clinical team' action='defer mobilization, document the contraindication, and reassess readiness for mobilization' objects='contraindication documentation, reassessment plan' id='act15'/>
+            </branch>
+            <branch condition='mobilization is not contraindicated' id='br10_new'>
+              <exclusiveGateway id='eg2b'>
+                <branch condition='within 24 hours of stroke onset' id='br9'>
+                  <activity role='clinical team' action='avoid frequent out of bed activity within 24 hours of stroke onset and allow mobilization only on a case by case basis using clinical judgement' objects='mobilization precautions, clinical judgement documentation' id='act13'/>
+                  <activity role='clinical team' action='reassess mobilization readiness at 24 hours after stroke onset and initiate early mobilization between 24 hours and 48 hours if still not contraindicated' objects='mobilization reassessment, early mobilization plan' id='act20'/>
+                </branch>
+                <branch condition='24 to 48 hours from stroke onset' id='br10'>
+                  <activity role='clinical team' action='mobilize the patient early between 24 hours and 48 hours of stroke onset' objects='early mobilization plan' id='act14'/>
+                </branch>
+              </exclusiveGateway>
+            </branch>
+          </exclusiveGateway>
+          <activity role='clinical team' action='encourage adequate hydration and mobilization as appropriate to help prevent venous thromboembolism' objects='hydration plan, venous thromboembolism prevention measures' id='act16'/>
+        </branch>
+      </parallelGateway>
+    </branch>
+    <branch condition='patient has TIA or minor nondisabling stroke' id='br13'>
+      <activity role='admitting clinician' action='document that the acute stroke unit treatment, early mobilization, and acute stroke assessment recommendations in Module 3a are not applicable' objects='clinical eligibility documentation' id='act19'/>
+      <activity role='ED clinicians' action='forward screening and assessment results to the TIA clinic for follow up' objects='ED screening results, TIA clinic referral information' id='act18'/>
+    </branch>
+  </exclusiveGateway>
+  <exclusiveGateway id='eg_act21_1'>
+    <branch condition='patient is admitted to in hospital rehabilitation' id='br_act21_1'>
+      <activity role='stroke team' action='provide appropriate cross continuum secondary prevention assessments and therapies during transition to in hospital rehabilitation' objects='secondary prevention assessments and therapies from Modules 5 and 10' id='act21_1'/>
+    </branch>
+    <branch condition='patient is discharged from acute care' id='br_act21_2'>
+      <activity role='stroke team' action='provide appropriate cross continuum secondary prevention assessments and therapies at discharge from acute care' objects='secondary prevention assessments and therapies from Modules 5 and 10' id='act21_2'/>
+    </branch>
+  </exclusiveGateway>
+</process>

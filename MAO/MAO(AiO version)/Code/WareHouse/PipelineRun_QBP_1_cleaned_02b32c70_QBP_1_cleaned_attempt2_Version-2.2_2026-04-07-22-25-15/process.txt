@@ -1,0 +1,151 @@
+<process>
+  <activity role='patient' action='present to the ED, outpatient clinic, or acute care unit with suspected TIA or minor stroke' objects='suspected stroke/TIA symptoms' id='act01'/>
+  <exclusiveGateway id='exg01'>
+    <branch condition='arrival is through EMS' id='br01'>
+      <activity role='EMS' action='divert the patient to a regional or district stroke centre where feasible and prenotify the receiving hospital' objects='suspected stroke/TIA patient information' id='act02'/>
+      <activity role='receiving hospital' action='contact and call the acute stroke team to the ED for appropriate patients' objects='EMS prenotification details' id='act03'/>
+    </branch>
+    <branch condition='arrival is by walk-in, outpatient clinic assessment, or direct admission' id='br02'>
+      <activity role='triage staff' action='activate the standardized stroke/TIA assessment protocol' objects='stroke/TIA assessment tools' id='act04'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='clinical team' action='assess airway patency' objects='airway' id='act05_1'/>
+  <activity role='clinical team' action='assess breathing status' objects='breathing' id='act05_2'/>
+  <activity role='clinical team' action='assess circulation status' objects='circulation' id='act05_3'/>
+  <parallelGateway id='pg01'>
+    <branch id='br03'>
+      <activity role='stroke clinician' action='examine the patient for focal neurological deficits' objects='neurological status' id='act06_1'/>
+      <activity role='stroke clinician' action='assess stroke severity using a standardized stroke scale' objects='NIHSS or CNS for stroke' id='act06_2'/>
+    </branch>
+    <branch id='br04'>
+      <exclusiveGateway id='exg11'>
+        <branch condition='CT is selected or immediately available' id='br34'>
+          <activity role='imaging staff' action='perform immediate brain CT' objects='brain CT' id='act07_1'/>
+        </branch>
+        <branch condition='MRI is selected and immediately available' id='br35'>
+          <activity role='imaging staff' action='perform immediate brain MRI' objects='brain MRI' id='act07_2'/>
+        </branch>
+      </exclusiveGateway>
+      <activity role='qualified imaging provider' action='interpret the brain imaging immediately' objects='CT and/or MRI images' id='act08'/>
+    </branch>
+    <branch id='br05'>
+      <activity role='clinical team' action='perform an ECG to detect atrial fibrillation and other acute arrhythmias' objects='ECG' id='act09'/>
+    </branch>
+    <branch id='br06'>
+      <activity role='clinical team' action='obtain initial blood work' objects='CBC, electrolytes, creatinine, glucose, INR, partial thromboplastin time' id='act10'/>
+      <inclusiveGateway id='ig01'>
+        <branch condition='troponin testing is clinically indicated' id='br07'>
+          <activity role='clinical team' action='perform troponin testing' objects='troponin test' id='act11'/>
+        </branch>
+        <branch condition='chest x-ray is requested or clinically indicated' id='br08'>
+          <activity role='clinical team' action='obtain a chest x-ray without delaying assessment for thrombolysis' objects='chest x-ray, thrombolysis assessment' id='act12'/>
+        </branch>
+      </inclusiveGateway>
+    </branch>
+  </parallelGateway>
+  <exclusiveGateway id='exg02'>
+    <branch condition='working diagnosis is TIA' id='br09'>
+      <activity role='clinical team' action='apply the standardized TIA triage tool' objects='TIA triage tool' id='act13_1'/>
+      <exclusiveGateway id='exg12'>
+        <branch condition='TIA triage result indicates hospital-based urgent care' id='br36'>
+          <activity role='clinical team' action='assign the patient to urgent hospital-based assessment and management' objects='urgent hospital care location' id='act13_2'/>
+        </branch>
+        <branch condition='TIA triage result indicates outpatient rapid-assessment care is appropriate' id='br37'>
+          <activity role='clinical team' action='assign the patient to an outpatient rapid-assessment TIA or stroke-prevention pathway' objects='rapid-assessment clinic or stroke-prevention clinic referral pathway' id='act13_3'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exg03'>
+        <branch condition='symptom onset was within 48 hours or motor or speech symptoms are fluctuating and the patient is not clearly excluded from carotid artery revascularization' id='br10'>
+          <activity role='clinical team' action='perform immediate vascular imaging of the neck arteries' objects='carotid ultrasound, CTA, or MRA' id='act14'/>
+        </branch>
+        <branch condition='symptom onset was within 48 hours or motor or speech symptoms are fluctuating and the patient is clearly not a candidate for carotid artery revascularization' id='br11'>
+          <activity role='clinical team' action='document that the patient is clearly not a candidate for carotid artery revascularization and continue the appropriate nonrevascularization pathway' objects='revascularization candidacy assessment, secondary prevention plan' id='act15'/>
+        </branch>
+        <branch condition='presentation is beyond 48 hours and there are no fluctuating motor or speech symptoms' id='br12'>
+          <activity role='clinical team' action='perform vascular imaging of the brain and neck arteries as soon as possible' objects='brain vascular imaging, neck artery vascular imaging' id='act16'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch condition='working diagnosis is minor (nondisabling) stroke' id='br13'>
+      <parallelGateway id='pg02'>
+        <branch id='br14'>
+          <activity role='clinical team' action='make the patient NPO initially' objects='oral medication, fluid, and food intake' id='act17'/>
+          <exclusiveGateway id='exg04'>
+            <branch condition='the patient is not alert within the first 24 hours' id='br15'>
+              <activity role='clinical team' action='monitor the patient closely and screen swallowing ability when clinically appropriate' objects='first 24-hour neurologic status, swallowing ability' id='act19'/>
+              <activity role='clinical team' action='screen swallowing ability using a simple, valid, reliable bedside testing protocol before initiating oral medication, fluid, or food when clinically appropriate' objects='bedside swallowing screening protocol' id='act18_1'/>
+            </branch>
+            <branch condition='the patient is alert within the first 24 hours' id='br16'>
+              <activity role='clinical team' action='screen swallowing ability using a simple, valid, reliable bedside testing protocol as part of the initial assessment and before initiating oral medication, fluid, or food' objects='bedside swallowing screening protocol' id='act18'/>
+            </branch>
+          </exclusiveGateway>
+          <exclusiveGateway id='exg05'>
+            <branch condition='features indicating dysphagia or pulmonary aspiration are present' id='br17'>
+              <activity role='speech-language pathologist or appropriately trained specialist' action='perform a full clinical swallowing assessment and advise on swallowing ability and the required consistency of diet and fluids' objects='clinical swallowing assessment, diet and fluid consistency recommendations' id='act21'/>
+              <activity role='clinical team' action='continue care according to the specialist swallowing recommendations' objects='specialist swallowing assessment results, diet and fluid consistency recommendations' id='act21_1'/>
+            </branch>
+            <branch condition='features indicating dysphagia or pulmonary aspiration are absent' id='br18'>
+              <activity role='clinical team' action='maintain the diet and fluid plan recommended from the bedside swallowing screen' objects='diet and fluid plan' id='act22'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch id='br19'>
+          <exclusiveGateway id='exg06'>
+            <branch condition='symptom onset was within 48 hours or motor or speech symptoms are fluctuating and the patient is not clearly excluded from carotid artery revascularization' id='br20'>
+              <activity role='clinical team' action='perform immediate vascular imaging of the neck arteries' objects='carotid ultrasound, CTA, or MRA' id='act23'/>
+            </branch>
+            <branch condition='symptom onset was within 48 hours or motor or speech symptoms are fluctuating and the patient is clearly not a candidate for carotid artery revascularization' id='br21'>
+              <activity role='clinical team' action='document that the patient is clearly not a candidate for carotid artery revascularization and continue the appropriate nonrevascularization pathway' objects='revascularization candidacy assessment, secondary prevention plan' id='act24'/>
+            </branch>
+            <branch condition='presentation is beyond 48 hours' id='br22'>
+              <activity role='clinical team' action='perform vascular imaging of the brain and neck arteries as soon as possible' objects='brain vascular imaging, neck artery vascular imaging' id='act25'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </parallelGateway>
+    </branch>
+    <branch condition='working diagnosis is other stroke' id='br23'>
+      <parallelGateway id='pg03'>
+        <branch id='br24'>
+          <activity role='clinical team' action='make the patient NPO initially' objects='oral medication, fluid, and food intake' id='act26'/>
+          <exclusiveGateway id='exg07'>
+            <branch condition='the patient is not alert within the first 24 hours' id='br25'>
+              <activity role='clinical team' action='monitor the patient closely and screen swallowing ability when clinically appropriate' objects='first 24-hour neurologic status, swallowing ability' id='act28'/>
+              <activity role='clinical team' action='screen swallowing ability when clinically appropriate before initiating oral medication, fluid, or food' objects='bedside swallowing screening protocol' id='act28_1'/>
+            </branch>
+            <branch condition='the patient is alert within the first 24 hours' id='br26'>
+              <activity role='clinical team' action='screen swallowing ability using a simple, valid, reliable bedside testing protocol as part of the initial assessment and before initiating oral medication, fluid, or food' objects='bedside swallowing screening protocol' id='act27'/>
+              <activity role='clinical team' action='continue care according to the initial swallowing screen result' objects='swallowing screen result' id='act29'/>
+            </branch>
+          </exclusiveGateway>
+          <exclusiveGateway id='exg08'>
+            <branch condition='features indicating dysphagia or pulmonary aspiration are present' id='br27'>
+              <activity role='speech-language pathologist or appropriately trained specialist' action='perform a full clinical swallowing assessment and advise on swallowing ability and the required consistency of diet and fluids' objects='clinical swallowing assessment, diet and fluid consistency recommendations' id='act30'/>
+            </branch>
+            <branch condition='features indicating dysphagia or pulmonary aspiration are absent' id='br28'>
+              <activity role='clinical team' action='maintain the diet and fluid plan recommended from the bedside swallowing screen' objects='diet and fluid plan' id='act31'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch id='br29'>
+          <exclusiveGateway id='exg09'>
+            <branch condition='the stroke is ischemic and presentation is beyond 48 hours' id='br30'>
+              <activity role='clinical team' action='perform vascular imaging of the brain and neck arteries as soon as possible' objects='brain vascular imaging, neck artery vascular imaging' id='act32'/>
+            </branch>
+            <branch condition='otherwise' id='br31'>
+              <activity role='clinical team' action='continue management on the appropriate stroke pathway' objects='stroke pathway orders' id='act33'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </parallelGateway>
+    </branch>
+  </exclusiveGateway>
+  <exclusiveGateway id='exg10'>
+    <branch condition='the patient is admitted to hospital' id='br32'>
+      <activity role='inpatient stroke team' action='provide appropriate cross-continuum secondary prevention assessments and therapies' objects='secondary prevention assessments and therapies from Modules 5 and 10' id='act34'/>
+    </branch>
+    <branch condition='the patient is discharged from the ED or outpatient clinic' id='br33'>
+      <activity role='ED or outpatient team' action='provide appropriate cross-continuum secondary prevention assessments and therapies' objects='secondary prevention assessments and therapies from Modules 5 and 10' id='act35'/>
+    </branch>
+  </exclusiveGateway>
+</process>

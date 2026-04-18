@@ -1,0 +1,108 @@
+<process>
+  <activity role='ED triage nurse' action='confirm suspected hip fracture pathway trigger and record arrival time for KPI tracking' objects='triage assessment, arrival timestamp' id='activity1_1'/>
+  <activity role='ED triage nurse' action='register patient with suspected hip fracture and activate hip fracture care pathway (perioperative patient goals by day of stay)' objects='patient, hip fracture care pathway' id='activity1'/>
+  <activity role='ED triage nurse' action='initiate hip fracture order set and notify ED team per pathway' objects='order set, notifications' id='activity1_2'/>
+
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1'>
+      <activity role='ED physician' action='perform initial medical assessment (target: physician seen within 1 hour for 90% of arrivals)' objects='patient' id='activity2'/>
+      <activity role='ED physician' action='assess airway/breathing/circulation and review vital signs; address immediate threats' objects='vital signs, resuscitation equipment' id='activity2_1'/>
+      <activity role='ED physician' action='perform focused history and physical exam for hip fracture and collateral injuries' objects='history, physical exam findings' id='activity2_2'/>
+      <activity role='ED physician' action='document working diagnosis and place immediate orders/precautions' objects='ED note, initial orders' id='activity2_3'/>
+      <activity role='ED physician' action='request orthopedic consultation early (target: orthopedic surgeon consultation within 2 hours for 90% of patients)' objects='consult request, preliminary patient summary' id='activity23'/>
+    </branch>
+    <branch id='branch2'>
+      <activity role='ED nurse' action='initiate ED management to manage hydration, pain, risk of delirium, and risk of pressure sores' objects='IV/PO fluids plan, analgesia, delirium prevention measures, pressure sore prevention measures' id='activity3'/>
+      <parallelGateway id='parallelgateway1_1'>
+        <branch id='branch2_1'>
+          <activity role='ED nurse' action='initiate hydration plan and monitor intake/output' objects='IV/PO fluids, I&O chart' id='activity3_1'/>
+        </branch>
+        <branch id='branch2_2'>
+          <activity role='ED nurse' action='provide analgesia per protocol and reassess pain' objects='analgesics, pain score' id='activity3_2'/>
+        </branch>
+        <branch id='branch2_3'>
+          <activity role='ED nurse' action='implement delirium prevention measures' objects='orientation aids, sleep/environment measures' id='activity3_3'/>
+        </branch>
+        <branch id='branch2_4'>
+          <activity role='ED nurse' action='implement pressure sore prevention measures' objects='pressure-relieving surface, turning plan, skin checks' id='activity3_4'/>
+        </branch>
+      </parallelGateway>
+    </branch>
+    <branch id='branch3'>
+      <activity role='ED pharmacist/ED nurse' action='complete medication reconciliation within the ED using a standardized form' objects='standardized medication reconciliation form, medication list, anticoagulant status' id='activity4'/>
+    </branch>
+  </parallelGateway>
+
+  <parallelGateway id='parallelgateway2'>
+    <branch id='branch4'>
+      <activity role='ED nurse/ED physician' action='assess and document reason for the fall' objects='history' id='activity5'/>
+      <activity role='ED nurse' action='assess and document fluid balance' objects='intake/output, vitals' id='activity6'/>
+      <activity role='ED nurse' action='assess and document pressure sore risk' objects='pressure sore risk tool/skin assessment' id='activity7'/>
+      <activity role='ED nurse/dietitian' action='assess and document hydration and nutrition' objects='hydration status, nutrition status' id='activity8'/>
+      <activity role='ED nurse/ED physician' action='assess and document pain' objects='pain score, analgesia response' id='activity9'/>
+      <activity role='ED nurse' action='assess and document temperature' objects='temperature reading' id='activity10'/>
+      <activity role='ED physician' action='assess and document other collateral injuries' objects='secondary survey findings' id='activity11'/>
+      <activity role='ED physician' action='assess and document comorbid conditions' objects='medical history/problem list' id='activity12'/>
+      <activity role='ED physician/ED pharmacist' action='assess and document current drug therapy including any anticoagulants' objects='medication history, anticoagulant details' id='activity13'/>
+      <activity role='ED nurse' action='assess and document continence' objects='continence status' id='activity14'/>
+      <activity role='ED physiotherapist/ED nurse' action='assess and document pre-fracture functional ability and mobility' objects='baseline mobility/ADL history' id='activity15'/>
+      <activity role='ED physiotherapist/ED physician' action='assess and document physical and functional level' objects='functional assessment findings' id='activity16'/>
+      <activity role='ED clinician' action='assess and document mental state based on pre-morbid functioning using validated screening tool (MMSE, MOCA, or CAM)' objects='MMSE/MOCA/CAM result, collateral history' id='activity17'/>
+      <activity role='ED social worker/ED nurse' action='assess and document social circumstances including caregiver status, community supports, and family involvement' objects='social history, caregiver/support details' id='activity18'/>
+    </branch>
+    <branch id='branch5'>
+      <exclusiveGateway id='exclusivegateway2'>
+        <branch condition='patient on anticoagulants or suspected coagulopathy' id='branch5_1'>
+          <activity role='ED physician' action='order standard hip fracture lab panel plus anticoagulation/coagulopathy tests' objects='CBC, electrolytes, renal function, glucose, coagulation studies, type&screen/crossmatch as per policy' id='activity19_2'/>
+        </branch>
+        <branch condition='patient not on anticoagulants and no coagulopathy suspected' id='branch5_2'>
+          <activity role='ED physician' action='order standard hip fracture lab panel' objects='CBC, electrolytes, renal function, glucose, type&screen as per policy' id='activity19_1'/>
+        </branch>
+      </exclusiveGateway>
+      <activity role='laboratory' action='collect and process blood work' objects='blood samples' id='activity20'/>
+    </branch>
+    <branch id='branch6'>
+      <activity role='ED physician' action='order hip/pelvis X-rays' objects='imaging order' id='activity21'/>
+      <activity role='radiology' action='perform and report X-rays' objects='X-ray images, radiology report' id='activity22'/>
+    </branch>
+  </parallelGateway>
+
+  <parallelGateway id='parallelgateway3'>
+    <branch id='branch7'>
+      <activity role='ED physician' action='update orthopedics with imaging/labs and confirm consult timing' objects='imaging, labs, updated patient status' id='activity23_1'/>
+      <activity role='orthopedic surgeon' action='assess patient and provide consultation within 2 hours (90% target)' objects='patient, imaging, labs' id='activity24'/>
+    </branch>
+    <branch id='branch8'>
+      <activity role='ED physician' action='screen need for additional perioperative consultations (anesthesia and/or internal medicine/geriatrics) and notify as indicated' objects='patient summary, comorbidities, frailty/mental status, anticoagulant status, labs/imaging' id='activity24_1'/>
+      <inclusiveGateway id='inclusivegateway1'>
+        <branch condition='anesthesia consultation needed' id='branch9'>
+          <activity role='ED physician' action='notify anesthesiologist and request consultation as needed' objects='patient summary, comorbidities, anticoagulant status' id='activity25'/>
+          <activity role='anesthesiologist' action='provide consultation as needed' objects='patient, pre-op risk considerations' id='activity26'/>
+        </branch>
+        <branch condition='internal medicine/geriatrics consultation needed' id='branch10'>
+          <activity role='ED physician' action='notify internist and request consultation as needed' objects='patient summary, comorbidities, labs' id='activity27'/>
+          <activity role='internist' action='provide consultation as needed' objects='patient, medical optimization plan' id='activity28'/>
+        </branch>
+      </inclusiveGateway>
+    </branch>
+  </parallelGateway>
+
+  <activity role='ED team' action='use documented ED assessment to inform most appropriate pathway trajectory, plan discharge to most appropriate setting, and establish baseline values for performance measurement' objects='ED assessment record, pathway goals, performance measures' id='activity34'/>
+
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='presenting hospital is surgical (operative capability available)' id='branch11'>
+      <activity role='ED physician/bed management' action='arrange inpatient admission from ED (target: 90% admitted within 4 hours spent in ED)' objects='admission order, bed request' id='activity29'/>
+      <activity role='ED physician/bed management' action='request inpatient bed and enter admission order' objects='bed request, admission orders' id='activity29_1'/>
+      <activity role='ED physician/ED nurse' action='handover to inpatient team and confirm destination ward/OR readiness per pathway' objects='handover note, checklist' id='activity29_2'/>
+    </branch>
+    <branch condition='presenting hospital is non-surgical (no operative capability)' id='branch12'>
+      <activity role='ED physician' action='medically stabilize patient while waiting for expeditious transfer to a surgical hospital for operation' objects='stabilization plan, vitals, analgesia, fluids' id='activity30'/>
+      <activity role='ED physician' action='stabilize hemodynamics/respiratory status and address urgent medical issues' objects='vital signs, oxygen/IV therapy, stabilization measures' id='activity30_1'/>
+      <activity role='ED physician' action='manage anticoagulation/bleeding risks as applicable while awaiting transfer' objects='anticoagulant status, reversal/holding plan if indicated' id='activity30_2'/>
+      <activity role='ED physician/ED nurse' action='reassess pain and hydration and continue monitoring while awaiting transfer' objects='pain score trend, fluid balance, monitoring chart' id='activity30_3'/>
+      <activity role='ED physician/transfer coordinator' action='initiate formal protocol for timely transfer to surgical hospital for surgery' objects='transfer protocol, referral package, imaging/labs' id='activity31'/>
+      <activity role='receiving surgical hospital/orthopedic service' action='accept transfer and schedule surgery ensuring surgery within 48 hours of initial presentation (including those admitted to non-surgical hospitals)' objects='OR booking, transfer documentation' id='activity32'/>
+      <activity role='surgical hospital/discharge planning' action='plan repatriation to patient’s local hospital after surgery per formal protocol' objects='repatriation protocol, bed coordination' id='activity33'/>
+    </branch>
+  </exclusiveGateway>
+</process>

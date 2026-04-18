@@ -3,8 +3,6 @@ WORKDIR /app
 
 # Accept Anaconda ToS and install system deps
 RUN conda config --set always_yes yes \
-    && conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main \
-    && conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r \
     && apt-get update && apt-get install -y graphviz \
     && rm -rf /var/lib/apt/lists/*
 
@@ -18,14 +16,10 @@ COPY . .
 
 # 1) Build the 'promoai' conda environment
 RUN conda config --set always_yes yes \
-    && conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main \
-    && conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r \
     && conda env update -n promoai -f environment-promoai.yml
 
 # 2) Build the 'MAO' conda environment and clean up
 RUN conda config --set always_yes yes \
-    && conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main \
-    && conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r \
     && conda env create -f environment-mao.yml \
     && conda clean -afy
 

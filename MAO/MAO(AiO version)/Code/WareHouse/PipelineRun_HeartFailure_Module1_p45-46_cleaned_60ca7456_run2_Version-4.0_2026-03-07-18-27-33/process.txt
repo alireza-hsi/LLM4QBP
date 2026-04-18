@@ -1,0 +1,52 @@
+<process>
+  <activity role='Ontario hospitals' action='develop and consistently apply standardized risk-stratification tools across all Ontario hospitals' objects='risk-stratification tool/process' id='activity1_combined'/>
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1'>
+      <activity role='clinical team' action='order blood work panel' objects='serum creatinine, electrolytes, troponin, complete blood count' id='activity_bloodwork1'/>
+      <activity role='healthcare expert' action='interpret blood work results' objects='creatinine/electrolytes/troponin/CBC results' id='activity_bloodwork_interpret1'/>
+    </branch>
+    <branch id='branch2'>
+      <activity role='clinical team' action='perform electrocardiogram (ECG)' objects='' id='activity_ecg1'/>
+      <activity role='healthcare expert' action='interpret ECG results' objects='ECG tracing' id='activity_ecg_interpret1'/>
+    </branch>
+    <branch id='branch3_imaging'>
+      <activity role='clinical team' action='perform chest x-ray examination' objects='' id='activity_cxr1'/>
+      <activity role='healthcare expert' action='interpret chest x-ray results' objects='chest x-ray images' id='activity_cxr_interpret1'/>
+    </branch>
+    <branch id='branch4'>
+      <exclusiveGateway id='exclusivegateway_echo1'>
+        <branch condition='no recent echocardiogram is available' id='branch4a'>
+          <activity role='clinical team' action='perform an echocardiogram' objects='' id='activity_echo1'/>
+          <activity role='healthcare expert' action='interpret echocardiogram results' objects='echocardiogram images/report' id='activity_echo_interpret1'/>
+        </branch>
+        <branch condition='a recent echocardiogram is available' id='branch4b'>
+          <activity role='healthcare expert' action='review prior echocardiogram results' objects='most recent echocardiogram report' id='activity_echo_review1'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch5'>
+      <activity role='clinical team' action='frequently measure heart rate, blood pressure, and oxygen saturation until patient is stabilized' objects='' id='activity_vitals1'/>
+    </branch>
+  </parallelGateway>
+  <activity role='clinical team' action='calculate an acute heart failure risk score (e.g., the EHMRG)' objects='clinical data and test results' id='activity_ehmrg1'/>
+  <exclusiveGateway id='exclusivegateway_disposition1'>
+    <branch condition='EHMRG quintiles 1-2 AND responded to initial treatment in the ED AND no other considerations' id='branch_disp1'>
+      <activity role='clinical team' action='discharge home without requiring inpatient admission' objects='' id='activity_discharge1'/>
+      <activity role='primary care provider' action='follow-up visit within days of discharge from the ED' objects='' id='activity_followup1'/>
+    </branch>
+    <branch condition='EHMRG quintiles 3-5 OR NOT (responded to initial treatment in the ED) OR other considerations present OR any high-risk marker present' id='branch_disp2'>
+      <activity role='clinical team' action='admit/transfer patient to appropriate hospital care setting and staffing level (inpatient unit or ICU as indicated)' objects='risk group, response to treatment, high-risk markers, ventilation need' id='activity_admit_and_assign_care_level1'/>
+      <inclusiveGateway id='inclusivegateway_high1'>
+        <branch condition='requires ventilation (noninvasive)' id='branch_high1'>
+          <activity role='clinical team' action='provide noninvasive ventilation' objects='' id='activity_niv1'/>
+        </branch>
+        <branch condition='requires ventilation (invasive)' id='branch_high2'>
+          <activity role='clinical team' action='provide invasive ventilation' objects='' id='activity_iv1'/>
+        </branch>
+        <branch condition='requires admission to an intensive care unit with higher nurse-to-patient staffing' id='branch_high3'>
+          <activity role='intensive care unit' action='admit to intensive care unit with higher nurse-to-patient staffing' objects='' id='activity_icu1'/>
+        </branch>
+      </inclusiveGateway>
+    </branch>
+  </exclusiveGateway>
+</process>

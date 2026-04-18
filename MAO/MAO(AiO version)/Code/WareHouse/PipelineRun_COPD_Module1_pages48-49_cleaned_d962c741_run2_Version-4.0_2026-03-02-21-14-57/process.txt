@@ -1,0 +1,71 @@
+<process>
+  <activity role='patient' action='present with suspected COPD exacerbation' objects='' id='activity1'/>
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1'>
+      <parallelGateway id='parallelgateway2'>
+        <branch id='branch15'>
+          <activity role='clinician' action='assess for hypoventilation' objects='' id='activity2.1'/>
+        </branch>
+        <branch id='branch16'>
+          <activity role='clinician' action='check level of consciousness/cognition' objects='' id='activity2.2'/>
+        </branch>
+        <branch id='branch17'>
+          <activity role='clinician' action='check blood-oxygen saturation level via pulse oximetry' objects='' id='activity2.3'/>
+        </branch>
+        <branch id='branch18'>
+          <activity role='clinician' action='assess whether patient has purulent sputum' objects='' id='activity2.4'/>
+        </branch>
+      </parallelGateway>
+    </branch>
+    <branch id='branch2'>
+      <activity role='clinician' action='perform a physical examination' objects='' id='activity3'/>
+    </branch>
+    <branch id='branch3'>
+      <activity role='clinician' action='check patient history' objects='' id='activity4'/>
+    </branch>
+    <branch id='branch4'>
+      <activity role='clinician' action='document and reconcile medications currently used by patient' objects='current medications' id='activity5'/>
+    </branch>
+    <branch id='branch5'>
+      <exclusiveGateway id='exclusivegateway2'>
+        <branch condition='patient is too unwell to leave emergency department' id='branch6'>
+          <activity role='clinician' action='perform a chest x-ray' objects='portable x-ray' id='activity6.2'/>
+          <activity role='healthcare expert' action='interpret chest x-ray results' objects='portable chest x-ray findings' id='activity6.2.interpret'/>
+          <inclusiveGateway id='inclusivegateway1a'>
+            <branch condition='concerned with pneumothorax' id='branch7a'>
+              <activity role='clinician' action='perform a chest x-ray' objects='expiratory view' id='activity6.3a'/>
+              <activity role='healthcare expert' action='interpret chest x-ray results' objects='expiratory view findings' id='activity6.3a.interpret'/>
+            </branch>
+            <branch condition='not concerned with pneumothorax' id='branch7a.no'>
+              <activity role='clinician' action='proceed without expiratory view chest x-ray' objects='' id='activity6.3a.skip'/>
+            </branch>
+          </inclusiveGateway>
+        </branch>
+        <branch condition='patient can leave emergency department' id='branch25'>
+          <activity role='clinician' action='perform a chest x-ray' objects='posteroanterior and lateral' id='activity6.1'/>
+          <activity role='healthcare expert' action='interpret chest x-ray results' objects='PA and lateral chest x-ray findings' id='activity6.1.interpret'/>
+          <inclusiveGateway id='inclusivegateway1b'>
+            <branch condition='concerned with pneumothorax' id='branch7b'>
+              <activity role='clinician' action='perform a chest x-ray' objects='expiratory view' id='activity6.3b'/>
+              <activity role='healthcare expert' action='interpret chest x-ray results' objects='expiratory view findings' id='activity6.3b.interpret'/>
+            </branch>
+            <branch condition='not concerned with pneumothorax' id='branch7b.no'>
+              <activity role='clinician' action='proceed without expiratory view chest x-ray' objects='' id='activity6.3b.skip'/>
+            </branch>
+          </inclusiveGateway>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch8'>
+      <activity role='clinician' action='conduct baseline blood work' objects='complete blood count; electrolytes; creatinine; blood urea nitrogen (if available)' id='activity9.all'/>
+      <activity role='healthcare expert' action='interpret baseline blood work results' objects='CBC; electrolytes; creatinine; BUN results' id='activity9.all.interpret'/>
+    </branch>
+    <branch id='branch9'>
+      <activity role='clinician' action='perform an electrocardiogram' objects='check for arrhythmias, myocardial ischemia, right ventricular strain, etc.' id='activity10'/>
+      <activity role='healthcare expert' action='interpret electrocardiogram results' objects='ECG findings' id='activity10.interpret.immediate'/>
+    </branch>
+    <branch id='branch10'>
+      <activity role='clinician' action='identify patient wishes with respect to goals of care and/or limitations of treatment (i.e., code status)' objects='' id='activity11'/>
+    </branch>
+  </parallelGateway>
+</process>

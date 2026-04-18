@@ -1,0 +1,79 @@
+<process>
+  <parallelGateway id='parallelgateway3_mod'>
+    <branch id='branch21_mod'>
+      <activity role='Ontario hospitals' action='implement a common standardized risk stratification assessment tool or process to determine where and how to assist with clinical decision making when patients present to the emergency department AND have a pathway or mechanism to transfer patients to a higher level provider AND develop and consistently apply risk-stratification tools that can be used for multiple conditions (including HF)' objects='' id='activity_hospitals_prereq_combined_mod'/>
+    </branch>
+    <branch id='branch22_mod'>
+      <activity role='Ontario hospitals' action='train clinical staff on standardized risk stratification tool use and escalation/transfer pathway' objects='' id='activity_hospitals_training_mod'/>
+    </branch>
+  </parallelGateway>
+
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1'>
+      <activity role='clinical staff' action='order and collect bloodwork (serum creatinine, electrolytes, troponin, complete blood count)' objects='' id='activity_bloodwork_merged'/>
+      <activity role='healthcare expert' action='interpret bloodwork results' objects='creatinine, electrolytes, troponin, CBC results' id='activity_interpret_bloodwork'/>
+    </branch>
+    <branch id='branch4'>
+      <activity role='clinical staff' action='perform electrocardiogram' objects='' id='activity5'/>
+      <activity role='healthcare expert' action='interpret electrocardiogram' objects='ECG results' id='activity_interpret_ecg'/>
+    </branch>
+    <branch id='branch5'>
+      <activity role='clinical staff' action='perform chest x-ray examination' objects='' id='activity6'/>
+      <activity role='healthcare expert' action='interpret chest x-ray' objects='chest x-ray results' id='activity_interpret_cxr'/>
+    </branch>
+    <branch id='branch6'>
+      <exclusiveGateway id='exclusivegateway1'>
+        <branch condition='no recent echocardiogram is available' id='branch7'>
+          <activity role='clinical staff' action='perform an echocardiogram' objects='' id='activity7'/>
+          <activity role='healthcare expert' action='interpret echocardiogram' objects='echocardiogram results' id='activity_interpret_echo'/>
+        </branch>
+        <branch condition='a recent echocardiogram is available' id='branch8'>
+          <activity role='clinical staff' action='retrieve recent echocardiogram report' objects='recent echocardiogram results' id='activity_retrieve_echo'/>
+          <activity role='healthcare expert' action='review recent echocardiogram' objects='recent echocardiogram results' id='activity_review_echo'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch9'>
+      <parallelGateway id='parallelgateway5'>
+        <branch id='branch25'>
+          <activity role='clinical staff' action='frequently measure heart rate until patient is stabilized' objects='' id='activity9.1'/>
+        </branch>
+        <branch id='branch26'>
+          <activity role='clinical staff' action='frequently measure blood pressure until patient is stabilized' objects='' id='activity9.2'/>
+        </branch>
+        <branch id='branch27'>
+          <activity role='clinical staff' action='frequently measure oxygen saturation until patient is stabilized' objects='' id='activity9.3'/>
+        </branch>
+      </parallelGateway>
+    </branch>
+  </parallelGateway>
+
+  <parallelGateway id='parallelgateway2'>
+    <branch id='branch10'>
+      <parallelGateway id='parallelgateway8'>
+        <branch id='branch38'>
+          <activity role='clinical staff' action='perform ABC assessment and evaluate high-risk markers (respiratory distress, hypoxemia, pulmonary edema severity, diuretic response, hemodynamic compromise, significant arrhythmias, positive troponin)' objects='' id='activity_abc_highrisk_merged'/>
+        </branch>
+        <branch id='branch39'>
+          <activity role='clinical staff' action='calculate an acute heart failure risk score (e.g., EHMRG) to assist with clinical decision-making and predicting the 7-day mortality risk' objects='' id='activity12'/>
+        </branch>
+      </parallelGateway>
+    </branch>
+    <branch id='branch11'>
+      <activity role='clinical staff' action='assess risk-stratification patient group (low intensity / average intensity / high intensity)' objects='' id='activity10'/>
+    </branch>
+  </parallelGateway>
+
+  <inclusiveGateway id='inclusivegateway_disposition_mod'>
+    <branch condition='high intensity (requires noninvasive ventilation or invasive ventilation and/or admission to an intensive care unit with higher nurse-to-patient staffing) OR any high-risk markers present' id='branch_dispo_highintensity_mod'>
+      <activity role='clinical staff' action='initiate escalation/transfer and admit to ICU/high-acuity setting' objects='' id='activity_admit_icu_mod'/>
+    </branch>
+    <branch condition='low-risk (e.g., EHMRG quintiles 1 and 2) AND responded to initial treatment in the ED AND no other considerations AND low intensity group' id='branch_dispo_discharge_mod'>
+      <activity role='clinical staff' action='treat in the ED or in outpatient settings and discharge home without requiring inpatient admission' objects='' id='activity_discharge_home_mod'/>
+      <activity role='primary care provider' action='conduct a follow-up visit within days of discharge from the ED' objects='' id='activity_followup_pcp_mod'/>
+    </branch>
+    <branch condition='average intensity OR higher-risk (e.g., EHMRG quintiles 3-5)' id='branch_dispo_admit_inpatient_mod'>
+      <activity role='clinical staff' action='admit to inpatient care with normal nurse-to-patient staffing' objects='' id='activity_admit_inpatient_mod'/>
+    </branch>
+  </inclusiveGateway>
+</process>

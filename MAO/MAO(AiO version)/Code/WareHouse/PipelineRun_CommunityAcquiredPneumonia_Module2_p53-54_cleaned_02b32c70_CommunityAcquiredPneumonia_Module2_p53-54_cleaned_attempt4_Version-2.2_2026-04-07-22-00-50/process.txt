@@ -1,0 +1,83 @@
+<process>
+  <activity role='clinical team' action='assess' objects='current care setting and ED presentation status' id='activity1_1'/>
+  <activity role='clinical team' action='assess' objects='sepsis status and need for hospital or ICU admission' id='activity1_2'/>
+  <activity role='clinical team' action='assess' objects='severity and calculate CRB-65 criteria' id='activity1_3'/>
+  <activity role='clinical team' action='determine' objects='intubation status' id='activity1_4'/>
+  <activity role='clinical team' action='avoid ordering' objects='CT scan' id='activity3'/>
+  <exclusiveGateway id='exclusiveGateway1'>
+    <branch condition='patient presents to the emergency department with symptoms of CAP' id='branch1'>
+      <activity role='clinical team' action='order' objects='chest x-ray to confirm the diagnosis of CAP' id='activity2'/>
+      <exclusiveGateway id='exclusiveGateway2'>
+        <branch condition='sepsis is absent' id='branch2'>
+          <activity role='clinical team' action='wait for chest x-ray results before giving' objects='antibiotics' id='activity4'/>
+        </branch>
+        <branch condition='sepsis is present' id='branch3'>
+          <activity role='clinical team' action='give' objects='antibiotics without waiting for chest x-ray results' id='activity5'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch condition='patient is already in the inpatient ward or ICU' id='branch4'>
+      <activity role='clinical team' action='continue' objects='CAP diagnostic testing in the current inpatient setting' id='activity6'/>
+    </branch>
+  </exclusiveGateway>
+  <exclusiveGateway id='exclusiveGateway3'>
+    <branch condition='patient is admitted to hospital' id='branch5'>
+      <parallelGateway id='parallelGateway1'>
+        <branch id='branch6'>
+          <activity role='clinical team' action='measure' objects='oxygen saturation' id='activity7'/>
+        </branch>
+        <branch id='branch7'>
+          <activity role='clinical team' action='initiate' objects='routine blood work panel' id='activity8_1'/>
+          <parallelGateway id='parallelGateway2'>
+            <branch id='branch14'>
+              <activity role='clinical team' action='order' objects='CBC' id='activity8_2'/>
+            </branch>
+            <branch id='branch15'>
+              <activity role='clinical team' action='order' objects='electrolytes' id='activity8_3'/>
+            </branch>
+            <branch id='branch16'>
+              <activity role='clinical team' action='order' objects='renal function tests' id='activity8_4'/>
+            </branch>
+          </parallelGateway>
+          <activity role='clinical team' action='review' objects='CBC white blood cell count result' id='activity8_6'/>
+        </branch>
+      </parallelGateway>
+      <activity role='clinical team' action='calculate' objects='SIRS criteria using vital signs and white blood cell count, and PaCO2 if available' id='activity8_5'/>
+      <inclusiveGateway id='inclusiveGateway1'>
+        <branch condition='patient meets more than 2 CRB-65 criteria' id='branch8'>
+          <activity role='clinical team' action='initiate' objects='extended severity-based blood testing panel' id='activity9_1'/>
+          <inclusiveGateway id='inclusiveGateway2'>
+            <branch condition='blood gases are clinically indicated' id='branch17'>
+              <activity role='clinical team' action='consider ordering' objects='blood gases' id='activity9_2'/>
+            </branch>
+            <branch condition='lactate is clinically indicated' id='branch18'>
+              <activity role='clinical team' action='consider ordering' objects='lactate' id='activity9_3'/>
+            </branch>
+            <branch condition='liver enzyme tests are clinically indicated' id='branch19'>
+              <activity role='clinical team' action='consider ordering' objects='liver enzyme tests' id='activity9_4'/>
+            </branch>
+            <branch condition='liver function tests are clinically indicated' id='branch20'>
+              <activity role='clinical team' action='consider ordering' objects='liver function tests' id='activity9_5'/>
+            </branch>
+          </inclusiveGateway>
+        </branch>
+        <branch condition='patient meets more than 2 SIRS criteria (temperature less than 36°C or greater than 38°C; heart rate greater than 90 bpm; respiratory rate greater than 20 breaths per minute or PaCO2 less than 32 mmHg; white blood cell count greater than 12,000 or less than 4,000 cells/mm3 or greater than 10% bands) or requires ICU admission' id='branch9'>
+          <activity role='clinical team' action='obtain' objects='blood cultures' id='activity10'/>
+        </branch>
+        <branch condition='an adequate sputum sample can be obtained' id='branch10'>
+          <activity role='clinical team' action='obtain' objects='sputum culture' id='activity11'/>
+          <activity role='clinical team' action='consider Gram staining and prioritize sputum culture collection when a targeted antibiotic is planned' objects='sputum specimen, Gram stain, targeted antibiotic plan' id='activity12'/>
+        </branch>
+        <branch condition='patient is high severity, or an enhanced surveillance directive from Public Health Ontario on Legionella applies to inpatients, or the patient is not responding to drug therapy after 48–72 hours, or the inpatient is in peak season from mid-June to early October' id='branch11'>
+          <activity role='clinical team' action='order' objects='urine antigen test' id='activity13'/>
+        </branch>
+        <branch condition='patient is intubated' id='branch12'>
+          <activity role='clinical team' action='consider ordering' objects='PCR test for Legionella' id='activity14'/>
+        </branch>
+      </inclusiveGateway>
+    </branch>
+    <branch condition='patient is not admitted to hospital' id='branch13'>
+      <activity role='clinical team' action='complete' objects='CAP diagnostic testing without the inpatient admission test panel' id='activity15'/>
+    </branch>
+  </exclusiveGateway>
+</process>

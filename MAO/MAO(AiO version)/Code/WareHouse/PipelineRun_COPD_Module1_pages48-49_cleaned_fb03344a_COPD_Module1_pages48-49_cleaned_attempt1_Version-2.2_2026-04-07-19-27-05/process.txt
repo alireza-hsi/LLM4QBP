@@ -1,0 +1,106 @@
+<process>
+  <activity role='triage clinician' action='identify patient presenting with suspected COPD exacerbation in the ED, outpatient clinic, or by direct admission' objects='patient presentation' id='activity1'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='initial presentation at the ED requires immediate resuscitation trial' id='branch1'>
+      <activity role='ED team' action='trial immediate resuscitation on initial presentation' objects='resuscitation measures' id='activity2'/>
+      <activity role='ED team' action='re-evaluate patient for admission after immediate resuscitation' objects='clinical status and response to resuscitation' id='activity3'/>
+    </branch>
+    <branch condition='initial presentation does not require immediate resuscitation trial' id='branch2'>
+      <activity role='clinical team' action='proceed directly to initial presentation and assessment workflow' objects='patient' id='activity4'/>
+    </branch>
+  </exclusiveGateway>
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch3'>
+      <activity role='clinician' action='check vital signs' objects='hypoventilation, level of consciousness or cognition, blood-oxygen saturation via pulse oximetry, purulent sputum status' id='activity5'/>
+      <activity role='clinician' action='assess respiratory and neurologic vital signs' objects='hypoventilation and level of consciousness or cognition' id='activity5_1'/>
+      <activity role='clinician' action='assess oxygenation and sputum characteristics' objects='blood-oxygen saturation via pulse oximetry and purulent sputum status' id='activity5_2'/>
+      <activity role='clinician' action='perform a physical examination' objects='patient' id='activity6'/>
+      <activity role='clinician' action='check patient history' objects='medical history and current presentation' id='activity7'/>
+      <activity role='clinician or pharmacist' action='document and reconcile medications currently used by the patient' objects='current medication list' id='activity8'/>
+      <activity role='clinician or pharmacist' action='document medications currently used by the patient' objects='current medication list' id='activity8_1'/>
+      <activity role='clinician or pharmacist' action='reconcile current medications against the treatment record' objects='documented medication list and treatment record' id='activity8_2'/>
+      <activity role='clinician' action='identify patient wishes with respect to goals of care and limitations of treatment' objects='goals of care and code status' id='activity9'/>
+    </branch>
+    <branch id='branch4'>
+      <exclusiveGateway id='exclusivegateway10_1'>
+        <branch condition='patient is able to undergo standard imaging in radiology' id='branch10_1'>
+          <activity role='radiology staff' action='perform standard chest x-ray views' objects='posteroanterior and lateral chest x-ray images' id='activity10_1'/>
+        </branch>
+        <branch condition='patient is too unwell to leave the emergency department' id='branch10_2'>
+          <activity role='radiology staff' action='perform portable chest x-ray' objects='portable chest x-ray images' id='activity10_2'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exclusivegateway10_3'>
+        <branch condition='pneumothorax is suspected' id='branch10_3'>
+          <activity role='radiology staff' action='perform expiratory chest x-ray view' objects='expiratory chest x-ray image' id='activity10_3'/>
+        </branch>
+        <branch condition='pneumothorax is not suspected' id='branch10_4'>
+          <activity role='radiology staff' action='continue chest x-ray workflow without expiratory view' objects='chest x-ray plan' id='activity10_4'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch5'>
+      <activity role='laboratory staff' action='conduct baseline blood work' objects='complete blood count, electrolytes, creatinine, blood urea nitrogen if available' id='activity11'/>
+      <parallelGateway id='parallelgateway11_1'>
+        <branch id='branch11_1'>
+          <activity role='laboratory staff' action='obtain complete blood count and electrolytes' objects='complete blood count sample and electrolyte results' id='activity11_1'/>
+        </branch>
+        <branch id='branch11_2'>
+          <activity role='laboratory staff' action='obtain creatinine and blood urea nitrogen if available' objects='creatinine result and blood urea nitrogen result' id='activity11_2'/>
+        </branch>
+      </parallelGateway>
+    </branch>
+    <branch id='branch6'>
+      <activity role='clinician or ECG technician' action='perform an electrocardiogram' objects='electrocardiogram to check for arrhythmias, myocardial ischemia, right ventricular strain, and related abnormalities' id='activity12'/>
+    </branch>
+  </parallelGateway>
+  <inclusiveGateway id='inclusivegateway1'>
+    <branch condition='low oxygen saturation on oximetry and/or acute respiratory failure is suspected' id='branch7'>
+      <activity role='clinician or respiratory therapist' action='check arterial blood gases where appropriate' objects='arterial blood gas sample and results' id='activity13'/>
+    </branch>
+    <branch condition='pneumonia or suspected sepsis is present' id='branch8'>
+      <activity role='clinician or laboratory staff' action='draw blood cultures' objects='blood culture specimens' id='activity14'/>
+    </branch>
+    <branch condition='suspected cardiac disorder is present' id='branch9'>
+      <activity role='clinician or laboratory staff' action='examine cardiac markers if appropriate' objects='cardiac marker tests' id='activity15'/>
+    </branch>
+    <branch condition='other suspected diagnoses or comorbidities need to be identified or ruled out' id='branch10'>
+      <activity role='clinician' action='perform other diagnostic interventions as appropriate' objects='additional diagnostic tests for alternative diagnoses or comorbidities' id='activity16'/>
+    </branch>
+  </inclusiveGateway>
+  <activity role='clinician' action='assess level of care required using clinical judgment, local resource availability, and NICE and/or GOLD admission criteria' objects='response to initial medical management, home support and ability to cope at home, breathlessness or marked symptom increase including resting dyspnea, general condition and severe underlying COPD, decreased level of activity, cyanosis, worsening peripheral edema or new physical signs such as cyanosis fatigue or inability to stand, decreased level of consciousness, long-term oxygen therapy use, social circumstances and older age, acute confusion, rapid rate of onset or frequent exacerbations, significant comorbidity such as heart failure or newly occurring arrhythmias, arterial oxygen saturation less than 90 percent, pH level, partial pressure of oxygen, and chest x-ray changes' id='activity19'/>
+  <parallelGateway id='parallelgateway19_1'>
+    <branch id='branch19_1'>
+      <activity role='clinician' action='evaluate clinical severity and physiologic admission criteria' objects='response to initial medical management, breathlessness, severe underlying COPD, cyanosis, peripheral edema or new physical signs, level of consciousness, long-term oxygen therapy use, acute confusion, comorbidity, arterial oxygen saturation, pH, partial pressure of oxygen, and chest x-ray changes' id='activity19_1'/>
+    </branch>
+    <branch id='branch19_2'>
+      <activity role='clinician' action='evaluate functional, social, and support factors affecting disposition' objects='home support, ability to cope at home, decreased level of activity, social circumstances, older age, and rapid rate of onset or frequent exacerbations' id='activity19_2'/>
+    </branch>
+  </parallelGateway>
+  <exclusiveGateway id='exclusivegateway3'>
+    <branch condition='admission is required based on re-evaluation, clinical judgment, and admission criteria' id='branch13'>
+      <activity role='ED or admitting staff' action='use a checklist for admission to hospital' objects='admission checklist including Module 1 practices and non-COPD concerns such as pain, anxiety, and comorbidities' id='activity21'/>
+      <parallelGateway id='parallelgateway21_1'>
+        <branch id='branch21_1'>
+          <activity role='ED or admitting staff' action='complete COPD-specific admission checklist items' objects='Module 1 recommended practice items for admission' id='activity21_1'/>
+        </branch>
+        <branch id='branch21_2'>
+          <activity role='ED or admitting staff' action='complete non-COPD admission checklist items' objects='pain, anxiety, comorbidities, and other non-COPD concerns' id='activity21_2'/>
+        </branch>
+      </parallelGateway>
+      <activity role='clinician' action='admit patient to the appropriate level of care' objects='admission decision and bed request' id='activity20'/>
+    </branch>
+    <branch condition='admission is not required based on re-evaluation, clinical judgment, and admission criteria' id='branch14'>
+      <activity role='clinician' action='manage patient without hospital admission and determine appropriate follow-up setting' objects='disposition plan' id='activity22'/>
+    </branch>
+  </exclusiveGateway>
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='patient has stabilized and has no prior objective documentation of COPD through spirometry' id='branch11'>
+      <activity role='clinician or respiratory therapist' action='perform spirometry once the patient has stabilized' objects='spirometry testing' id='activity17'/>
+    </branch>
+    <branch condition='patient is not yet stabilized or prior objective documentation of COPD through spirometry already exists' id='branch12'>
+      <activity role='clinician' action='defer spirometry during the initial assessment of the exacerbation' objects='spirometry decision' id='activity18'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='hospital administration and admitting clinicians' action='review COPD admission rates on a quarterly basis benchmarked against similar hospitals in the province' objects='quarterly COPD admission rate reports' id='activity23'/>
+</process>

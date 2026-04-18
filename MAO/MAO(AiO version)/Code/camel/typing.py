@@ -50,6 +50,14 @@ class ModelType(Enum):
     GPT_4o = "gpt-4o"
     GPT_4o1 = "gpt-4.1"
     GPT_5o2 = "gpt-5.2"
+    GPT_5o2_low_reasoning = "gpt-5.2-low-reasoning"
+    GPT_5o2_medium_reasoning = "gpt-5.2-medium-reasoning"
+    GPT_5o2_high_reasoning = "gpt-5.2-high-reasoning"
+    GPT_5o4 = "gpt-5.4"
+    GPT_5o4_low_reasoning = "gpt-5.4-low-reasoning"
+    GPT_5o4_medium_reasoning = "gpt-5.4-medium-reasoning"
+    GPT_5o4_high_reasoning = "gpt-5.4-high-reasoning"
+    GPT_5o4_xhigh_reasoning = "gpt-5.4-xhigh-reasoning"
     STUB = "stub"
 
     @property
@@ -58,7 +66,7 @@ class ModelType(Enum):
             return "gpt-3.5-turbo-16k"
         elif self.name == "GPT_4o":
             return "gpt-4"  # Use GPT-4's tokenizer for GPT_4o
-        elif self.name == "GPT_4o1" or "GPT_5o2":
+        elif self.name == "GPT_4o1" or "GPT_5o2" or "GPT_5o2_low_reasoning" or "GPT_5o2_medium_reasoning" or "GPT_5o2_high_reasoning":
             return "gpt-4"  # Use GPT-4's tokenizer for GPT_4o
         else:
             return self.value

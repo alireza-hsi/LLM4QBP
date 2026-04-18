@@ -1,0 +1,105 @@
+<process>
+  <activity role='clinician' action='order chest x-ray to confirm the diagnosis' objects='chest x-ray' id='activity1'/>
+  <activity role='healthcare expert' action='interpret chest x-ray results' objects='chest x-ray results' id='activity34a'/>
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='Patient without sepsis' id='branch2'>
+      <activity role='clinician' action='wait for results of chest x-ray prior to giving antibiotics' objects='chest x-ray results, antibiotics' id='activity2'/>
+    </branch>
+    <branch condition='Patient with sepsis' id='branch3'>
+      <activity role='clinician' action='do not wait for results of chest x-ray prior to giving antibiotics' objects='antibiotics' id='activity3'/>
+    </branch>
+  </exclusiveGateway>
+
+  <exclusiveGateway id='exclusivegateway3'>
+    <branch condition='Patient admitted to hospital' id='branch5'>
+      <parallelGateway id='parallelgateway1'>
+        <branch id='branch6'>
+          <activity role='clinician' action='measure oxygen saturation' objects='oxygen saturation' id='activity5'/>
+        </branch>
+        <branch id='branch7'>
+          <parallelGateway id='parallelgateway2'>
+            <branch id='branch19'>
+              <activity role='clinician' action='order routine blood work (CBC, electrolytes, renal function tests)' objects='CBC, electrolytes, renal function tests' id='activity6_merged'/>
+            </branch>
+            <branch id='branch20'>
+              <activity role='clinician' action='continue concurrent clinical assessment while labs pending' objects='clinical assessment' id='activity6_concurrent'/>
+            </branch>
+          </parallelGateway>
+          <activity role='healthcare expert' action='interpret routine blood work results' objects='CBC results, electrolytes results, renal function test results' id='activity23'/>
+        </branch>
+      </parallelGateway>
+
+      <inclusiveGateway id='inclusivegateway1'>
+        <branch condition='Patient meets >2 CRB-65 criteria' id='branch8'>
+          <parallelGateway id='parallelgateway3'>
+            <branch id='branch22'>
+              <activity role='clinician' action='consider blood gases' objects='blood gases' id='activity7_1'/>
+            </branch>
+            <branch id='branch23'>
+              <activity role='clinician' action='consider lactate' objects='lactate' id='activity7_2'/>
+            </branch>
+            <branch id='branch24'>
+              <activity role='clinician' action='consider liver enzyme tests' objects='liver enzyme tests' id='activity7_3'/>
+            </branch>
+            <branch id='branch25'>
+              <activity role='clinician' action='consider liver function tests' objects='liver function tests' id='activity7_4'/>
+            </branch>
+          </parallelGateway>
+          <activity role='healthcare expert' action='interpret blood gases, lactate, and liver test results' objects='blood gases results, lactate results, liver enzyme test results, liver function test results' id='activity24'/>
+        </branch>
+
+        <branch condition='Patient meets >2 SIRS criteria OR requires admission to the ICU' id='branch9_merged'>
+          <activity role='clinician' action='obtain blood cultures' objects='blood cultures' id='activity8'/>
+          <activity role='healthcare expert' action='interpret blood culture results' objects='blood culture results' id='activity25'/>
+        </branch>
+
+        <branch condition='It is possible to obtain an adequate sample' id='branch11'>
+          <activity role='clinician' action='consider a sputum culture' objects='sputum sample, sputum culture' id='activity10'/>
+          <exclusiveGateway id='exclusivegateway4'>
+            <branch condition='Sputum culture obtained' id='branch26'>
+              <activity role='clinician' action='consider Gram staining' objects='sputum sample, Gram stain' id='activity11'/>
+              <activity role='healthcare expert' action='interpret sputum culture and Gram stain results' objects='sputum culture results, Gram stain results' id='activity27'/>
+            </branch>
+            <branch condition='Sputum culture not obtained' id='branch27'>
+              <activity role='clinician' action='do not consider Gram staining' objects='Gram stain' id='activity20'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+
+        <branch condition='Using a targeted antibiotic instead of using a non-targeted antibiotic' id='branch12'>
+          <activity role='clinician' action='consider a sputum culture' objects='sputum sample, sputum culture' id='activity12'/>
+          <activity role='healthcare expert' action='interpret sputum culture results' objects='sputum culture results' id='activity28'/>
+        </branch>
+
+        <branch condition='High-severity patients' id='branch13'>
+          <activity role='clinician' action='perform urine antigen testing' objects='urine antigen test' id='activity13'/>
+          <activity role='healthcare expert' action='interpret urine antigen test results' objects='urine antigen test results' id='activity29'/>
+        </branch>
+
+        <branch condition='Enhanced surveillance directive from Public Health Ontario on Legionella in inpatients' id='branch14'>
+          <activity role='clinician' action='perform urine antigen testing' objects='urine antigen test' id='activity14'/>
+          <activity role='healthcare expert' action='interpret urine antigen test results' objects='urine antigen test results' id='activity30'/>
+        </branch>
+
+        <branch condition='Not responding to drug therapy after 48–72 hours' id='branch15'>
+          <activity role='clinician' action='perform urine antigen testing' objects='urine antigen test' id='activity15'/>
+          <activity role='healthcare expert' action='interpret urine antigen test results' objects='urine antigen test results' id='activity31'/>
+        </branch>
+
+        <branch condition='Inpatients during peak season (mid-June to early October)' id='branch16'>
+          <activity role='clinician' action='perform urine antigen testing' objects='urine antigen test' id='activity16'/>
+          <activity role='healthcare expert' action='interpret urine antigen test results' objects='urine antigen test results' id='activity32'/>
+        </branch>
+
+        <branch condition='Intubated patients (e.g. high severity)' id='branch17'>
+          <activity role='clinician' action='consider PCR testing for Legionella' objects='Legionella PCR test' id='activity17'/>
+          <activity role='healthcare expert' action='interpret Legionella PCR test results' objects='Legionella PCR test results' id='activity33'/>
+        </branch>
+      </inclusiveGateway>
+    </branch>
+
+    <branch condition='Patient not admitted to hospital' id='branch18'>
+      <activity role='clinician' action='measure oxygen saturation' objects='oxygen saturation' id='activity21'/>
+    </branch>
+  </exclusiveGateway>
+</process>

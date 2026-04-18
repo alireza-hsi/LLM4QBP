@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" targetNamespace="http://www.example.com/bpmn">
+  <process id="Process_Acute_Heart_Failure_Episode" name="Acute Heart Failure Episode of Care" isExecutable="false">
+    <startEvent id="Start_AHF_Presentation" name="Patient with acute heart failure presents to ED"/>
+    <task id="Task_Apply_Risk_Assessment" name="Apply common standardized risk assessment and stratification tool"/>
+    <parallelGateway id="Gateway_Initial_Split"/>
+    <task id="Task_Initial_Investigations" name="Perform initial investigations including creatinine and electrolytes, troponin, complete blood count, ECG, chest x-ray, and echocardiogram if needed"/>
+    <task id="Task_Frequent_Monitoring" name="Measure heart rate, blood pressure, and oxygen saturation frequently until stabilized"/>
+    <task id="Task_Initial_Treatment" name="Administer initial ED treatment and diuresis"/>
+    <parallelGateway id="Gateway_Initial_Join"/>
+    <task id="Task_Assess_Response_HighRisk" name="Assess response to diuresis and high-risk markers"/>
+    <task id="Task_Calculate_Risk_Score" name="Calculate acute heart failure risk score such as EHMRG"/>
+    <exclusiveGateway id="Gateway_Determine_Patient_Group" name="Classify patient as low, average, or high intensity"/>
+    <exclusiveGateway id="Gateway_Low_Risk_Disposition" name="Is low-risk patient eligible for discharge"/>
+    <task id="Task_Discharge_Home" name="Discharge patient home from ED or outpatient setting"/>
+    <task id="Task_Arrange_PCP_Followup" name="Arrange follow-up visit with primary care provider within days of ED discharge"/>
+    <endEvent id="End_Discharge_Home" name="Home discharge completed"/>
+    <exclusiveGateway id="Gateway_Inpatient_Merge"/>
+    <task id="Task_Admit_Inpatient" name="Admit patient to inpatient care with normal nurse-to-patient staffing"/>
+    <endEvent id="End_Inpatient_Care" name="Inpatient care initiated"/>
+    <exclusiveGateway id="Gateway_Higher_Level_Available" name="Is higher-level care available locally"/>
+    <task id="Task_Transfer_Higher_Level" name="Transfer patient to a higher level provider"/>
+    <exclusiveGateway id="Gateway_High_Intensity_Merge"/>
+    <task id="Task_ICU_Ventilation" name="Provide ventilation and/or admit patient to intensive care unit with higher nurse-to-patient staffing"/>
+    <endEvent id="End_High_Intensity_Care" name="High-intensity care initiated"/>
+
+    <sequenceFlow id="Flow_Start_to_Assessment" sourceRef="Start_AHF_Presentation" targetRef="Task_Apply_Risk_Assessment"/>
+    <sequenceFlow id="Flow_Assessment_to_InitialSplit" sourceRef="Task_Apply_Risk_Assessment" targetRef="Gateway_Initial_Split"/>
+    <sequenceFlow id="Flow_InitialSplit_to_Investigations" sourceRef="Gateway_Initial_Split" targetRef="Task_Initial_Investigations"/>
+    <sequenceFlow id="Flow_InitialSplit_to_Monitoring" sourceRef="Gateway_Initial_Split" targetRef="Task_Frequent_Monitoring"/>
+    <sequenceFlow id="Flow_InitialSplit_to_Treatment" sourceRef="Gateway_Initial_Split" targetRef="Task_Initial_Treatment"/>
+    <sequenceFlow id="Flow_Investigations_to_InitialJoin" sourceRef="Task_Initial_Investigations" targetRef="Gateway_Initial_Join"/>
+    <sequenceFlow id="Flow_Monitoring_to_InitialJoin" sourceRef="Task_Frequent_Monitoring" targetRef="Gateway_Initial_Join"/>
+    <sequenceFlow id="Flow_Treatment_to_InitialJoin" sourceRef="Task_Initial_Treatment" targetRef="Gateway_Initial_Join"/>
+    <sequenceFlow id="Flow_InitialJoin_to_AssessResponse" sourceRef="Gateway_Initial_Join" targetRef="Task_Assess_Response_HighRisk"/>
+    <sequenceFlow id="Flow_AssessResponse_to_CalculateRisk" sourceRef="Task_Assess_Response_HighRisk" targetRef="Task_Calculate_Risk_Score"/>
+    <sequenceFlow id="Flow_CalculateRisk_to_DetermineGroup" sourceRef="Task_Calculate_Risk_Score" targetRef="Gateway_Determine_Patient_Group"/>
+    <sequenceFlow id="Flow_DetermineGroup_to_Low" name="Low intensity" sourceRef="Gateway_Determine_Patient_Group" targetRef="Gateway_Low_Risk_Disposition"/>
+    <sequenceFlow id="Flow_DetermineGroup_to_InpatientMerge" name="Average intensity" sourceRef="Gateway_Determine_Patient_Group" targetRef="Gateway_Inpatient_Merge"/>
+    <sequenceFlow id="Flow_DetermineGroup_to_HigherLevel" name="High intensity" sourceRef="Gateway_Determine_Patient_Group" targetRef="Gateway_Higher_Level_Available"/>
+    <sequenceFlow id="Flow_LowDisposition_to_Discharge" name="Eligible for discharge" sourceRef="Gateway_Low_Risk_Disposition" targetRef="Task_Discharge_Home"/>
+    <sequenceFlow id="Flow_LowDisposition_to_InpatientMerge" name="Admission required" sourceRef="Gateway_Low_Risk_Disposition" targetRef="Gateway_Inpatient_Merge"/>
+    <sequenceFlow id="Flow_Discharge_to_PCPFollowup" sourceRef="Task_Discharge_Home" targetRef="Task_Arrange_PCP_Followup"/>
+    <sequenceFlow id="Flow_PCPFollowup_to_EndDischarge" sourceRef="Task_Arrange_PCP_Followup" targetRef="End_Discharge_Home"/>
+    <sequenceFlow id="Flow_InpatientMerge_to_AdmitInpatient" sourceRef="Gateway_Inpatient_Merge" targetRef="Task_Admit_Inpatient"/>
+    <sequenceFlow id="Flow_AdmitInpatient_to_EndInpatient" sourceRef="Task_Admit_Inpatient" targetRef="End_Inpatient_Care"/>
+    <sequenceFlow id="Flow_HigherLevelAvailable_to_HighMerge" name="Available locally" sourceRef="Gateway_Higher_Level_Available" targetRef="Gateway_High_Intensity_Merge"/>
+    <sequenceFlow id="Flow_HigherLevelAvailable_to_Transfer" name="Transfer required" sourceRef="Gateway_Higher_Level_Available" targetRef="Task_Transfer_Higher_Level"/>
+    <sequenceFlow id="Flow_Transfer_to_HighMerge" sourceRef="Task_Transfer_Higher_Level" targetRef="Gateway_High_Intensity_Merge"/>
+    <sequenceFlow id="Flow_HighMerge_to_ICU" sourceRef="Gateway_High_Intensity_Merge" targetRef="Task_ICU_Ventilation"/>
+    <sequenceFlow id="Flow_ICU_to_EndHigh" sourceRef="Task_ICU_Ventilation" targetRef="End_High_Intensity_Care"/>
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Acute_Heart_Failure">
+    <bpmndi:BPMNPlane id="BPMNPlane_Acute_Heart_Failure" bpmnElement="Process_Acute_Heart_Failure_Episode">
+      <bpmndi:BPMNShape id="BPMNShape_Start_AHF_Presentation" bpmnElement="Start_AHF_Presentation">
+        <dc:Bounds x="80" y="272" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Apply_Risk_Assessment" bpmnElement="Task_Apply_Risk_Assessment">
+        <dc:Bounds x="150" y="250" width="220" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Gateway_Initial_Split" bpmnElement="Gateway_Initial_Split">
+        <dc:Bounds x="410" y="265" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Initial_Investigations" bpmnElement="Task_Initial_Investigations">
+        <dc:Bounds x="530" y="90" width="270" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Frequent_Monitoring" bpmnElement="Task_Frequent_Monitoring">
+        <dc:Bounds x="530" y="250" width="270" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Initial_Treatment" bpmnElement="Task_Initial_Treatment">
+        <dc:Bounds x="530" y="410" width="270" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Gateway_Initial_Join" bpmnElement="Gateway_Initial_Join">
+        <dc:Bounds x="850" y="265" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Assess_Response_HighRisk" bpmnElement="Task_Assess_Response_HighRisk">
+        <dc:Bounds x="950" y="250" width="230" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Calculate_Risk_Score" bpmnElement="Task_Calculate_Risk_Score">
+        <dc:Bounds x="1230" y="250" width="210" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Gateway_Determine_Patient_Group" bpmnElement="Gateway_Determine_Patient_Group">
+        <dc:Bounds x="1490" y="265" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Gateway_Low_Risk_Disposition" bpmnElement="Gateway_Low_Risk_Disposition">
+        <dc:Bounds x="1620" y="105" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Discharge_Home" bpmnElement="Task_Discharge_Home">
+        <dc:Bounds x="1720" y="90" width="210" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Arrange_PCP_Followup" bpmnElement="Task_Arrange_PCP_Followup">
+        <dc:Bounds x="1970" y="90" width="250" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_End_Discharge_Home" bpmnElement="End_Discharge_Home">
+        <dc:Bounds x="2260" y="112" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Gateway_Inpatient_Merge" bpmnElement="Gateway_Inpatient_Merge">
+        <dc:Bounds x="1620" y="265" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Admit_Inpatient" bpmnElement="Task_Admit_Inpatient">
+        <dc:Bounds x="1720" y="250" width="300" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_End_Inpatient_Care" bpmnElement="End_Inpatient_Care">
+        <dc:Bounds x="2060" y="272" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Gateway_Higher_Level_Available" bpmnElement="Gateway_Higher_Level_Available">
+        <dc:Bounds x="1620" y="425" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Transfer_Higher_Level" bpmnElement="Task_Transfer_Higher_Level">
+        <dc:Bounds x="1720" y="520" width="220" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Gateway_High_Intensity_Merge" bpmnElement="Gateway_High_Intensity_Merge">
+        <dc:Bounds x="1980" y="425" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_ICU_Ventilation" bpmnElement="Task_ICU_Ventilation">
+        <dc:Bounds x="2090" y="410" width="300" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_End_High_Intensity_Care" bpmnElement="End_High_Intensity_Care">
+        <dc:Bounds x="2430" y="432" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_Start_to_Assessment" bpmnElement="Flow_Start_to_Assessment">
+        <di:waypoint x="116" y="290"/>
+        <di:waypoint x="150" y="290"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_Assessment_to_InitialSplit" bpmnElement="Flow_Assessment_to_InitialSplit">
+        <di:waypoint x="370" y="290"/>
+        <di:waypoint x="410" y="290"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_InitialSplit_to_Investigations" bpmnElement="Flow_InitialSplit_to_Investigations">
+        <di:waypoint x="435" y="265"/>
+        <di:waypoint x="435" y="130"/>
+        <di:waypoint x="530" y="130"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_InitialSplit_to_Monitoring" bpmnElement="Flow_InitialSplit_to_Monitoring">
+        <di:waypoint x="460" y="290"/>
+        <di:waypoint x="530" y="290"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_InitialSplit_to_Treatment" bpmnElement="Flow_InitialSplit_to_Treatment">
+        <di:waypoint x="435" y="315"/>
+        <di:waypoint x="435" y="450"/>
+        <di:waypoint x="530" y="450"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_Investigations_to_InitialJoin" bpmnElement="Flow_Investigations_to_InitialJoin">
+        <di:waypoint x="800" y="130"/>
+        <di:waypoint x="875" y="130"/>
+        <di:waypoint x="875" y="265"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_Monitoring_to_InitialJoin" bpmnElement="Flow_Monitoring_to_InitialJoin">
+        <di:waypoint x="800" y="290"/>
+        <di:waypoint x="850" y="290"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_Treatment_to_InitialJoin" bpmnElement="Flow_Treatment_to_InitialJoin">
+        <di:waypoint x="800" y="450"/>
+        <di:waypoint x="875" y="450"/>
+        <di:waypoint x="875" y="315"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_InitialJoin_to_AssessResponse" bpmnElement="Flow_InitialJoin_to_AssessResponse">
+        <di:waypoint x="900" y="290"/>
+        <di:waypoint x="950" y="290"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_AssessResponse_to_CalculateRisk" bpmnElement="Flow_AssessResponse_to_CalculateRisk">
+        <di:waypoint x="1180" y="290"/>
+        <di:waypoint x="1230" y="290"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_CalculateRisk_to_DetermineGroup" bpmnElement="Flow_CalculateRisk_to_DetermineGroup">
+        <di:waypoint x="1440" y="290"/>
+        <di:waypoint x="1490" y="290"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_DetermineGroup_to_Low" bpmnElement="Flow_DetermineGroup_to_Low">
+        <di:waypoint x="1515" y="265"/>
+        <di:waypoint x="1515" y="130"/>
+        <di:waypoint x="1620" y="130"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_DetermineGroup_to_InpatientMerge" bpmnElement="Flow_DetermineGroup_to_InpatientMerge">
+        <di:waypoint x="1540" y="290"/>
+        <di:waypoint x="1620" y="290"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_DetermineGroup_to_HigherLevel" bpmnElement="Flow_DetermineGroup_to_HigherLevel">
+        <di:waypoint x="1515" y="315"/>
+        <di:waypoint x="1515" y="450"/>
+        <di:waypoint x="1620" y="450"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_LowDisposition_to_Discharge" bpmnElement="Flow_LowDisposition_to_Discharge">
+        <di:waypoint x="1670" y="130"/>
+        <di:waypoint x="1720" y="130"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_LowDisposition_to_InpatientMerge" bpmnElement="Flow_LowDisposition_to_InpatientMerge">
+        <di:waypoint x="1645" y="155"/>
+        <di:waypoint x="1645" y="265"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_Discharge_to_PCPFollowup" bpmnElement="Flow_Discharge_to_PCPFollowup">
+        <di:waypoint x="1930" y="130"/>
+        <di:waypoint x="1970" y="130"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_PCPFollowup_to_EndDischarge" bpmnElement="Flow_PCPFollowup_to_EndDischarge">
+        <di:waypoint x="2220" y="130"/>
+        <di:waypoint x="2260" y="130"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_InpatientMerge_to_AdmitInpatient" bpmnElement="Flow_InpatientMerge_to_AdmitInpatient">
+        <di:waypoint x="1670" y="290"/>
+        <di:waypoint x="1720" y="290"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_AdmitInpatient_to_EndInpatient" bpmnElement="Flow_AdmitInpatient_to_EndInpatient">
+        <di:waypoint x="2020" y="290"/>
+        <di:waypoint x="2060" y="290"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_HigherLevelAvailable_to_HighMerge" bpmnElement="Flow_HigherLevelAvailable_to_HighMerge">
+        <di:waypoint x="1670" y="450"/>
+        <di:waypoint x="1980" y="450"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_HigherLevelAvailable_to_Transfer" bpmnElement="Flow_HigherLevelAvailable_to_Transfer">
+        <di:waypoint x="1645" y="475"/>
+        <di:waypoint x="1645" y="560"/>
+        <di:waypoint x="1720" y="560"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_Transfer_to_HighMerge" bpmnElement="Flow_Transfer_to_HighMerge">
+        <di:waypoint x="1940" y="560"/>
+        <di:waypoint x="2005" y="560"/>
+        <di:waypoint x="2005" y="475"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_HighMerge_to_ICU" bpmnElement="Flow_HighMerge_to_ICU">
+        <di:waypoint x="2030" y="450"/>
+        <di:waypoint x="2090" y="450"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_ICU_to_EndHigh" bpmnElement="Flow_ICU_to_EndHigh">
+        <di:waypoint x="2390" y="450"/>
+        <di:waypoint x="2430" y="450"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

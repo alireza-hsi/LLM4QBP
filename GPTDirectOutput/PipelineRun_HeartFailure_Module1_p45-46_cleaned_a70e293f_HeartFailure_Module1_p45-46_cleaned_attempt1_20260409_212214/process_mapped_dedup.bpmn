@@ -1,0 +1,369 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" targetNamespace="http://www.example.com/bpmn" id="Definitions_1">
+  <process id="Process_Acute_Heart_Failure_Risk_Stratification" name="Episode of Care for Acute Heart Failure - Module 1 Risk Stratification" isExecutable="false">
+    <startEvent id="StartEvent_ED_Presentation" name="Patient with acute heart failure presents to ED">
+      <outgoing>Flow_01_Start_To_Risk_Assessment</outgoing>
+    </startEvent>
+    <task id="Task_Apply_Risk_Assessment" name="Risk stratification&#10;(e.g., EHMRG)">
+      <incoming>Flow_01_Start_To_Risk_Assessment</incoming>
+      <outgoing>Flow_02_Risk_Assessment_To_Investigations_Split</outgoing>
+    </task>
+    <parallelGateway id="Gateway_Investigations_Split">
+      <incoming>Flow_02_Risk_Assessment_To_Investigations_Split</incoming>
+      <outgoing>Flow_03_Split_To_Creatinine</outgoing>
+      <outgoing>Flow_04_Split_To_Troponin</outgoing>
+      <outgoing>Flow_05_Split_To_CBC</outgoing>
+      <outgoing>Flow_06_Split_To_ECG</outgoing>
+      <outgoing>Flow_07_Split_To_CXR</outgoing>
+      <outgoing>Flow_08_Split_To_Echocardiogram</outgoing>
+      <outgoing>Flow_09_Split_To_Monitor_Vitals</outgoing>
+    </parallelGateway>
+    <task id="Task_Measure_Creatinine_Electrolytes" name="Serum creatinine and electrolyte levels">
+      <incoming>Flow_03_Split_To_Creatinine</incoming>
+      <outgoing>Flow_10_Creatinine_To_Investigations_Join</outgoing>
+    </task>
+    <task id="Task_Measure_Troponin" name="Troponin measurements">
+      <incoming>Flow_04_Split_To_Troponin</incoming>
+      <outgoing>Flow_11_Troponin_To_Investigations_Join</outgoing>
+    </task>
+    <task id="Task_Obtain_CBC" name="Complete blood count">
+      <incoming>Flow_05_Split_To_CBC</incoming>
+      <outgoing>Flow_12_CBC_To_Investigations_Join</outgoing>
+    </task>
+    <task id="Task_Perform_ECG" name="Perform electrocardiogram">
+      <incoming>Flow_06_Split_To_ECG</incoming>
+      <outgoing>Flow_13_ECG_To_Investigations_Join</outgoing>
+    </task>
+    <task id="Task_Perform_CXR" name="Chest x-ray">
+      <incoming>Flow_07_Split_To_CXR</incoming>
+      <outgoing>Flow_14_CXR_To_Investigations_Join</outgoing>
+    </task>
+    <task id="Task_Perform_Echocardiogram_If_Needed" name="Echocardiogram">
+      <incoming>Flow_08_Split_To_Echocardiogram</incoming>
+      <outgoing>Flow_15_Echocardiogram_To_Investigations_Join</outgoing>
+    </task>
+    <task id="Task_Monitor_Vitals_Until_Stabilized" name="Monitor heart rate, blood pressure, oxygen saturation until stabilized">
+      <incoming>Flow_09_Split_To_Monitor_Vitals</incoming>
+      <outgoing>Flow_16_Monitor_Vitals_To_Investigations_Join</outgoing>
+    </task>
+    <parallelGateway id="Gateway_Investigations_Join">
+      <incoming>Flow_10_Creatinine_To_Investigations_Join</incoming>
+      <incoming>Flow_11_Troponin_To_Investigations_Join</incoming>
+      <incoming>Flow_12_CBC_To_Investigations_Join</incoming>
+      <incoming>Flow_13_ECG_To_Investigations_Join</incoming>
+      <incoming>Flow_14_CXR_To_Investigations_Join</incoming>
+      <incoming>Flow_15_Echocardiogram_To_Investigations_Join</incoming>
+      <incoming>Flow_16_Monitor_Vitals_To_Investigations_Join</incoming>
+      <outgoing>Flow_17_Investigations_Join_To_Assessment</outgoing>
+    </parallelGateway>
+    <task id="Task_Assess_Response_And_High_Risk_Markers" name="Check responsiveness to Diuresis">
+      <incoming>Flow_17_Investigations_Join_To_Assessment</incoming>
+      <outgoing>Flow_18_Assessment_To_EHMRG</outgoing>
+    </task>
+    <task id="Task_Calculate_EHMRG" name="Risk stratification&#10;(e.g., EHMRG)">
+      <incoming>Flow_18_Assessment_To_EHMRG</incoming>
+      <outgoing>Flow_19_EHMRG_To_Patient_Group</outgoing>
+    </task>
+    <exclusiveGateway id="Gateway_Determine_Patient_Group" name="Determine patient group and disposition">
+      <incoming>Flow_19_EHMRG_To_Patient_Group</incoming>
+      <outgoing>Flow_20_Group_To_Follow_Up</outgoing>
+      <outgoing>Flow_23_Group_To_Admit</outgoing>
+      <outgoing>Flow_25_Group_To_Care_Available</outgoing>
+    </exclusiveGateway>
+    <task id="Task_Arrange_PCP_Follow_Up" name="Arrange follow-up (within days) with primary care">
+      <incoming>Flow_20_Group_To_Follow_Up</incoming>
+      <outgoing>Flow_21_Follow_Up_To_Discharge</outgoing>
+    </task>
+    <task id="Task_Discharge_Home" name="Discharge home">
+      <incoming>Flow_21_Follow_Up_To_Discharge</incoming>
+      <outgoing>Flow_22_Discharge_To_End</outgoing>
+    </task>
+    <endEvent id="EndEvent_Discharge" name="Discharged home">
+      <incoming>Flow_22_Discharge_To_End</incoming>
+    </endEvent>
+    <task id="Task_Admit_Inpatient" name="Admit to inpatient care (normal nurse-to-patient staffing)">
+      <incoming>Flow_23_Group_To_Admit</incoming>
+      <outgoing>Flow_24_Admit_To_End</outgoing>
+    </task>
+    <endEvent id="EndEvent_Inpatient" name="Admitted to inpatient care">
+      <incoming>Flow_24_Admit_To_End</incoming>
+    </endEvent>
+    <exclusiveGateway id="Gateway_Higher_Level_Care_Available" name="Higher-level care available on site?">
+      <incoming>Flow_25_Group_To_Care_Available</incoming>
+      <outgoing>Flow_26_Care_Available_To_ICU</outgoing>
+      <outgoing>Flow_28_Care_Available_To_Transfer</outgoing>
+    </exclusiveGateway>
+    <task id="Task_Provide_Ventilation_Or_ICU" name="Admit to ICU (high nurse-to-patient staffing)">
+      <incoming>Flow_26_Care_Available_To_ICU</incoming>
+      <outgoing>Flow_27_ICU_To_End</outgoing>
+    </task>
+    <endEvent id="EndEvent_High_Intensity" name="High-intensity care initiated">
+      <incoming>Flow_27_ICU_To_End</incoming>
+    </endEvent>
+    <task id="Task_Transfer_Higher_Level_Provider" name="Transfer patient to higher level provider">
+      <incoming>Flow_28_Care_Available_To_Transfer</incoming>
+      <outgoing>Flow_29_Transfer_To_End</outgoing>
+    </task>
+    <endEvent id="EndEvent_Transfer" name="Transferred to higher level provider">
+      <incoming>Flow_29_Transfer_To_End</incoming>
+    </endEvent>
+
+    <sequenceFlow id="Flow_01_Start_To_Risk_Assessment" sourceRef="StartEvent_ED_Presentation" targetRef="Task_Apply_Risk_Assessment" />
+    <sequenceFlow id="Flow_02_Risk_Assessment_To_Investigations_Split" sourceRef="Task_Apply_Risk_Assessment" targetRef="Gateway_Investigations_Split" />
+    <sequenceFlow id="Flow_03_Split_To_Creatinine" sourceRef="Gateway_Investigations_Split" targetRef="Task_Measure_Creatinine_Electrolytes" />
+    <sequenceFlow id="Flow_04_Split_To_Troponin" sourceRef="Gateway_Investigations_Split" targetRef="Task_Measure_Troponin" />
+    <sequenceFlow id="Flow_05_Split_To_CBC" sourceRef="Gateway_Investigations_Split" targetRef="Task_Obtain_CBC" />
+    <sequenceFlow id="Flow_06_Split_To_ECG" sourceRef="Gateway_Investigations_Split" targetRef="Task_Perform_ECG" />
+    <sequenceFlow id="Flow_07_Split_To_CXR" sourceRef="Gateway_Investigations_Split" targetRef="Task_Perform_CXR" />
+    <sequenceFlow id="Flow_08_Split_To_Echocardiogram" sourceRef="Gateway_Investigations_Split" targetRef="Task_Perform_Echocardiogram_If_Needed" />
+    <sequenceFlow id="Flow_09_Split_To_Monitor_Vitals" sourceRef="Gateway_Investigations_Split" targetRef="Task_Monitor_Vitals_Until_Stabilized" />
+    <sequenceFlow id="Flow_10_Creatinine_To_Investigations_Join" sourceRef="Task_Measure_Creatinine_Electrolytes" targetRef="Gateway_Investigations_Join" />
+    <sequenceFlow id="Flow_11_Troponin_To_Investigations_Join" sourceRef="Task_Measure_Troponin" targetRef="Gateway_Investigations_Join" />
+    <sequenceFlow id="Flow_12_CBC_To_Investigations_Join" sourceRef="Task_Obtain_CBC" targetRef="Gateway_Investigations_Join" />
+    <sequenceFlow id="Flow_13_ECG_To_Investigations_Join" sourceRef="Task_Perform_ECG" targetRef="Gateway_Investigations_Join" />
+    <sequenceFlow id="Flow_14_CXR_To_Investigations_Join" sourceRef="Task_Perform_CXR" targetRef="Gateway_Investigations_Join" />
+    <sequenceFlow id="Flow_15_Echocardiogram_To_Investigations_Join" sourceRef="Task_Perform_Echocardiogram_If_Needed" targetRef="Gateway_Investigations_Join" />
+    <sequenceFlow id="Flow_16_Monitor_Vitals_To_Investigations_Join" sourceRef="Task_Monitor_Vitals_Until_Stabilized" targetRef="Gateway_Investigations_Join" />
+    <sequenceFlow id="Flow_17_Investigations_Join_To_Assessment" sourceRef="Gateway_Investigations_Join" targetRef="Task_Assess_Response_And_High_Risk_Markers" />
+    <sequenceFlow id="Flow_18_Assessment_To_EHMRG" sourceRef="Task_Assess_Response_And_High_Risk_Markers" targetRef="Task_Calculate_EHMRG" />
+    <sequenceFlow id="Flow_19_EHMRG_To_Patient_Group" sourceRef="Task_Calculate_EHMRG" targetRef="Gateway_Determine_Patient_Group" />
+    <sequenceFlow id="Flow_20_Group_To_Follow_Up" name="Low intensity and suitable for discharge" sourceRef="Gateway_Determine_Patient_Group" targetRef="Task_Arrange_PCP_Follow_Up" />
+    <sequenceFlow id="Flow_21_Follow_Up_To_Discharge" sourceRef="Task_Arrange_PCP_Follow_Up" targetRef="Task_Discharge_Home" />
+    <sequenceFlow id="Flow_22_Discharge_To_End" sourceRef="Task_Discharge_Home" targetRef="EndEvent_Discharge" />
+    <sequenceFlow id="Flow_23_Group_To_Admit" name="Average intensity" sourceRef="Gateway_Determine_Patient_Group" targetRef="Task_Admit_Inpatient" />
+    <sequenceFlow id="Flow_24_Admit_To_End" sourceRef="Task_Admit_Inpatient" targetRef="EndEvent_Inpatient" />
+    <sequenceFlow id="Flow_25_Group_To_Care_Available" name="High intensity" sourceRef="Gateway_Determine_Patient_Group" targetRef="Gateway_Higher_Level_Care_Available" />
+    <sequenceFlow id="Flow_26_Care_Available_To_ICU" name="Yes" sourceRef="Gateway_Higher_Level_Care_Available" targetRef="Task_Provide_Ventilation_Or_ICU" />
+    <sequenceFlow id="Flow_27_ICU_To_End" sourceRef="Task_Provide_Ventilation_Or_ICU" targetRef="EndEvent_High_Intensity" />
+    <sequenceFlow id="Flow_28_Care_Available_To_Transfer" name="No" sourceRef="Gateway_Higher_Level_Care_Available" targetRef="Task_Transfer_Higher_Level_Provider" />
+    <sequenceFlow id="Flow_29_Transfer_To_End" sourceRef="Task_Transfer_Higher_Level_Provider" targetRef="EndEvent_Transfer" />
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_Acute_Heart_Failure_Risk_Stratification">
+      <bpmndi:BPMNShape id="BPMNShape_StartEvent_ED_Presentation" bpmnElement="StartEvent_ED_Presentation">
+        <dc:Bounds x="40" y="357" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Apply_Risk_Assessment" bpmnElement="Task_Apply_Risk_Assessment">
+        <dc:Bounds x="120" y="335" width="200" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Gateway_Investigations_Split" bpmnElement="Gateway_Investigations_Split">
+        <dc:Bounds x="360" y="350" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Measure_Creatinine_Electrolytes" bpmnElement="Task_Measure_Creatinine_Electrolytes">
+        <dc:Bounds x="450" y="20" width="280" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Measure_Troponin" bpmnElement="Task_Measure_Troponin">
+        <dc:Bounds x="450" y="100" width="280" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Obtain_CBC" bpmnElement="Task_Obtain_CBC">
+        <dc:Bounds x="450" y="180" width="280" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Perform_ECG" bpmnElement="Task_Perform_ECG">
+        <dc:Bounds x="450" y="260" width="280" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Perform_CXR" bpmnElement="Task_Perform_CXR">
+        <dc:Bounds x="450" y="340" width="280" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Perform_Echocardiogram_If_Needed" bpmnElement="Task_Perform_Echocardiogram_If_Needed">
+        <dc:Bounds x="450" y="420" width="280" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Monitor_Vitals_Until_Stabilized" bpmnElement="Task_Monitor_Vitals_Until_Stabilized">
+        <dc:Bounds x="450" y="500" width="280" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Gateway_Investigations_Join" bpmnElement="Gateway_Investigations_Join">
+        <dc:Bounds x="780" y="350" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Assess_Response_And_High_Risk_Markers" bpmnElement="Task_Assess_Response_And_High_Risk_Markers">
+        <dc:Bounds x="860" y="335" width="260" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Calculate_EHMRG" bpmnElement="Task_Calculate_EHMRG">
+        <dc:Bounds x="1160" y="335" width="200" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Gateway_Determine_Patient_Group" bpmnElement="Gateway_Determine_Patient_Group">
+        <dc:Bounds x="1400" y="350" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Arrange_PCP_Follow_Up" bpmnElement="Task_Arrange_PCP_Follow_Up">
+        <dc:Bounds x="1500" y="180" width="240" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Discharge_Home" bpmnElement="Task_Discharge_Home">
+        <dc:Bounds x="1780" y="180" width="240" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_EndEvent_Discharge" bpmnElement="EndEvent_Discharge">
+        <dc:Bounds x="2060" y="202" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Admit_Inpatient" bpmnElement="Task_Admit_Inpatient">
+        <dc:Bounds x="1500" y="335" width="260" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_EndEvent_Inpatient" bpmnElement="EndEvent_Inpatient">
+        <dc:Bounds x="1800" y="357" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Gateway_Higher_Level_Care_Available" bpmnElement="Gateway_Higher_Level_Care_Available">
+        <dc:Bounds x="1500" y="500" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Provide_Ventilation_Or_ICU" bpmnElement="Task_Provide_Ventilation_Or_ICU">
+        <dc:Bounds x="1600" y="460" width="300" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_EndEvent_High_Intensity" bpmnElement="EndEvent_High_Intensity">
+        <dc:Bounds x="1940" y="482" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_Transfer_Higher_Level_Provider" bpmnElement="Task_Transfer_Higher_Level_Provider">
+        <dc:Bounds x="1600" y="570" width="300" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_EndEvent_Transfer" bpmnElement="EndEvent_Transfer">
+        <dc:Bounds x="1940" y="592" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_01_Start_To_Risk_Assessment" bpmnElement="Flow_01_Start_To_Risk_Assessment">
+        <di:waypoint x="76" y="375" />
+        <di:waypoint x="120" y="375" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_02_Risk_Assessment_To_Investigations_Split" bpmnElement="Flow_02_Risk_Assessment_To_Investigations_Split">
+        <di:waypoint x="320" y="375" />
+        <di:waypoint x="360" y="375" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_03_Split_To_Creatinine" bpmnElement="Flow_03_Split_To_Creatinine">
+        <di:waypoint x="410" y="375" />
+        <di:waypoint x="430" y="375" />
+        <di:waypoint x="430" y="50" />
+        <di:waypoint x="450" y="50" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_04_Split_To_Troponin" bpmnElement="Flow_04_Split_To_Troponin">
+        <di:waypoint x="410" y="375" />
+        <di:waypoint x="430" y="375" />
+        <di:waypoint x="430" y="130" />
+        <di:waypoint x="450" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_05_Split_To_CBC" bpmnElement="Flow_05_Split_To_CBC">
+        <di:waypoint x="410" y="375" />
+        <di:waypoint x="430" y="375" />
+        <di:waypoint x="430" y="210" />
+        <di:waypoint x="450" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_06_Split_To_ECG" bpmnElement="Flow_06_Split_To_ECG">
+        <di:waypoint x="410" y="375" />
+        <di:waypoint x="430" y="375" />
+        <di:waypoint x="430" y="290" />
+        <di:waypoint x="450" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_07_Split_To_CXR" bpmnElement="Flow_07_Split_To_CXR">
+        <di:waypoint x="410" y="375" />
+        <di:waypoint x="430" y="375" />
+        <di:waypoint x="430" y="370" />
+        <di:waypoint x="450" y="370" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_08_Split_To_Echocardiogram" bpmnElement="Flow_08_Split_To_Echocardiogram">
+        <di:waypoint x="410" y="375" />
+        <di:waypoint x="430" y="375" />
+        <di:waypoint x="430" y="450" />
+        <di:waypoint x="450" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_09_Split_To_Monitor_Vitals" bpmnElement="Flow_09_Split_To_Monitor_Vitals">
+        <di:waypoint x="410" y="375" />
+        <di:waypoint x="430" y="375" />
+        <di:waypoint x="430" y="540" />
+        <di:waypoint x="450" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_10_Creatinine_To_Investigations_Join" bpmnElement="Flow_10_Creatinine_To_Investigations_Join">
+        <di:waypoint x="730" y="50" />
+        <di:waypoint x="755" y="50" />
+        <di:waypoint x="755" y="375" />
+        <di:waypoint x="780" y="375" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_11_Troponin_To_Investigations_Join" bpmnElement="Flow_11_Troponin_To_Investigations_Join">
+        <di:waypoint x="730" y="130" />
+        <di:waypoint x="755" y="130" />
+        <di:waypoint x="755" y="375" />
+        <di:waypoint x="780" y="375" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_12_CBC_To_Investigations_Join" bpmnElement="Flow_12_CBC_To_Investigations_Join">
+        <di:waypoint x="730" y="210" />
+        <di:waypoint x="755" y="210" />
+        <di:waypoint x="755" y="375" />
+        <di:waypoint x="780" y="375" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_13_ECG_To_Investigations_Join" bpmnElement="Flow_13_ECG_To_Investigations_Join">
+        <di:waypoint x="730" y="290" />
+        <di:waypoint x="755" y="290" />
+        <di:waypoint x="755" y="375" />
+        <di:waypoint x="780" y="375" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_14_CXR_To_Investigations_Join" bpmnElement="Flow_14_CXR_To_Investigations_Join">
+        <di:waypoint x="730" y="370" />
+        <di:waypoint x="755" y="370" />
+        <di:waypoint x="755" y="375" />
+        <di:waypoint x="780" y="375" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_15_Echocardiogram_To_Investigations_Join" bpmnElement="Flow_15_Echocardiogram_To_Investigations_Join">
+        <di:waypoint x="730" y="450" />
+        <di:waypoint x="755" y="450" />
+        <di:waypoint x="755" y="375" />
+        <di:waypoint x="780" y="375" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_16_Monitor_Vitals_To_Investigations_Join" bpmnElement="Flow_16_Monitor_Vitals_To_Investigations_Join">
+        <di:waypoint x="730" y="540" />
+        <di:waypoint x="755" y="540" />
+        <di:waypoint x="755" y="375" />
+        <di:waypoint x="780" y="375" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_17_Investigations_Join_To_Assessment" bpmnElement="Flow_17_Investigations_Join_To_Assessment">
+        <di:waypoint x="830" y="375" />
+        <di:waypoint x="860" y="375" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_18_Assessment_To_EHMRG" bpmnElement="Flow_18_Assessment_To_EHMRG">
+        <di:waypoint x="1120" y="375" />
+        <di:waypoint x="1160" y="375" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_19_EHMRG_To_Patient_Group" bpmnElement="Flow_19_EHMRG_To_Patient_Group">
+        <di:waypoint x="1360" y="375" />
+        <di:waypoint x="1400" y="375" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_20_Group_To_Follow_Up" bpmnElement="Flow_20_Group_To_Follow_Up">
+        <di:waypoint x="1425" y="350" />
+        <di:waypoint x="1425" y="220" />
+        <di:waypoint x="1500" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_21_Follow_Up_To_Discharge" bpmnElement="Flow_21_Follow_Up_To_Discharge">
+        <di:waypoint x="1740" y="220" />
+        <di:waypoint x="1780" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_22_Discharge_To_End" bpmnElement="Flow_22_Discharge_To_End">
+        <di:waypoint x="2020" y="220" />
+        <di:waypoint x="2060" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_23_Group_To_Admit" bpmnElement="Flow_23_Group_To_Admit">
+        <di:waypoint x="1450" y="375" />
+        <di:waypoint x="1500" y="375" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_24_Admit_To_End" bpmnElement="Flow_24_Admit_To_End">
+        <di:waypoint x="1760" y="375" />
+        <di:waypoint x="1800" y="375" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_25_Group_To_Care_Available" bpmnElement="Flow_25_Group_To_Care_Available">
+        <di:waypoint x="1425" y="400" />
+        <di:waypoint x="1425" y="525" />
+        <di:waypoint x="1500" y="525" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_26_Care_Available_To_ICU" bpmnElement="Flow_26_Care_Available_To_ICU">
+        <di:waypoint x="1550" y="525" />
+        <di:waypoint x="1575" y="525" />
+        <di:waypoint x="1575" y="500" />
+        <di:waypoint x="1600" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_27_ICU_To_End" bpmnElement="Flow_27_ICU_To_End">
+        <di:waypoint x="1900" y="500" />
+        <di:waypoint x="1940" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_28_Care_Available_To_Transfer" bpmnElement="Flow_28_Care_Available_To_Transfer">
+        <di:waypoint x="1550" y="525" />
+        <di:waypoint x="1575" y="525" />
+        <di:waypoint x="1575" y="610" />
+        <di:waypoint x="1600" y="610" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_29_Transfer_To_End" bpmnElement="Flow_29_Transfer_To_End">
+        <di:waypoint x="1900" y="610" />
+        <di:waypoint x="1940" y="610" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+             targetNamespace="http://www.example.com/bpmn">
+  <process id="Process_Hip_Fracture_ED_Care" name="Hip fracture care pathway for early assessment and emergency care" isExecutable="false">
+    <startEvent id="StartEvent_Presentation" name="Suspected hip fracture patient presents for emergency or acute care assessment">
+      <outgoing>Flow_Start_To_Split</outgoing>
+    </startEvent>
+
+    <parallelGateway id="Gateway_ED_Work_Split" gatewayDirection="Diverging">
+      <incoming>Flow_Start_To_Split</incoming>
+      <outgoing>Flow_Split_To_Physician</outgoing>
+      <outgoing>Flow_Split_To_Assess_Initial</outgoing>
+      <outgoing>Flow_Split_To_MedRec</outgoing>
+      <outgoing>Flow_Split_To_Manage_Risks</outgoing>
+    </parallelGateway>
+
+    <task id="Task_Physician_Assessment" name="Provide physician assessment within 1 hour of arrival">
+      <incoming>Flow_Split_To_Physician</incoming>
+      <outgoing>Flow_Physician_To_Orthopedic</outgoing>
+    </task>
+
+    <task id="Task_Orthopedic_Consultation" name="Provide orthopedic surgeon consultation within 2 hours of arrival">
+      <incoming>Flow_Physician_To_Orthopedic</incoming>
+      <outgoing>Flow_Orthopedic_To_Anesthesia</outgoing>
+    </task>
+
+    <task id="Task_Anesthesia_Internist_Consultation" name="Notify anesthesiologist or internist and obtain consultation as needed">
+      <incoming>Flow_Orthopedic_To_Anesthesia</incoming>
+      <outgoing>Flow_Anesthesia_To_Join</outgoing>
+    </task>
+
+    <task id="Task_Assess_Initial_ED_Factors" name="Assess and document fall reason, fluid balance, pressure sore risk, hydration and nutrition, pain, temperature, and collateral injuries">
+      <incoming>Flow_Split_To_Assess_Initial</incoming>
+      <outgoing>Flow_Assess_Initial_To_Diagnostics</outgoing>
+    </task>
+
+    <task id="Task_Order_Bloodwork_Xrays" name="Order and review appropriate blood work and X-rays">
+      <incoming>Flow_Assess_Initial_To_Diagnostics</incoming>
+      <outgoing>Flow_Diagnostics_To_Comorbidities</outgoing>
+    </task>
+
+    <task id="Task_Assess_Comorbidities_Medications" name="Assess comorbidities and current drug therapy including anticoagulants">
+      <incoming>Flow_Diagnostics_To_Comorbidities</incoming>
+      <outgoing>Flow_Comorbidities_To_Functional</outgoing>
+    </task>
+
+    <task id="Task_Assess_Function_Mental_Social" name="Assess continence, pre-fracture mobility and function, physical function, mental state with a validated tool, and social circumstances">
+      <incoming>Flow_Comorbidities_To_Functional</incoming>
+      <outgoing>Flow_Functional_To_Join</outgoing>
+    </task>
+
+    <task id="Task_Medication_Reconciliation" name="Complete medication reconciliation using a standardized form in the ED">
+      <incoming>Flow_Split_To_MedRec</incoming>
+      <outgoing>Flow_MedRec_To_Join</outgoing>
+    </task>
+
+    <task id="Task_Manage_ED_Risks" name="Initiate management of hydration, pain, delirium risk, and pressure sore risk in the ED">
+      <incoming>Flow_Split_To_Manage_Risks</incoming>
+      <outgoing>Flow_Manage_Risks_To_Join</outgoing>
+    </task>
+
+    <parallelGateway id="Gateway_ED_Work_Join" gatewayDirection="Converging">
+      <incoming>Flow_Anesthesia_To_Join</incoming>
+      <incoming>Flow_Functional_To_Join</incoming>
+      <incoming>Flow_MedRec_To_Join</incoming>
+      <incoming>Flow_Manage_Risks_To_Join</incoming>
+      <outgoing>Flow_Join_To_Admission</outgoing>
+    </parallelGateway>
+
+    <task id="Task_Admit_Within_4_Hours" name="Admit patient to acute care within 4 hours spent in the ED">
+      <incoming>Flow_Join_To_Admission</incoming>
+      <outgoing>Flow_Admission_To_Hospital_Type</outgoing>
+    </task>
+
+    <exclusiveGateway id="Gateway_Hospital_Type" name="Is hospital non-surgical?" gatewayDirection="Diverging">
+      <incoming>Flow_Admission_To_Hospital_Type</incoming>
+      <outgoing>Flow_Hospital_Type_To_Admitted_End</outgoing>
+      <outgoing>Flow_Hospital_Type_To_Stabilize</outgoing>
+    </exclusiveGateway>
+
+    <task id="Task_Medically_Stabilize" name="Medically stabilize patient while awaiting transfer">
+      <incoming>Flow_Hospital_Type_To_Stabilize</incoming>
+      <outgoing>Flow_Stabilize_To_Transfer</outgoing>
+    </task>
+
+    <task id="Task_Transfer_To_Surgical_Hospital" name="Transfer patient expeditiously to a surgical hospital using a formal transfer protocol">
+      <incoming>Flow_Stabilize_To_Transfer</incoming>
+      <outgoing>Flow_Transfer_To_Surgery</outgoing>
+    </task>
+
+    <task id="Task_Perform_Surgery_Within_48_Hours" name="Perform surgery within 48 hours of initial presentation">
+      <incoming>Flow_Transfer_To_Surgery</incoming>
+      <outgoing>Flow_Surgery_To_Repatriate</outgoing>
+    </task>
+
+    <task id="Task_Repatriate_To_Local_Hospital" name="Repatriate patient to the local hospital after surgery">
+      <incoming>Flow_Surgery_To_Repatriate</incoming>
+      <outgoing>Flow_Repatriate_To_End</outgoing>
+    </task>
+
+    <endEvent id="EndEvent_Admitted_For_Inpatient_Care" name="Patient admitted for inpatient hip fracture care">
+      <incoming>Flow_Hospital_Type_To_Admitted_End</incoming>
+    </endEvent>
+
+    <endEvent id="EndEvent_Repatriated_After_Surgery" name="Patient repatriated to local hospital after surgery">
+      <incoming>Flow_Repatriate_To_End</incoming>
+    </endEvent>
+
+    <sequenceFlow id="Flow_Start_To_Split" sourceRef="StartEvent_Presentation" targetRef="Gateway_ED_Work_Split"/>
+    <sequenceFlow id="Flow_Split_To_Physician" sourceRef="Gateway_ED_Work_Split" targetRef="Task_Physician_Assessment"/>
+    <sequenceFlow id="Flow_Physician_To_Orthopedic" sourceRef="Task_Physician_Assessment" targetRef="Task_Orthopedic_Consultation"/>
+    <sequenceFlow id="Flow_Orthopedic_To_Anesthesia" sourceRef="Task_Orthopedic_Consultation" targetRef="Task_Anesthesia_Internist_Consultation"/>
+    <sequenceFlow id="Flow_Anesthesia_To_Join" sourceRef="Task_Anesthesia_Internist_Consultation" targetRef="Gateway_ED_Work_Join"/>
+    <sequenceFlow id="Flow_Split_To_Assess_Initial" sourceRef="Gateway_ED_Work_Split" targetRef="Task_Assess_Initial_ED_Factors"/>
+    <sequenceFlow id="Flow_Assess_Initial_To_Diagnostics" sourceRef="Task_Assess_Initial_ED_Factors" targetRef="Task_Order_Bloodwork_Xrays"/>
+    <sequenceFlow id="Flow_Diagnostics_To_Comorbidities" sourceRef="Task_Order_Bloodwork_Xrays" targetRef="Task_Assess_Comorbidities_Medications"/>
+    <sequenceFlow id="Flow_Comorbidities_To_Functional" sourceRef="Task_Assess_Comorbidities_Medications" targetRef="Task_Assess_Function_Mental_Social"/>
+    <sequenceFlow id="Flow_Functional_To_Join" sourceRef="Task_Assess_Function_Mental_Social" targetRef="Gateway_ED_Work_Join"/>
+    <sequenceFlow id="Flow_Split_To_MedRec" sourceRef="Gateway_ED_Work_Split" targetRef="Task_Medication_Reconciliation"/>
+    <sequenceFlow id="Flow_MedRec_To_Join" sourceRef="Task_Medication_Reconciliation" targetRef="Gateway_ED_Work_Join"/>
+    <sequenceFlow id="Flow_Split_To_Manage_Risks" sourceRef="Gateway_ED_Work_Split" targetRef="Task_Manage_ED_Risks"/>
+    <sequenceFlow id="Flow_Manage_Risks_To_Join" sourceRef="Task_Manage_ED_Risks" targetRef="Gateway_ED_Work_Join"/>
+    <sequenceFlow id="Flow_Join_To_Admission" sourceRef="Gateway_ED_Work_Join" targetRef="Task_Admit_Within_4_Hours"/>
+    <sequenceFlow id="Flow_Admission_To_Hospital_Type" sourceRef="Task_Admit_Within_4_Hours" targetRef="Gateway_Hospital_Type"/>
+    <sequenceFlow id="Flow_Hospital_Type_To_Admitted_End" name="No" sourceRef="Gateway_Hospital_Type" targetRef="EndEvent_Admitted_For_Inpatient_Care"/>
+    <sequenceFlow id="Flow_Hospital_Type_To_Stabilize" name="Yes" sourceRef="Gateway_Hospital_Type" targetRef="Task_Medically_Stabilize"/>
+    <sequenceFlow id="Flow_Stabilize_To_Transfer" sourceRef="Task_Medically_Stabilize" targetRef="Task_Transfer_To_Surgical_Hospital"/>
+    <sequenceFlow id="Flow_Transfer_To_Surgery" sourceRef="Task_Transfer_To_Surgical_Hospital" targetRef="Task_Perform_Surgery_Within_48_Hours"/>
+    <sequenceFlow id="Flow_Surgery_To_Repatriate" sourceRef="Task_Perform_Surgery_Within_48_Hours" targetRef="Task_Repatriate_To_Local_Hospital"/>
+    <sequenceFlow id="Flow_Repatriate_To_End" sourceRef="Task_Repatriate_To_Local_Hospital" targetRef="EndEvent_Repatriated_After_Surgery"/>
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Hip_Fracture_ED_Care">
+    <bpmndi:BPMNPlane id="BPMNPlane_Hip_Fracture_ED_Care" bpmnElement="Process_Hip_Fracture_ED_Care">
+      <bpmndi:BPMNShape id="Shape_StartEvent_Presentation" bpmnElement="StartEvent_Presentation">
+        <dc:Bounds x="40" y="298" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_ED_Work_Split" bpmnElement="Gateway_ED_Work_Split">
+        <dc:Bounds x="120" y="291" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Physician_Assessment" bpmnElement="Task_Physician_Assessment">
+        <dc:Bounds x="230" y="80" width="170" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Orthopedic_Consultation" bpmnElement="Task_Orthopedic_Consultation">
+        <dc:Bounds x="440" y="80" width="180" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Anesthesia_Internist_Consultation" bpmnElement="Task_Anesthesia_Internist_Consultation">
+        <dc:Bounds x="660" y="80" width="210" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Assess_Initial_ED_Factors" bpmnElement="Task_Assess_Initial_ED_Factors">
+        <dc:Bounds x="230" y="200" width="210" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Order_Bloodwork_Xrays" bpmnElement="Task_Order_Bloodwork_Xrays">
+        <dc:Bounds x="480" y="200" width="160" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Assess_Comorbidities_Medications" bpmnElement="Task_Assess_Comorbidities_Medications">
+        <dc:Bounds x="680" y="200" width="200" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Assess_Function_Mental_Social" bpmnElement="Task_Assess_Function_Mental_Social">
+        <dc:Bounds x="920" y="200" width="220" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Medication_Reconciliation" bpmnElement="Task_Medication_Reconciliation">
+        <dc:Bounds x="560" y="320" width="210" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Manage_ED_Risks" bpmnElement="Task_Manage_ED_Risks">
+        <dc:Bounds x="560" y="440" width="230" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_ED_Work_Join" bpmnElement="Gateway_ED_Work_Join">
+        <dc:Bounds x="1190" y="291" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Admit_Within_4_Hours" bpmnElement="Task_Admit_Within_4_Hours">
+        <dc:Bounds x="1300" y="276" width="210" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Gateway_Hospital_Type" bpmnElement="Gateway_Hospital_Type">
+        <dc:Bounds x="1560" y="291" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_Admitted_For_Inpatient_Care" bpmnElement="EndEvent_Admitted_For_Inpatient_Care">
+        <dc:Bounds x="1710" y="298" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Medically_Stabilize" bpmnElement="Task_Medically_Stabilize">
+        <dc:Bounds x="1640" y="420" width="200" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Transfer_To_Surgical_Hospital" bpmnElement="Task_Transfer_To_Surgical_Hospital">
+        <dc:Bounds x="1880" y="420" width="220" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Perform_Surgery_Within_48_Hours" bpmnElement="Task_Perform_Surgery_Within_48_Hours">
+        <dc:Bounds x="2140" y="420" width="200" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Task_Repatriate_To_Local_Hospital" bpmnElement="Task_Repatriate_To_Local_Hospital">
+        <dc:Bounds x="2380" y="420" width="200" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndEvent_Repatriated_After_Surgery" bpmnElement="EndEvent_Repatriated_After_Surgery">
+        <dc:Bounds x="2620" y="442" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Edge_Flow_Start_To_Split" bpmnElement="Flow_Start_To_Split">
+        <di:waypoint x="76" y="316"/>
+        <di:waypoint x="120" y="316"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Split_To_Physician" bpmnElement="Flow_Split_To_Physician">
+        <di:waypoint x="170" y="316"/>
+        <di:waypoint x="200" y="316"/>
+        <di:waypoint x="200" y="120"/>
+        <di:waypoint x="230" y="120"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Physician_To_Orthopedic" bpmnElement="Flow_Physician_To_Orthopedic">
+        <di:waypoint x="400" y="120"/>
+        <di:waypoint x="440" y="120"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Orthopedic_To_Anesthesia" bpmnElement="Flow_Orthopedic_To_Anesthesia">
+        <di:waypoint x="620" y="120"/>
+        <di:waypoint x="660" y="120"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Anesthesia_To_Join" bpmnElement="Flow_Anesthesia_To_Join">
+        <di:waypoint x="870" y="120"/>
+        <di:waypoint x="1160" y="120"/>
+        <di:waypoint x="1160" y="316"/>
+        <di:waypoint x="1190" y="316"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Split_To_Assess_Initial" bpmnElement="Flow_Split_To_Assess_Initial">
+        <di:waypoint x="170" y="316"/>
+        <di:waypoint x="200" y="316"/>
+        <di:waypoint x="200" y="240"/>
+        <di:waypoint x="230" y="240"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Assess_Initial_To_Diagnostics" bpmnElement="Flow_Assess_Initial_To_Diagnostics">
+        <di:waypoint x="440" y="240"/>
+        <di:waypoint x="480" y="240"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Diagnostics_To_Comorbidities" bpmnElement="Flow_Diagnostics_To_Comorbidities">
+        <di:waypoint x="640" y="240"/>
+        <di:waypoint x="680" y="240"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Comorbidities_To_Functional" bpmnElement="Flow_Comorbidities_To_Functional">
+        <di:waypoint x="880" y="240"/>
+        <di:waypoint x="920" y="240"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Functional_To_Join" bpmnElement="Flow_Functional_To_Join">
+        <di:waypoint x="1140" y="240"/>
+        <di:waypoint x="1170" y="240"/>
+        <di:waypoint x="1170" y="316"/>
+        <di:waypoint x="1190" y="316"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Split_To_MedRec" bpmnElement="Flow_Split_To_MedRec">
+        <di:waypoint x="170" y="316"/>
+        <di:waypoint x="360" y="316"/>
+        <di:waypoint x="360" y="360"/>
+        <di:waypoint x="560" y="360"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_MedRec_To_Join" bpmnElement="Flow_MedRec_To_Join">
+        <di:waypoint x="770" y="360"/>
+        <di:waypoint x="1060" y="360"/>
+        <di:waypoint x="1060" y="316"/>
+        <di:waypoint x="1190" y="316"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Split_To_Manage_Risks" bpmnElement="Flow_Split_To_Manage_Risks">
+        <di:waypoint x="170" y="316"/>
+        <di:waypoint x="360" y="316"/>
+        <di:waypoint x="360" y="480"/>
+        <di:waypoint x="560" y="480"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Manage_Risks_To_Join" bpmnElement="Flow_Manage_Risks_To_Join">
+        <di:waypoint x="790" y="480"/>
+        <di:waypoint x="1080" y="480"/>
+        <di:waypoint x="1080" y="316"/>
+        <di:waypoint x="1190" y="316"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Join_To_Admission" bpmnElement="Flow_Join_To_Admission">
+        <di:waypoint x="1240" y="316"/>
+        <di:waypoint x="1300" y="316"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Admission_To_Hospital_Type" bpmnElement="Flow_Admission_To_Hospital_Type">
+        <di:waypoint x="1510" y="316"/>
+        <di:waypoint x="1560" y="316"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Hospital_Type_To_Admitted_End" bpmnElement="Flow_Hospital_Type_To_Admitted_End">
+        <di:waypoint x="1610" y="316"/>
+        <di:waypoint x="1710" y="316"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Hospital_Type_To_Stabilize" bpmnElement="Flow_Hospital_Type_To_Stabilize">
+        <di:waypoint x="1585" y="341"/>
+        <di:waypoint x="1585" y="460"/>
+        <di:waypoint x="1640" y="460"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Stabilize_To_Transfer" bpmnElement="Flow_Stabilize_To_Transfer">
+        <di:waypoint x="1840" y="460"/>
+        <di:waypoint x="1880" y="460"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Transfer_To_Surgery" bpmnElement="Flow_Transfer_To_Surgery">
+        <di:waypoint x="2100" y="460"/>
+        <di:waypoint x="2140" y="460"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Surgery_To_Repatriate" bpmnElement="Flow_Surgery_To_Repatriate">
+        <di:waypoint x="2340" y="460"/>
+        <di:waypoint x="2380" y="460"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Flow_Repatriate_To_End" bpmnElement="Flow_Repatriate_To_End">
+        <di:waypoint x="2580" y="460"/>
+        <di:waypoint x="2620" y="460"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -1,0 +1,326 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" targetNamespace="http://www.example.com/bpmn">
+  <process id="Process_HipFractureEDCare" name="Care in the Emergency Department for Suspected Hip Fracture" isExecutable="false">
+    <startEvent id="StartEvent_Presentation" name="Suspected hip fracture patient presents to care or is directly admitted">
+      <outgoing>Flow_Start_To_ApplyHipFracturePathway</outgoing>
+    </startEvent>
+    <task id="Task_ApplyHipFracturePathway" name="Follow hospital hip fracture care pathway and perioperative day-of-stay goals">
+      <incoming>Flow_Start_To_ApplyHipFracturePathway</incoming>
+      <outgoing>Flow_ApplyHipFracturePathway_To_InitialParallelSplit</outgoing>
+    </task>
+    <parallelGateway id="Gateway_InitialParallelSplit">
+      <incoming>Flow_ApplyHipFracturePathway_To_InitialParallelSplit</incoming>
+      <outgoing>Flow_InitialParallelSplit_To_MedicalAttentionSplit</outgoing>
+      <outgoing>Flow_InitialParallelSplit_To_AssessClinicalStatus</outgoing>
+    </parallelGateway>
+    <parallelGateway id="Gateway_MedicalAttentionSplit">
+      <incoming>Flow_InitialParallelSplit_To_MedicalAttentionSplit</incoming>
+      <outgoing>Flow_MedicalAttentionSplit_To_PhysicianAssessment</outgoing>
+      <outgoing>Flow_MedicalAttentionSplit_To_OrthopedicConsultation</outgoing>
+    </parallelGateway>
+    <task id="Task_PhysicianAssessment" name="Seen by physician">
+      <incoming>Flow_MedicalAttentionSplit_To_PhysicianAssessment</incoming>
+      <outgoing>Flow_PhysicianAssessment_To_MedicalAttentionJoin</outgoing>
+    </task>
+    <task id="Task_OrthopedicConsultation" name="Consultation with orthopaedic surgeon">
+      <incoming>Flow_MedicalAttentionSplit_To_OrthopedicConsultation</incoming>
+      <outgoing>Flow_OrthopedicConsultation_To_MedicalAttentionJoin</outgoing>
+    </task>
+    <parallelGateway id="Gateway_MedicalAttentionJoin">
+      <incoming>Flow_PhysicianAssessment_To_MedicalAttentionJoin</incoming>
+      <incoming>Flow_OrthopedicConsultation_To_MedicalAttentionJoin</incoming>
+      <outgoing>Flow_MedicalAttentionJoin_To_AdditionalConsultDecision</outgoing>
+    </parallelGateway>
+    <exclusiveGateway id="Gateway_AdditionalConsultDecision" name="Additional anesthesiologist or internist consultation needed?" default="Flow_AdditionalConsultDecision_No">
+      <incoming>Flow_MedicalAttentionJoin_To_AdditionalConsultDecision</incoming>
+      <outgoing>Flow_AdditionalConsultDecision_Yes</outgoing>
+      <outgoing>Flow_AdditionalConsultDecision_No</outgoing>
+    </exclusiveGateway>
+    <task id="Task_AdditionalMedicalConsultation" name="Consultation with internist">
+      <incoming>Flow_AdditionalConsultDecision_Yes</incoming>
+      <outgoing>Flow_AdditionalMedicalConsultation_To_AdditionalConsultMerge</outgoing>
+    </task>
+    <exclusiveGateway id="Gateway_AdditionalConsultMerge">
+      <incoming>Flow_AdditionalConsultDecision_No</incoming>
+      <incoming>Flow_AdditionalMedicalConsultation_To_AdditionalConsultMerge</incoming>
+      <outgoing>Flow_AdditionalConsultMerge_To_InitialParallelJoin</outgoing>
+    </exclusiveGateway>
+    <task id="Task_AssessClinicalStatus" name="Assess reason for fall">
+      <incoming>Flow_InitialParallelSplit_To_AssessClinicalStatus</incoming>
+      <outgoing>Flow_AssessClinicalStatus_To_PerformDiagnostics</outgoing>
+    </task>
+    <task id="Task_PerformDiagnostics" name="Perform x-ray">
+      <incoming>Flow_AssessClinicalStatus_To_PerformDiagnostics</incoming>
+      <outgoing>Flow_PerformDiagnostics_To_AssessComorbiditiesAndDrugTherapy</outgoing>
+    </task>
+    <task id="Task_AssessComorbiditiesAndDrugTherapy" name="Assess current drug therapy">
+      <incoming>Flow_PerformDiagnostics_To_AssessComorbiditiesAndDrugTherapy</incoming>
+      <outgoing>Flow_AssessComorbiditiesAndDrugTherapy_To_AssessFunctionCognitionAndSocialSupport</outgoing>
+    </task>
+    <task id="Task_AssessFunctionCognitionAndSocialSupport" name="Assess mental state based on pre-morbid functioning level">
+      <incoming>Flow_AssessComorbiditiesAndDrugTherapy_To_AssessFunctionCognitionAndSocialSupport</incoming>
+      <outgoing>Flow_AssessFunctionCognitionAndSocialSupport_To_MedicationReconciliation</outgoing>
+    </task>
+    <task id="Task_MedicationReconciliation" name="Perform medication reconciliation within the ED">
+      <incoming>Flow_AssessFunctionCognitionAndSocialSupport_To_MedicationReconciliation</incoming>
+      <outgoing>Flow_MedicationReconciliation_To_ManageHydrationPainDeliriumPressureSoreRisk</outgoing>
+    </task>
+    <task id="Task_ManageHydrationPainDeliriumPressureSoreRisk" name="Manage patients delirium  within the ED">
+      <incoming>Flow_MedicationReconciliation_To_ManageHydrationPainDeliriumPressureSoreRisk</incoming>
+      <outgoing>Flow_ManageHydrationPainDeliriumPressureSoreRisk_To_InitialParallelJoin</outgoing>
+    </task>
+    <parallelGateway id="Gateway_InitialParallelJoin">
+      <incoming>Flow_AdditionalConsultMerge_To_InitialParallelJoin</incoming>
+      <incoming>Flow_ManageHydrationPainDeliriumPressureSoreRisk_To_InitialParallelJoin</incoming>
+      <outgoing>Flow_InitialParallelJoin_To_AdmitWithin4Hours</outgoing>
+    </parallelGateway>
+    <task id="Task_AdmitWithin4Hours" name="Admit patient">
+      <incoming>Flow_InitialParallelJoin_To_AdmitWithin4Hours</incoming>
+      <outgoing>Flow_AdmitWithin4Hours_To_SurgicalHospitalDecision</outgoing>
+    </task>
+    <exclusiveGateway id="Gateway_SurgicalHospitalDecision" name="Presenting hospital has surgical capability?" default="Flow_SurgicalHospitalDecision_No">
+      <incoming>Flow_AdmitWithin4Hours_To_SurgicalHospitalDecision</incoming>
+      <outgoing>Flow_SurgicalHospitalDecision_Yes</outgoing>
+      <outgoing>Flow_SurgicalHospitalDecision_No</outgoing>
+    </exclusiveGateway>
+    <endEvent id="EndEvent_Admitted" name="Patient admitted at surgical hospital">
+      <incoming>Flow_SurgicalHospitalDecision_Yes</incoming>
+    </endEvent>
+    <task id="Task_MedicallyStabilizeForTransfer" name="Medically stabilize">
+      <incoming>Flow_SurgicalHospitalDecision_No</incoming>
+      <outgoing>Flow_MedicallyStabilizeForTransfer_To_TransferToSurgicalHospital</outgoing>
+    </task>
+    <task id="Task_TransferToSurgicalHospital" name="expeditious transfer to a surgical hospital for operation based on formal protocol">
+      <incoming>Flow_MedicallyStabilizeForTransfer_To_TransferToSurgicalHospital</incoming>
+      <outgoing>Flow_TransferToSurgicalHospital_To_EnsureSurgeryWithin48Hours</outgoing>
+    </task>
+    <task id="Task_EnsureSurgeryWithin48Hours" name="Ensure surgery within 48 hours of initial presentation">
+      <incoming>Flow_TransferToSurgicalHospital_To_EnsureSurgeryWithin48Hours</incoming>
+      <outgoing>Flow_EnsureSurgeryWithin48Hours_To_EndTransferred</outgoing>
+    </task>
+    <endEvent id="EndEvent_Transferred" name="Patient transferred for surgery">
+      <incoming>Flow_EnsureSurgeryWithin48Hours_To_EndTransferred</incoming>
+    </endEvent>
+
+    <sequenceFlow id="Flow_Start_To_ApplyHipFracturePathway" sourceRef="StartEvent_Presentation" targetRef="Task_ApplyHipFracturePathway" />
+    <sequenceFlow id="Flow_ApplyHipFracturePathway_To_InitialParallelSplit" sourceRef="Task_ApplyHipFracturePathway" targetRef="Gateway_InitialParallelSplit" />
+    <sequenceFlow id="Flow_InitialParallelSplit_To_MedicalAttentionSplit" sourceRef="Gateway_InitialParallelSplit" targetRef="Gateway_MedicalAttentionSplit" />
+    <sequenceFlow id="Flow_InitialParallelSplit_To_AssessClinicalStatus" sourceRef="Gateway_InitialParallelSplit" targetRef="Task_AssessClinicalStatus" />
+    <sequenceFlow id="Flow_MedicalAttentionSplit_To_PhysicianAssessment" sourceRef="Gateway_MedicalAttentionSplit" targetRef="Task_PhysicianAssessment" />
+    <sequenceFlow id="Flow_MedicalAttentionSplit_To_OrthopedicConsultation" sourceRef="Gateway_MedicalAttentionSplit" targetRef="Task_OrthopedicConsultation" />
+    <sequenceFlow id="Flow_PhysicianAssessment_To_MedicalAttentionJoin" sourceRef="Task_PhysicianAssessment" targetRef="Gateway_MedicalAttentionJoin" />
+    <sequenceFlow id="Flow_OrthopedicConsultation_To_MedicalAttentionJoin" sourceRef="Task_OrthopedicConsultation" targetRef="Gateway_MedicalAttentionJoin" />
+    <sequenceFlow id="Flow_MedicalAttentionJoin_To_AdditionalConsultDecision" sourceRef="Gateway_MedicalAttentionJoin" targetRef="Gateway_AdditionalConsultDecision" />
+    <sequenceFlow id="Flow_AdditionalConsultDecision_Yes" name="Yes" sourceRef="Gateway_AdditionalConsultDecision" targetRef="Task_AdditionalMedicalConsultation" />
+    <sequenceFlow id="Flow_AdditionalConsultDecision_No" name="No" sourceRef="Gateway_AdditionalConsultDecision" targetRef="Gateway_AdditionalConsultMerge" />
+    <sequenceFlow id="Flow_AdditionalMedicalConsultation_To_AdditionalConsultMerge" sourceRef="Task_AdditionalMedicalConsultation" targetRef="Gateway_AdditionalConsultMerge" />
+    <sequenceFlow id="Flow_AdditionalConsultMerge_To_InitialParallelJoin" sourceRef="Gateway_AdditionalConsultMerge" targetRef="Gateway_InitialParallelJoin" />
+    <sequenceFlow id="Flow_AssessClinicalStatus_To_PerformDiagnostics" sourceRef="Task_AssessClinicalStatus" targetRef="Task_PerformDiagnostics" />
+    <sequenceFlow id="Flow_PerformDiagnostics_To_AssessComorbiditiesAndDrugTherapy" sourceRef="Task_PerformDiagnostics" targetRef="Task_AssessComorbiditiesAndDrugTherapy" />
+    <sequenceFlow id="Flow_AssessComorbiditiesAndDrugTherapy_To_AssessFunctionCognitionAndSocialSupport" sourceRef="Task_AssessComorbiditiesAndDrugTherapy" targetRef="Task_AssessFunctionCognitionAndSocialSupport" />
+    <sequenceFlow id="Flow_AssessFunctionCognitionAndSocialSupport_To_MedicationReconciliation" sourceRef="Task_AssessFunctionCognitionAndSocialSupport" targetRef="Task_MedicationReconciliation" />
+    <sequenceFlow id="Flow_MedicationReconciliation_To_ManageHydrationPainDeliriumPressureSoreRisk" sourceRef="Task_MedicationReconciliation" targetRef="Task_ManageHydrationPainDeliriumPressureSoreRisk" />
+    <sequenceFlow id="Flow_ManageHydrationPainDeliriumPressureSoreRisk_To_InitialParallelJoin" sourceRef="Task_ManageHydrationPainDeliriumPressureSoreRisk" targetRef="Gateway_InitialParallelJoin" />
+    <sequenceFlow id="Flow_InitialParallelJoin_To_AdmitWithin4Hours" sourceRef="Gateway_InitialParallelJoin" targetRef="Task_AdmitWithin4Hours" />
+    <sequenceFlow id="Flow_AdmitWithin4Hours_To_SurgicalHospitalDecision" sourceRef="Task_AdmitWithin4Hours" targetRef="Gateway_SurgicalHospitalDecision" />
+    <sequenceFlow id="Flow_SurgicalHospitalDecision_Yes" name="Yes" sourceRef="Gateway_SurgicalHospitalDecision" targetRef="EndEvent_Admitted" />
+    <sequenceFlow id="Flow_SurgicalHospitalDecision_No" name="No" sourceRef="Gateway_SurgicalHospitalDecision" targetRef="Task_MedicallyStabilizeForTransfer" />
+    <sequenceFlow id="Flow_MedicallyStabilizeForTransfer_To_TransferToSurgicalHospital" sourceRef="Task_MedicallyStabilizeForTransfer" targetRef="Task_TransferToSurgicalHospital" />
+    <sequenceFlow id="Flow_TransferToSurgicalHospital_To_EnsureSurgeryWithin48Hours" sourceRef="Task_TransferToSurgicalHospital" targetRef="Task_EnsureSurgeryWithin48Hours" />
+    <sequenceFlow id="Flow_EnsureSurgeryWithin48Hours_To_EndTransferred" sourceRef="Task_EnsureSurgeryWithin48Hours" targetRef="EndEvent_Transferred" />
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_HipFractureEDCare">
+    <bpmndi:BPMNPlane id="BPMNPlane_HipFractureEDCare" bpmnElement="Process_HipFractureEDCare">
+      <bpmndi:BPMNShape id="StartEvent_Presentation_di" bpmnElement="StartEvent_Presentation">
+        <dc:Bounds x="40" y="282" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ApplyHipFracturePathway_di" bpmnElement="Task_ApplyHipFracturePathway">
+        <dc:Bounds x="120" y="260" width="220" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_InitialParallelSplit_di" bpmnElement="Gateway_InitialParallelSplit">
+        <dc:Bounds x="380" y="275" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_MedicalAttentionSplit_di" bpmnElement="Gateway_MedicalAttentionSplit">
+        <dc:Bounds x="500" y="90" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PhysicianAssessment_di" bpmnElement="Task_PhysicianAssessment">
+        <dc:Bounds x="620" y="40" width="210" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_OrthopedicConsultation_di" bpmnElement="Task_OrthopedicConsultation">
+        <dc:Bounds x="620" y="140" width="220" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_MedicalAttentionJoin_di" bpmnElement="Gateway_MedicalAttentionJoin">
+        <dc:Bounds x="880" y="90" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_AdditionalConsultDecision_di" bpmnElement="Gateway_AdditionalConsultDecision">
+        <dc:Bounds x="990" y="90" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AdditionalMedicalConsultation_di" bpmnElement="Task_AdditionalMedicalConsultation">
+        <dc:Bounds x="1110" y="20" width="260" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_AdditionalConsultMerge_di" bpmnElement="Gateway_AdditionalConsultMerge">
+        <dc:Bounds x="1410" y="90" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AssessClinicalStatus_di" bpmnElement="Task_AssessClinicalStatus">
+        <dc:Bounds x="500" y="250" width="270" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PerformDiagnostics_di" bpmnElement="Task_PerformDiagnostics">
+        <dc:Bounds x="820" y="260" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AssessComorbiditiesAndDrugTherapy_di" bpmnElement="Task_AssessComorbiditiesAndDrugTherapy">
+        <dc:Bounds x="1050" y="250" width="260" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AssessFunctionCognitionAndSocialSupport_di" bpmnElement="Task_AssessFunctionCognitionAndSocialSupport">
+        <dc:Bounds x="1360" y="240" width="330" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_MedicationReconciliation_di" bpmnElement="Task_MedicationReconciliation">
+        <dc:Bounds x="1730" y="260" width="220" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ManageHydrationPainDeliriumPressureSoreRisk_di" bpmnElement="Task_ManageHydrationPainDeliriumPressureSoreRisk">
+        <dc:Bounds x="2000" y="250" width="280" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_InitialParallelJoin_di" bpmnElement="Gateway_InitialParallelJoin">
+        <dc:Bounds x="2330" y="275" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AdmitWithin4Hours_di" bpmnElement="Task_AdmitWithin4Hours">
+        <dc:Bounds x="2430" y="260" width="220" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_SurgicalHospitalDecision_di" bpmnElement="Gateway_SurgicalHospitalDecision">
+        <dc:Bounds x="2690" y="275" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Admitted_di" bpmnElement="EndEvent_Admitted">
+        <dc:Bounds x="2810" y="282" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_MedicallyStabilizeForTransfer_di" bpmnElement="Task_MedicallyStabilizeForTransfer">
+        <dc:Bounds x="2810" y="420" width="230" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_TransferToSurgicalHospital_di" bpmnElement="Task_TransferToSurgicalHospital">
+        <dc:Bounds x="3080" y="410" width="270" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EnsureSurgeryWithin48Hours_di" bpmnElement="Task_EnsureSurgeryWithin48Hours">
+        <dc:Bounds x="3390" y="420" width="230" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Transferred_di" bpmnElement="EndEvent_Transferred">
+        <dc:Bounds x="3660" y="442" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_Start_To_ApplyHipFracturePathway_di" bpmnElement="Flow_Start_To_ApplyHipFracturePathway">
+        <di:waypoint x="76" y="300" />
+        <di:waypoint x="120" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ApplyHipFracturePathway_To_InitialParallelSplit_di" bpmnElement="Flow_ApplyHipFracturePathway_To_InitialParallelSplit">
+        <di:waypoint x="340" y="300" />
+        <di:waypoint x="380" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_InitialParallelSplit_To_MedicalAttentionSplit_di" bpmnElement="Flow_InitialParallelSplit_To_MedicalAttentionSplit">
+        <di:waypoint x="405" y="275" />
+        <di:waypoint x="405" y="115" />
+        <di:waypoint x="500" y="115" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_InitialParallelSplit_To_AssessClinicalStatus_di" bpmnElement="Flow_InitialParallelSplit_To_AssessClinicalStatus">
+        <di:waypoint x="430" y="300" />
+        <di:waypoint x="500" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_MedicalAttentionSplit_To_PhysicianAssessment_di" bpmnElement="Flow_MedicalAttentionSplit_To_PhysicianAssessment">
+        <di:waypoint x="525" y="90" />
+        <di:waypoint x="525" y="80" />
+        <di:waypoint x="620" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_MedicalAttentionSplit_To_OrthopedicConsultation_di" bpmnElement="Flow_MedicalAttentionSplit_To_OrthopedicConsultation">
+        <di:waypoint x="525" y="140" />
+        <di:waypoint x="525" y="180" />
+        <di:waypoint x="620" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_PhysicianAssessment_To_MedicalAttentionJoin_di" bpmnElement="Flow_PhysicianAssessment_To_MedicalAttentionJoin">
+        <di:waypoint x="830" y="80" />
+        <di:waypoint x="855" y="80" />
+        <di:waypoint x="855" y="115" />
+        <di:waypoint x="880" y="115" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_OrthopedicConsultation_To_MedicalAttentionJoin_di" bpmnElement="Flow_OrthopedicConsultation_To_MedicalAttentionJoin">
+        <di:waypoint x="840" y="180" />
+        <di:waypoint x="855" y="180" />
+        <di:waypoint x="855" y="115" />
+        <di:waypoint x="880" y="115" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_MedicalAttentionJoin_To_AdditionalConsultDecision_di" bpmnElement="Flow_MedicalAttentionJoin_To_AdditionalConsultDecision">
+        <di:waypoint x="930" y="115" />
+        <di:waypoint x="990" y="115" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AdditionalConsultDecision_Yes_di" bpmnElement="Flow_AdditionalConsultDecision_Yes">
+        <di:waypoint x="1015" y="90" />
+        <di:waypoint x="1015" y="60" />
+        <di:waypoint x="1110" y="60" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AdditionalConsultDecision_No_di" bpmnElement="Flow_AdditionalConsultDecision_No">
+        <di:waypoint x="1040" y="115" />
+        <di:waypoint x="1410" y="115" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AdditionalMedicalConsultation_To_AdditionalConsultMerge_di" bpmnElement="Flow_AdditionalMedicalConsultation_To_AdditionalConsultMerge">
+        <di:waypoint x="1370" y="60" />
+        <di:waypoint x="1390" y="60" />
+        <di:waypoint x="1390" y="115" />
+        <di:waypoint x="1410" y="115" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AdditionalConsultMerge_To_InitialParallelJoin_di" bpmnElement="Flow_AdditionalConsultMerge_To_InitialParallelJoin">
+        <di:waypoint x="1460" y="115" />
+        <di:waypoint x="2355" y="115" />
+        <di:waypoint x="2355" y="275" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AssessClinicalStatus_To_PerformDiagnostics_di" bpmnElement="Flow_AssessClinicalStatus_To_PerformDiagnostics">
+        <di:waypoint x="770" y="300" />
+        <di:waypoint x="820" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_PerformDiagnostics_To_AssessComorbiditiesAndDrugTherapy_di" bpmnElement="Flow_PerformDiagnostics_To_AssessComorbiditiesAndDrugTherapy">
+        <di:waypoint x="1000" y="300" />
+        <di:waypoint x="1050" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AssessComorbiditiesAndDrugTherapy_To_AssessFunctionCognitionAndSocialSupport_di" bpmnElement="Flow_AssessComorbiditiesAndDrugTherapy_To_AssessFunctionCognitionAndSocialSupport">
+        <di:waypoint x="1310" y="300" />
+        <di:waypoint x="1360" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AssessFunctionCognitionAndSocialSupport_To_MedicationReconciliation_di" bpmnElement="Flow_AssessFunctionCognitionAndSocialSupport_To_MedicationReconciliation">
+        <di:waypoint x="1690" y="300" />
+        <di:waypoint x="1730" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_MedicationReconciliation_To_ManageHydrationPainDeliriumPressureSoreRisk_di" bpmnElement="Flow_MedicationReconciliation_To_ManageHydrationPainDeliriumPressureSoreRisk">
+        <di:waypoint x="1950" y="300" />
+        <di:waypoint x="2000" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ManageHydrationPainDeliriumPressureSoreRisk_To_InitialParallelJoin_di" bpmnElement="Flow_ManageHydrationPainDeliriumPressureSoreRisk_To_InitialParallelJoin">
+        <di:waypoint x="2280" y="300" />
+        <di:waypoint x="2330" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_InitialParallelJoin_To_AdmitWithin4Hours_di" bpmnElement="Flow_InitialParallelJoin_To_AdmitWithin4Hours">
+        <di:waypoint x="2380" y="300" />
+        <di:waypoint x="2430" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AdmitWithin4Hours_To_SurgicalHospitalDecision_di" bpmnElement="Flow_AdmitWithin4Hours_To_SurgicalHospitalDecision">
+        <di:waypoint x="2650" y="300" />
+        <di:waypoint x="2690" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SurgicalHospitalDecision_Yes_di" bpmnElement="Flow_SurgicalHospitalDecision_Yes">
+        <di:waypoint x="2740" y="300" />
+        <di:waypoint x="2810" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SurgicalHospitalDecision_No_di" bpmnElement="Flow_SurgicalHospitalDecision_No">
+        <di:waypoint x="2715" y="325" />
+        <di:waypoint x="2715" y="460" />
+        <di:waypoint x="2810" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_MedicallyStabilizeForTransfer_To_TransferToSurgicalHospital_di" bpmnElement="Flow_MedicallyStabilizeForTransfer_To_TransferToSurgicalHospital">
+        <di:waypoint x="3040" y="460" />
+        <di:waypoint x="3080" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_TransferToSurgicalHospital_To_EnsureSurgeryWithin48Hours_di" bpmnElement="Flow_TransferToSurgicalHospital_To_EnsureSurgeryWithin48Hours">
+        <di:waypoint x="3350" y="460" />
+        <di:waypoint x="3390" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_EnsureSurgeryWithin48Hours_To_EndTransferred_di" bpmnElement="Flow_EnsureSurgeryWithin48Hours_To_EndTransferred">
+        <di:waypoint x="3620" y="460" />
+        <di:waypoint x="3660" y="460" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

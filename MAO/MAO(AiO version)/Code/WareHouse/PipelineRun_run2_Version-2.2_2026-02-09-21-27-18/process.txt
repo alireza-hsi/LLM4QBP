@@ -1,0 +1,95 @@
+<process>
+  <activity role='ED triage nurse' action='register suspected hip fracture patient' objects='patient registration record' id='activity0'/>
+  <activity role='ED triage nurse' action='verify suspected hip fracture criteria and assign acuity' objects='triage criteria, vital signs' id='activity1_1'/>
+  <activity role='ED triage nurse' action='activate hip fracture care pathway with perioperative patient goals by day of stay and notify core team' objects='hip fracture care pathway, notification' id='activity1_2'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='Patient presents to surgical hospital (or surgical capability available)' id='branch1'>
+      <activity role='ED physician' action='assess patient within 1 hour of ED arrival (target 90%)' objects='patient' id='activity2'/>
+      <activity role='ED physician' action='perform primary survey (ABCs), focused hip exam and initial pain assessment' objects='assessment findings, pain score' id='activity2_1'/>
+      <activity role='ED physician' action='document initial medical assessment and place urgent orders as indicated' objects='ED note, initial orders' id='activity2_2'/>
+      <activity role='orthopedic surgeon' action='provide consultation within 2 hours of ED arrival (target 90%)' objects='patient' id='activity3'/>
+      <activity role='orthopedic surgeon' action='review imaging/clinical findings and confirm suspected hip fracture diagnosis' objects='X-ray report, exam findings' id='activity3_1'/>
+      <activity role='orthopedic surgeon' action='determine initial operative plan and perioperative requirements (or alternative plan if not surgical candidate)' objects='treatment plan, perioperative requirements' id='activity3_2'/>
+      <inclusiveGateway id='inclusivegateway1_split'>
+        <branch condition='Anesthesia consultation needed' id='branch2'>
+          <activity role='ED physician' action='notify anesthesiologist and request consultation as needed' objects='patient summary' id='activity4'/>
+          <activity role='anesthesiologist' action='complete anesthesia consultation and document perioperative recommendations' objects='anesthesia consult note, perioperative recommendations' id='activity4_1'/>
+        </branch>
+        <branch condition='Internal medicine consultation needed' id='branch3'>
+          <activity role='ED physician' action='notify internist and request consultation as needed' objects='patient summary' id='activity5'/>
+          <activity role='internist' action='complete internal medicine consultation and document optimization recommendations' objects='medicine consult note, optimization recommendations' id='activity5_1'/>
+        </branch>
+      </inclusiveGateway>
+      <activity role='ED physician' action='review consultation outputs and confirm readiness to proceed with ED workup/admission planning' objects='consult notes, consolidated plan' id='activity5_2'/>
+      <parallelGateway id='parallelgateway1'>
+        <branch id='branch4'>
+          <activity role='ED nurse' action='assess and document reason for the fall' objects='history' id='activity6'/>
+          <activity role='ED nurse' action='assess and document fluid balance' objects='intake/output status' id='activity7'/>
+          <activity role='ED nurse' action='assess and document pressure sore risk' objects='pressure sore risk tool' id='activity8'/>
+          <activity role='ED nurse' action='assess and document hydration and nutrition status' objects='nutrition/hydration screen' id='activity9'/>
+          <activity role='ED nurse' action='assess and document pain' objects='pain score' id='activity10'/>
+          <activity role='ED nurse' action='measure and document temperature' objects='vital signs' id='activity11'/>
+          <activity role='ED physician' action='assess and document other collateral injuries' objects='physical exam findings' id='activity12'/>
+          <activity role='ED physician' action='assess and document comorbid conditions' objects='medical history' id='activity13'/>
+          <activity role='ED nurse' action='assess and document continence status' objects='continence assessment' id='activity14'/>
+          <activity role='physiotherapist or ED clinician' action='assess and document pre-fracture functional ability and mobility' objects='functional history' id='activity15'/>
+          <activity role='physiotherapist or ED clinician' action='assess and document current physical and functional level' objects='mobility/transfer ability' id='activity16'/>
+          <activity role='ED clinician' action='assess and document mental state vs pre-morbid baseline using validated tool (MMSE, MOCA, or CAM)' objects='MMSE/MOCA/CAM result' id='activity17'/>
+          <activity role='social worker or ED clinician' action='assess and document social circumstances (caregiver status, community supports, family involvement)' objects='social history' id='activity18'/>
+        </branch>
+        <branch id='branch5'>
+          <activity role='ED physician' action='order appropriate blood work tests' objects='lab orders' id='activity19'/>
+          <activity role='laboratory' action='collect and process blood work' objects='blood samples' id='activity20'/>
+        </branch>
+        <branch id='branch6'>
+          <activity role='ED physician' action='order hip/pelvis X-rays' objects='imaging order' id='activity21'/>
+          <activity role='radiology' action='perform X-rays and report results' objects='X-ray images/report' id='activity22'/>
+        </branch>
+        <branch id='branch7'>
+          <activity role='pharmacist or ED nurse' action='assess and document current drug therapy including any anticoagulants' objects='medication list' id='activity23'/>
+        </branch>
+        <branch id='branch8'>
+          <activity role='pharmacist or ED nurse' action='complete medication reconciliation within the ED using a standardized form' objects='standardized medication reconciliation form' id='activity24'/>
+          <activity role='pharmacist or ED nurse' action='obtain best possible medication history from patient/family/records' objects='BPMH sources, prior med list' id='activity24_1'/>
+          <activity role='pharmacist or ED nurse' action='reconcile medications, resolve discrepancies and document final list (including anticoagulants)' objects='reconciled medication list, discrepancy log' id='activity24_2'/>
+        </branch>
+        <branch id='branch9'>
+          <activity role='ED team' action='initiate hydration management within the ED' objects='IV/oral fluids plan' id='activity25'/>
+          <activity role='ED team' action='initiate pain management within the ED' objects='analgesia plan' id='activity26'/>
+          <activity role='ED team' action='initiate delirium risk management within the ED' objects='delirium prevention measures' id='activity27'/>
+          <activity role='ED team' action='initiate pressure sore risk management within the ED' objects='pressure injury prevention measures' id='activity28'/>
+        </branch>
+      </parallelGateway>
+      <activity role='ED physician' action='make inpatient admission decision and arrange admission (target: 90% admitted within 4 hours spent in ED)' objects='admission order/bed request' id='activity29'/>
+      <activity role='ED physician' action='determine disposition and level of care (e.g., ortho ward/ICU) based on assessment and consult input' objects='disposition decision' id='activity29_1'/>
+      <activity role='ED physician' action='request bed and place admission orders/hand over to admitting service' objects='bed request, admission orders, handover' id='activity29_2'/>
+      <activity role='bed management and inpatient unit' action='admit patient to inpatient acute care within 4 hours ED length of stay (target 90%)' objects='inpatient bed' id='activity30'/>
+    </branch>
+    <branch condition='Patient presents to non-surgical hospital' id='branch10'>
+      <activity role='ED physician' action='assess patient within 1 hour of ED arrival (target 90%)' objects='patient' id='activity31'/>
+      <parallelGateway id='parallelgateway2'>
+        <branch id='branch11'>
+          <activity role='ED team' action='medically stabilize patient while awaiting expeditious transfer to surgical hospital' objects='stabilization plan (airway/breathing/circulation, pain, fluids)' id='activity32'/>
+          <activity role='ED team' action='stabilize ABCs and treat immediate issues (pain control, fluids, hypoxia, hypotension)' objects='stabilization interventions' id='activity32_1'/>
+          <activity role='ED team' action='reassess and document stability at intervals while awaiting transfer readiness' objects='reassessment record' id='activity32_2'/>
+        </branch>
+        <branch id='branch12'>
+          <activity role='ED physician and transfer coordinator' action='activate formal protocol for timely transfer to surgical hospital for operation (LHIN/hospital protocol)' objects='transfer protocol, referral package' id='activity33'/>
+          <activity role='ED physician and transfer coordinator' action='contact receiving surgical hospital/orthopedic service and confirm acceptance' objects='acceptance confirmation, receiving physician details' id='activity33_1'/>
+          <activity role='ED physician and transfer coordinator' action='arrange transport level and send referral package (summary, imaging, labs, meds)' objects='transport booking, referral package' id='activity33_2'/>
+        </branch>
+        <branch id='branch13'>
+          <activity role='ED clinician' action='document comprehensive ED assessment to inform treatment and discharge decisions (reason for fall, fluid balance, pressure sore risk, hydration/nutrition, pain, temperature, collateral injuries, comorbidities, continence, pre-fracture function/mobility, physical/functional level, mental state via MMSE/MOCA/CAM, social circumstances)' objects='ED assessment record' id='activity34'/>
+        </branch>
+        <branch id='branch14'>
+          <activity role='pharmacist or ED nurse' action='complete medication reconciliation within the ED using a standardized form' objects='standardized medication reconciliation form' id='activity35'/>
+          <activity role='ED team' action='manage hydration, pain, delirium risk and pressure sore risk within the ED' objects='supportive care measures' id='activity36'/>
+        </branch>
+      </parallelGateway>
+      <activity role='ED physician' action='ensure surgical timing plan: patient to receive surgery within 48 hours of initial presentation (including after transfer)' objects='surgical timing target' id='activity37'/>
+      <activity role='transfer team and receiving surgical hospital' action='transfer patient to surgical hospital for operation and coordinate repatriation to local hospital after surgery per protocol' objects='transport, handover, repatriation plan' id='activity38'/>
+      <activity role='transfer team and receiving surgical hospital' action='perform transfer with structured clinical handover (SBAR) and confirm receipt' objects='handover record, transfer checklist' id='activity38_1'/>
+      <activity role='receiving surgical hospital and sending hospital' action='plan repatriation to local hospital after surgery per protocol and communicate criteria/timing' objects='repatriation plan, communication note' id='activity38_2'/>
+    </branch>
+  </exclusiveGateway>
+</process>

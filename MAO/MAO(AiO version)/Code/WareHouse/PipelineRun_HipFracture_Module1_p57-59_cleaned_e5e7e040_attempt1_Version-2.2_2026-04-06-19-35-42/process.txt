@@ -1,0 +1,49 @@
+<process>
+  <activity role='hospital administration' action='Establish hip fracture care pathway specifying perioperative patient goals by day of stay' objects='hip fracture care pathway documentation' id='activity1'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='Patient presents to ED' id='branch1'>
+      <activity role='ED triage nurse' action='Register and triage suspected hip fracture patient' objects='patient, triage form' id='activity2'/>
+      <activity role='ED physician' action='Initial clinical assessment' objects='patient' id='activity3-1'/>
+      <activity role='ED physician' action='Document assessment findings' objects='patient, assessment record' id='activity3-2'/>
+      <activity role='ED staff' action='Notify orthopedic surgeon for consultation within 2 hours of ED arrival' objects='patient' id='activity4'/>
+      <activity role='ED staff' action='Notify anesthesiologist/internist for consultation as needed' objects='patient' id='activity5'/>
+      <parallelGateway id='parallelgateway1'>
+        <branch id='branch2'>
+          <activity role='ED clinical staff' action='Assess and document reason for fall, fluid balance, pressure sore risk, hydration, nutrition, pain, temperature, collateral injuries, comorbid conditions, current drug therapy (including anticoagulants), continence, pre-fracture functional ability and mobility, physical and functional level, mental state (using MMSE/MOCA/CAM), and social circumstances' objects='patient, assessment forms' id='activity6'/>
+        </branch>
+        <branch id='branch3'>
+          <activity role='ED clinical staff' action='Order and review blood work and X-rays' objects='patient, lab and imaging requisitions' id='activity7'/>
+        </branch>
+      </parallelGateway>
+      <parallelGateway id='parallelgateway2'>
+        <branch id='branch4'>
+          <activity role='ED pharmacist or nurse' action='Complete medication reconciliation using standardized form' objects='patient, medication list, reconciliation form' id='activity8'/>
+        </branch>
+        <branch id='branch5'>
+          <activity role='ED clinical staff' action='Manage hydration, pain, risk of delirium, and risk of pressure sores while in ED' objects='patient, care protocols' id='activity9'/>
+        </branch>
+      </parallelGateway>
+      <activity role='ED physician' action='Review and confirm completion of all assessments and management actions; determine patient readiness for admission' objects='patient, assessment records, management checklist' id='activity10-confirm'/>
+      <activity role='ED staff' action='Prepare admission paperwork' objects='patient, admission paperwork' id='activity10-1'/>
+      <activity role='ED staff' action='Transfer patient to inpatient unit' objects='patient, transport resources' id='activity10-2'/>
+    </branch>
+    <branch condition='Patient presents to outpatient clinic or is directly admitted to acute care' id='branch6'>
+      <activity role='clinical staff' action='Follow same early assessment and documentation practices as ED pathway' objects='patient, assessment forms' id='activity11'/>
+      <activity role='clinical staff' action='Notify orthopedic surgeon and anesthesiologist/internist for consultation as needed' objects='patient' id='activity12'/>
+      <activity role='clinical staff' action='Arrange inpatient admission as per ED pathway (within 4 hours if possible)' objects='patient, admission paperwork' id='activity13'/>
+    </branch>
+    <branch condition='Patient presents to non-surgical hospital' id='branch7'>
+      <parallelGateway id='parallelgateway3'>
+        <branch id='branch6-1'>
+          <activity role='non-surgical hospital staff' action='Monitor vital signs and manage acute medical issues' objects='patient, monitoring equipment, medication' id='activity14-1'/>
+        </branch>
+        <branch id='branch6-2'>
+          <activity role='non-surgical hospital staff' action='Provide supportive care (hydration, pain management, pressure sore prevention)' objects='patient, care protocols' id='activity14-2'/>
+        </branch>
+      </parallelGateway>
+      <activity role='non-surgical hospital staff' action='Initiate formal protocol for timely transfer to surgical hospital' objects='patient, transfer protocol' id='activity15'/>
+      <activity role='non-surgical hospital staff' action='Ensure surgery is performed within 48 hours of initial presentation' objects='patient, surgical scheduling' id='activity16'/>
+      <activity role='LHINs and hospital administration' action='Ensure formal protocols exist for transfer and repatriation between non-surgical and surgical hospitals' objects='protocol documentation' id='activity17'/>
+    </branch>
+  </exclusiveGateway>
+</process>

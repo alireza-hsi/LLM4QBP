@@ -1,0 +1,485 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
+  <process id="Process_1" name="Stroke Process" isExecutable="true">
+    <startEvent id="StartEvent_1" name="Start">
+      <outgoing>Flow_39</outgoing>
+    </startEvent>
+    <endEvent id="EndEvent_1" name="End">
+      <incoming>Flow_60</incoming>
+    </endEvent>
+    <parallelGateway id="parallelgateway1" name="Parallel Gateway">
+      <incoming>Flow_39</incoming>
+      <outgoing>Flow_27</outgoing>
+      <outgoing>Flow_28</outgoing>
+      <outgoing>Flow_29</outgoing>
+      <outgoing>Flow_30</outgoing>
+      <outgoing>Flow_31</outgoing>
+      <outgoing>Flow_32</outgoing>
+    </parallelGateway>
+    <task id="activity_bloodwork1" name="Serum creatinine and electrolyte levels">
+      <incoming>Flow_2</incoming>
+      <outgoing>Flow_3</outgoing>
+    </task>
+    <task id="activity_interpret_bloodwork1" name="interpret blood work results (Role: healthcare expert; Objects: blood work panel results)">
+      <incoming>Flow_3</incoming>
+      <outgoing>Flow_33</outgoing>
+    </task>
+    <task id="activity5" name="Electrocardiogram">
+      <incoming>Flow_5</incoming>
+      <outgoing>Flow_6</outgoing>
+    </task>
+    <task id="activity_interpret_ecg1" name="interpret electrocardiogram results (Role: healthcare expert; Objects: ECG results)">
+      <incoming>Flow_6</incoming>
+      <outgoing>Flow_34</outgoing>
+    </task>
+    <task id="activity_assess_cxr_need1" name="assess need for chest x-ray examination (do not delay other assessment/treatment) (Role: clinical team)">
+      <incoming>Flow_8</incoming>
+      <outgoing>Flow_16</outgoing>
+    </task>
+    <exclusiveGateway id="exclusivegateway4" name="Exclusive Gateway">
+      <incoming>Flow_16</incoming>
+      <outgoing>Flow_12</outgoing>
+      <outgoing>Flow_14</outgoing>
+    </exclusiveGateway>
+    <task id="activity6" name="Chest x-ray">
+      <incoming>Flow_10</incoming>
+      <outgoing>Flow_11</outgoing>
+    </task>
+    <task id="activity_interpret_cxr1" name="interpret chest x-ray results (Role: healthcare expert; Objects: chest x-ray results)">
+      <incoming>Flow_11</incoming>
+      <outgoing>Flow_13</outgoing>
+    </task>
+    <task id="activity_skip_cxr1" name="skip chest x-ray examination and continue care (Role: clinical team)">
+      <incoming>Flow_14</incoming>
+      <outgoing>Flow_15</outgoing>
+    </task>
+    <exclusiveGateway id="exclusivegateway4Join" name="Exclusive Merge">
+      <incoming>Flow_13</incoming>
+      <incoming>Flow_15</incoming>
+      <outgoing>Flow_35</outgoing>
+    </exclusiveGateway>
+    <task id="activity_check_recent_echo1" name="check for a recent echocardiogram (Role: clinical team; Objects: prior echocardiogram availability/status)">
+      <incoming>Flow_18</incoming>
+      <outgoing>Flow_26</outgoing>
+    </task>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway">
+      <incoming>Flow_26</incoming>
+      <outgoing>Flow_22</outgoing>
+      <outgoing>Flow_24</outgoing>
+    </exclusiveGateway>
+    <task id="activity7" name="Echocardiogram">
+      <incoming>Flow_20</incoming>
+      <outgoing>Flow_21</outgoing>
+    </task>
+    <task id="activity_interpret_echo1" name="interpret echocardiogram results (Role: healthcare expert; Objects: echocardiogram results)">
+      <incoming>Flow_21</incoming>
+      <outgoing>Flow_23</outgoing>
+    </task>
+    <task id="activity8" name="proceed without an echocardiogram (Role: clinical team)">
+      <incoming>Flow_24</incoming>
+      <outgoing>Flow_25</outgoing>
+    </task>
+    <exclusiveGateway id="exclusivegateway1Join" name="Exclusive Merge">
+      <incoming>Flow_23</incoming>
+      <incoming>Flow_25</incoming>
+      <outgoing>Flow_36</outgoing>
+    </exclusiveGateway>
+    <task id="activity9" name="Monitor heart rate, blood pressure, oxygen saturation until stabilized">
+      <incoming>Flow_31</incoming>
+      <outgoing>Flow_37</outgoing>
+    </task>
+    <task id="activity_ed_eval1" name="Check responsiveness to Diuresis">
+      <incoming>Flow_32</incoming>
+      <outgoing>Flow_38</outgoing>
+    </task>
+    <parallelGateway id="parallelgateway1Join" name="Parallel Merge">
+      <incoming>Flow_33</incoming>
+      <incoming>Flow_34</incoming>
+      <incoming>Flow_35</incoming>
+      <incoming>Flow_36</incoming>
+      <incoming>Flow_37</incoming>
+      <incoming>Flow_38</incoming>
+      <outgoing>Flow_40</outgoing>
+    </parallelGateway>
+    <task id="activity10" name="Risk stratification&#10;(e.g., EHMRG)">
+      <incoming>Flow_40</incoming>
+      <outgoing>Flow_59</outgoing>
+    </task>
+    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway">
+      <incoming>Flow_59</incoming>
+      <outgoing>Flow_55</outgoing>
+      <outgoing>Flow_57</outgoing>
+    </exclusiveGateway>
+    <task id="activity11" name="Discharge home">
+      <incoming>Flow_42</incoming>
+      <outgoing>Flow_43</outgoing>
+    </task>
+    <task id="activity12" name="Arrange follow-up (within days) with primary care">
+      <incoming>Flow_43</incoming>
+      <outgoing>Flow_56</outgoing>
+    </task>
+    <task id="activity13" name="Admit to inpatient care (normal nurse-to-patient staffing)">
+      <incoming>Flow_45</incoming>
+      <outgoing>Flow_54</outgoing>
+    </task>
+    <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway">
+      <incoming>Flow_54</incoming>
+      <outgoing>Flow_50</outgoing>
+      <outgoing>Flow_52</outgoing>
+    </exclusiveGateway>
+    <task id="activity14" name="Admit to inpatient care (normal nurse-to-patient staffing)">
+      <incoming>Flow_50</incoming>
+      <outgoing>Flow_51</outgoing>
+    </task>
+    <inclusiveGateway id="inclusivegateway1" name="Inclusive Gateway">
+      <incoming>Flow_52</incoming>
+      <outgoing>Flow_46</outgoing>
+      <outgoing>Flow_48</outgoing>
+    </inclusiveGateway>
+    <task id="activity15" name="provide ventilation (either noninvasive or invasive ventilation) (Role: hospital)">
+      <incoming>Flow_46</incoming>
+      <outgoing>Flow_47</outgoing>
+    </task>
+    <task id="activity16" name="Admit to ICU (high nurse-to-patient staffing)">
+      <incoming>Flow_48</incoming>
+      <outgoing>Flow_49</outgoing>
+    </task>
+    <inclusiveGateway id="inclusivegateway1Join" name="Inclusive Merge">
+      <incoming>Flow_47</incoming>
+      <incoming>Flow_49</incoming>
+      <outgoing>Flow_53</outgoing>
+    </inclusiveGateway>
+    <exclusiveGateway id="exclusivegateway3Join" name="Exclusive Merge">
+      <incoming>Flow_51</incoming>
+      <incoming>Flow_53</incoming>
+      <outgoing>Flow_58</outgoing>
+    </exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway2Join" name="Exclusive Merge">
+      <incoming>Flow_56</incoming>
+      <incoming>Flow_58</incoming>
+      <outgoing>Flow_60</outgoing>
+    </exclusiveGateway>
+    <sequenceFlow id="Flow_3" sourceRef="activity_bloodwork1" targetRef="activity_interpret_bloodwork1" />
+    <sequenceFlow id="Flow_6" sourceRef="activity5" targetRef="activity_interpret_ecg1" />
+    <sequenceFlow id="Flow_11" sourceRef="activity6" targetRef="activity_interpret_cxr1" />
+    <sequenceFlow id="Flow_13" sourceRef="activity_interpret_cxr1" targetRef="exclusivegateway4Join" />
+    <sequenceFlow id="Flow_14" name="chest x-ray examination is not required" sourceRef="exclusivegateway4" targetRef="activity_skip_cxr1">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">chest x-ray examination is not required</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_15" sourceRef="activity_skip_cxr1" targetRef="exclusivegateway4Join" />
+    <sequenceFlow id="Flow_16" sourceRef="activity_assess_cxr_need1" targetRef="exclusivegateway4" />
+    <sequenceFlow id="Flow_21" sourceRef="activity7" targetRef="activity_interpret_echo1" />
+    <sequenceFlow id="Flow_23" sourceRef="activity_interpret_echo1" targetRef="exclusivegateway1Join" />
+    <sequenceFlow id="Flow_24" name="a recent echocardiogram is available" sourceRef="exclusivegateway1" targetRef="activity8">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">a recent echocardiogram is available</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_25" sourceRef="activity8" targetRef="exclusivegateway1Join" />
+    <sequenceFlow id="Flow_26" sourceRef="activity_check_recent_echo1" targetRef="exclusivegateway1" />
+    <sequenceFlow id="Flow_31" sourceRef="parallelgateway1" targetRef="activity9" />
+    <sequenceFlow id="Flow_32" sourceRef="parallelgateway1" targetRef="activity_ed_eval1" />
+    <sequenceFlow id="Flow_33" sourceRef="activity_interpret_bloodwork1" targetRef="parallelgateway1Join" />
+    <sequenceFlow id="Flow_34" sourceRef="activity_interpret_ecg1" targetRef="parallelgateway1Join" />
+    <sequenceFlow id="Flow_35" sourceRef="exclusivegateway4Join" targetRef="parallelgateway1Join" />
+    <sequenceFlow id="Flow_36" sourceRef="exclusivegateway1Join" targetRef="parallelgateway1Join" />
+    <sequenceFlow id="Flow_37" sourceRef="activity9" targetRef="parallelgateway1Join" />
+    <sequenceFlow id="Flow_38" sourceRef="activity_ed_eval1" targetRef="parallelgateway1Join" />
+    <sequenceFlow id="Flow_39" sourceRef="StartEvent_1" targetRef="parallelgateway1" />
+    <sequenceFlow id="Flow_40" sourceRef="parallelgateway1Join" targetRef="activity10" />
+    <sequenceFlow id="Flow_43" sourceRef="activity11" targetRef="activity12" />
+    <sequenceFlow id="Flow_46" name="requires ventilation (either noninvasive or invasive ventilation)" sourceRef="inclusivegateway1" targetRef="activity15">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">requires ventilation (either noninvasive or invasive ventilation)</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_47" sourceRef="activity15" targetRef="inclusivegateway1Join" />
+    <sequenceFlow id="Flow_48" name="requires admission to an intensive care unit with higher nurse-to-patient staffing" sourceRef="inclusivegateway1" targetRef="activity16">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">requires admission to an intensive care unit with higher nurse-to-patient staffing</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_49" sourceRef="activity16" targetRef="inclusivegateway1Join" />
+    <sequenceFlow id="Flow_50" name="average intensity" sourceRef="exclusivegateway3" targetRef="activity14">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">average intensity</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_51" sourceRef="activity14" targetRef="exclusivegateway3Join" />
+    <sequenceFlow id="Flow_52" name="high intensity" sourceRef="exclusivegateway3" targetRef="inclusivegateway1">
+      <conditionExpression xsi:type="bpmn:tFormalExpression">high intensity</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_53" sourceRef="inclusivegateway1Join" targetRef="exclusivegateway3Join" />
+    <sequenceFlow id="Flow_54" sourceRef="activity13" targetRef="exclusivegateway3" />
+    <sequenceFlow id="Flow_56" sourceRef="activity12" targetRef="exclusivegateway2Join" />
+    <sequenceFlow id="Flow_58" sourceRef="exclusivegateway3Join" targetRef="exclusivegateway2Join" />
+    <sequenceFlow id="Flow_59" sourceRef="activity10" targetRef="exclusivegateway2" />
+    <sequenceFlow id="Flow_60" sourceRef="exclusivegateway2Join" targetRef="EndEvent_1" />
+  <sequenceFlow id="merged_Flow_27_Flow_2" sourceRef="parallelgateway1" targetRef="activity_bloodwork1" /><sequenceFlow id="merged_Flow_28_Flow_5" sourceRef="parallelgateway1" targetRef="activity5" /><sequenceFlow id="merged_Flow_29_Flow_8" sourceRef="parallelgateway1" targetRef="activity_assess_cxr_need1" /><sequenceFlow id="merged_Flow_12_Flow_10" sourceRef="exclusivegateway4" targetRef="activity6" name="chest x-ray examination is required"><conditionExpression xsi:type="bpmn:tFormalExpression">chest x-ray examination is required</conditionExpression></sequenceFlow><sequenceFlow id="merged_Flow_30_Flow_18" sourceRef="parallelgateway1" targetRef="activity_check_recent_echo1" /><sequenceFlow id="merged_Flow_22_Flow_20" sourceRef="exclusivegateway1" targetRef="activity7" name="no recent echocardiogram is available"><conditionExpression xsi:type="bpmn:tFormalExpression">no recent echocardiogram is available</conditionExpression></sequenceFlow><sequenceFlow id="merged_Flow_55_Flow_42" sourceRef="exclusivegateway2" targetRef="activity11" name="low-risk (e.g., EHMRG quintiles 1 and 2) AND responded to initial treatment in the ED AND no other considerations (e.g., advanced-directives, severe dementia, estimated impact of admission on life-expectancy, etc.)"><conditionExpression xsi:type="bpmn:tFormalExpression">low-risk (e.g., EHMRG quintiles 1 and 2) AND responded to initial treatment in the ED AND no other considerations (e.g., advanced-directives, severe dementia, estimated impact of admission on life-expectancy, etc.)</conditionExpression></sequenceFlow><sequenceFlow id="merged_Flow_57_Flow_45" sourceRef="exclusivegateway2" targetRef="activity13" name="higher-risk (e.g., EHMRG quintiles 3-5)"><conditionExpression xsi:type="bpmn:tFormalExpression">higher-risk (e.g., EHMRG quintiles 3-5)</conditionExpression></sequenceFlow></process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Process_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_Process_1" bpmnElement="Process_1">
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="57" y="52" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="parallelgateway1_di" bpmnElement="parallelgateway1">
+        <dc:Bounds x="200" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity_bloodwork1_di" bpmnElement="activity_bloodwork1">
+        <dc:Bounds x="475" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity_interpret_bloodwork1_di" bpmnElement="activity_interpret_bloodwork1">
+        <dc:Bounds x="625" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="parallelgateway1Join_di" bpmnElement="parallelgateway1Join">
+        <dc:Bounds x="2150" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity10_di" bpmnElement="activity10">
+        <dc:Bounds x="2275" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclusivegateway2_di" bpmnElement="exclusivegateway2" isMarkerVisible="true">
+        <dc:Bounds x="2450" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity11_di" bpmnElement="activity11">
+        <dc:Bounds x="2725" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity12_di" bpmnElement="activity12">
+        <dc:Bounds x="2875" y="30" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclusivegateway2Join_di" bpmnElement="exclusivegateway2Join" isMarkerVisible="true">
+        <dc:Bounds x="3650" y="45" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
+        <dc:Bounds x="3807" y="52" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity5_di" bpmnElement="activity5">
+        <dc:Bounds x="475" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity_interpret_ecg1_di" bpmnElement="activity_interpret_ecg1">
+        <dc:Bounds x="625" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity13_di" bpmnElement="activity13">
+        <dc:Bounds x="2725" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclusivegateway3_di" bpmnElement="exclusivegateway3" isMarkerVisible="true">
+        <dc:Bounds x="2900" y="185" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity14_di" bpmnElement="activity14">
+        <dc:Bounds x="3025" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclusivegateway3Join_di" bpmnElement="exclusivegateway3Join" isMarkerVisible="true">
+        <dc:Bounds x="3500" y="185" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity_assess_cxr_need1_di" bpmnElement="activity_assess_cxr_need1">
+        <dc:Bounds x="475" y="310" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclusivegateway4_di" bpmnElement="exclusivegateway4" isMarkerVisible="true">
+        <dc:Bounds x="650" y="325" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity6_di" bpmnElement="activity6">
+        <dc:Bounds x="925" y="310" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity_interpret_cxr1_di" bpmnElement="activity_interpret_cxr1">
+        <dc:Bounds x="1075" y="310" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclusivegateway4Join_di" bpmnElement="exclusivegateway4Join" isMarkerVisible="true">
+        <dc:Bounds x="1250" y="325" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="inclusivegateway1_di" bpmnElement="inclusivegateway1">
+        <dc:Bounds x="3050" y="325" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity15_di" bpmnElement="activity15">
+        <dc:Bounds x="3175" y="310" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="inclusivegateway1Join_di" bpmnElement="inclusivegateway1Join">
+        <dc:Bounds x="3350" y="325" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity_check_recent_echo1_di" bpmnElement="activity_check_recent_echo1">
+        <dc:Bounds x="475" y="450" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity_skip_cxr1_di" bpmnElement="activity_skip_cxr1">
+        <dc:Bounds x="1075" y="450" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclusivegateway1_di" bpmnElement="exclusivegateway1" isMarkerVisible="true">
+        <dc:Bounds x="1400" y="465" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity7_di" bpmnElement="activity7">
+        <dc:Bounds x="1675" y="450" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity_interpret_echo1_di" bpmnElement="activity_interpret_echo1">
+        <dc:Bounds x="1825" y="450" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="exclusivegateway1Join_di" bpmnElement="exclusivegateway1Join" isMarkerVisible="true">
+        <dc:Bounds x="2000" y="465" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity16_di" bpmnElement="activity16">
+        <dc:Bounds x="3175" y="450" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity9_di" bpmnElement="activity9">
+        <dc:Bounds x="325" y="590" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity8_di" bpmnElement="activity8">
+        <dc:Bounds x="1525" y="590" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="activity_ed_eval1_di" bpmnElement="activity_ed_eval1">
+        <dc:Bounds x="325" y="730" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_39_di" bpmnElement="Flow_39">
+        <di:waypoint x="93" y="70" />
+        <di:waypoint x="200" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_31_di" bpmnElement="Flow_31">
+        <di:waypoint x="225" y="95" />
+        <di:waypoint x="225" y="630" />
+        <di:waypoint x="325" y="630" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_32_di" bpmnElement="Flow_32">
+        <di:waypoint x="225" y="95" />
+        <di:waypoint x="225" y="770" />
+        <di:waypoint x="325" y="770" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="575" y="70" />
+        <di:waypoint x="625" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_33_di" bpmnElement="Flow_33">
+        <di:waypoint x="725" y="70" />
+        <di:waypoint x="2150" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_40_di" bpmnElement="Flow_40">
+        <di:waypoint x="2200" y="70" />
+        <di:waypoint x="2275" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_59_di" bpmnElement="Flow_59">
+        <di:waypoint x="2375" y="70" />
+        <di:waypoint x="2450" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_43_di" bpmnElement="Flow_43">
+        <di:waypoint x="2825" y="70" />
+        <di:waypoint x="2875" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_56_di" bpmnElement="Flow_56">
+        <di:waypoint x="2975" y="70" />
+        <di:waypoint x="3650" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_60_di" bpmnElement="Flow_60">
+        <di:waypoint x="3700" y="70" />
+        <di:waypoint x="3807" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_6_di" bpmnElement="Flow_6">
+        <di:waypoint x="575" y="210" />
+        <di:waypoint x="625" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_34_di" bpmnElement="Flow_34">
+        <di:waypoint x="725" y="210" />
+        <di:waypoint x="2175" y="210" />
+        <di:waypoint x="2175" y="95" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_54_di" bpmnElement="Flow_54">
+        <di:waypoint x="2825" y="210" />
+        <di:waypoint x="2900" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_50_di" bpmnElement="Flow_50">
+        <di:waypoint x="2950" y="210" />
+        <di:waypoint x="3025" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_52_di" bpmnElement="Flow_52">
+        <di:waypoint x="2925" y="235" />
+        <di:waypoint x="2925" y="350" />
+        <di:waypoint x="3050" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_51_di" bpmnElement="Flow_51">
+        <di:waypoint x="3125" y="210" />
+        <di:waypoint x="3500" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_58_di" bpmnElement="Flow_58">
+        <di:waypoint x="3550" y="210" />
+        <di:waypoint x="3675" y="210" />
+        <di:waypoint x="3675" y="95" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16_di" bpmnElement="Flow_16">
+        <di:waypoint x="575" y="350" />
+        <di:waypoint x="650" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14_di" bpmnElement="Flow_14">
+        <di:waypoint x="675" y="375" />
+        <di:waypoint x="675" y="490" />
+        <di:waypoint x="1075" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11_di" bpmnElement="Flow_11">
+        <di:waypoint x="1025" y="350" />
+        <di:waypoint x="1075" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13_di" bpmnElement="Flow_13">
+        <di:waypoint x="1175" y="350" />
+        <di:waypoint x="1250" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_35_di" bpmnElement="Flow_35">
+        <di:waypoint x="1300" y="350" />
+        <di:waypoint x="2175" y="350" />
+        <di:waypoint x="2175" y="95" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_46_di" bpmnElement="Flow_46">
+        <di:waypoint x="3100" y="350" />
+        <di:waypoint x="3175" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_48_di" bpmnElement="Flow_48">
+        <di:waypoint x="3075" y="375" />
+        <di:waypoint x="3075" y="490" />
+        <di:waypoint x="3175" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_47_di" bpmnElement="Flow_47">
+        <di:waypoint x="3275" y="350" />
+        <di:waypoint x="3350" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_53_di" bpmnElement="Flow_53">
+        <di:waypoint x="3400" y="350" />
+        <di:waypoint x="3525" y="350" />
+        <di:waypoint x="3525" y="235" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_26_di" bpmnElement="Flow_26">
+        <di:waypoint x="525" y="530" />
+        <di:waypoint x="525" y="560" />
+        <di:waypoint x="1425" y="560" />
+        <di:waypoint x="1425" y="515" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15_di" bpmnElement="Flow_15">
+        <di:waypoint x="1175" y="490" />
+        <di:waypoint x="1275" y="490" />
+        <di:waypoint x="1275" y="375" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_24_di" bpmnElement="Flow_24">
+        <di:waypoint x="1425" y="515" />
+        <di:waypoint x="1425" y="630" />
+        <di:waypoint x="1525" y="630" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_21_di" bpmnElement="Flow_21">
+        <di:waypoint x="1775" y="490" />
+        <di:waypoint x="1825" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_23_di" bpmnElement="Flow_23">
+        <di:waypoint x="1925" y="490" />
+        <di:waypoint x="2000" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_36_di" bpmnElement="Flow_36">
+        <di:waypoint x="2050" y="490" />
+        <di:waypoint x="2175" y="490" />
+        <di:waypoint x="2175" y="95" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_49_di" bpmnElement="Flow_49">
+        <di:waypoint x="3275" y="490" />
+        <di:waypoint x="3375" y="490" />
+        <di:waypoint x="3375" y="375" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_37_di" bpmnElement="Flow_37">
+        <di:waypoint x="425" y="630" />
+        <di:waypoint x="450" y="630" />
+        <di:waypoint x="450" y="140" />
+        <di:waypoint x="2100" y="140" />
+        <di:waypoint x="2100" y="70" />
+        <di:waypoint x="2150" y="70" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_25_di" bpmnElement="Flow_25">
+        <di:waypoint x="1625" y="630" />
+        <di:waypoint x="2025" y="630" />
+        <di:waypoint x="2025" y="515" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_38_di" bpmnElement="Flow_38">
+        <di:waypoint x="425" y="770" />
+        <di:waypoint x="2175" y="770" />
+        <di:waypoint x="2175" y="95" />
+      </bpmndi:BPMNEdge>
+    <bpmndi:BPMNEdge id="edge_merged_Flow_27_Flow_2" bpmnElement="merged_Flow_27_Flow_2"><di:waypoint x="250" y="70" /><di:waypoint x="475" y="70" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="edge_merged_Flow_28_Flow_5" bpmnElement="merged_Flow_28_Flow_5"><di:waypoint x="225" y="95" /><di:waypoint x="475" y="210" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="edge_merged_Flow_29_Flow_8" bpmnElement="merged_Flow_29_Flow_8"><di:waypoint x="225" y="95" /><di:waypoint x="475" y="350" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="edge_merged_Flow_12_Flow_10" bpmnElement="merged_Flow_12_Flow_10"><di:waypoint x="700" y="350" /><di:waypoint x="925" y="350" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="edge_merged_Flow_30_Flow_18" bpmnElement="merged_Flow_30_Flow_18"><di:waypoint x="225" y="95" /><di:waypoint x="475" y="490" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="edge_merged_Flow_22_Flow_20" bpmnElement="merged_Flow_22_Flow_20"><di:waypoint x="1450" y="490" /><di:waypoint x="1675" y="490" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="edge_merged_Flow_55_Flow_42" bpmnElement="merged_Flow_55_Flow_42"><di:waypoint x="2500" y="70" /><di:waypoint x="2725" y="70" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="edge_merged_Flow_57_Flow_45" bpmnElement="merged_Flow_57_Flow_45"><di:waypoint x="2475" y="95" /><di:waypoint x="2725" y="210" /></bpmndi:BPMNEdge></bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

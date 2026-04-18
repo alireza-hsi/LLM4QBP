@@ -147,22 +147,43 @@ class OpenAIModel(ModelBackend):
             "gpt-4o": 16384,
             "gpt-4.1": 30000,
             "gpt-5.2": 30000,
+            "gpt-5.2-low-reasoning": 30000,
+            "gpt-5.2-medium-reasoning": 30000,
+            "gpt-5.2-high-reasoning": 30000,
+            "gpt-5.4": 128000,
+            "gpt-5.4-low-reasoning": 128000,
+            "gpt-5.4-medium-reasoning": 128000,
+            "gpt-5.4-high-reasoning": 128000,
+            "gpt-5.4-xhigh-reasoning": 128000,
         }
         # TODO: The 'openai.api_base' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(api_base="https://sailaoda.cn/v1")'
         # openai.api_base = "https://sailaoda.cn/v1"
         num_max_token = num_max_token_map[self.model_type.value]
         num_max_completion_tokens = num_max_token - num_prompt_tokens
 
-        if self.model_type.value == "gpt-5.2":
+        if self.model_type.value == "gpt-5.2" or self.model_type.value == "gpt-5.2-low-reasoning" or self.model_type.value == "gpt-5.2-medium-reasoning" or self.model_type.value == "gpt-5.2-high-reasoning" or self.model_type.value == "gpt-5.4" or self.model_type.value == "gpt-5.4-low-reasoning" or self.model_type.value == "gpt-5.4-medium-reasoning" or self.model_type.value == "gpt-5.4-high-reasoning" or self.model_type.value == "gpt-5.4-xhigh-reasoning":
+            reasoning_effort = "none"
+            if self.model_type.value == "gpt-5.2-low-reasoning" or self.model_type.value == "gpt-5.4-low-reasoning":
+                reasoning_effort = "low"
+            elif self.model_type.value == "gpt-5.2-medium-reasoning" or self.model_type.value == "gpt-5.4-medium-reasoning":
+                reasoning_effort = "medium"
+            elif self.model_type.value == "gpt-5.2-high-reasoning" or self.model_type.value == "gpt-5.4-high-reasoning":
+                reasoning_effort = "high"
+            model = self.model_type.value
+            if model == "gpt-5.2-low-reasoning" or model == "gpt-5.2-medium-reasoning" or model == "gpt-5.2-high-reasoning":
+                model = "gpt-5.2"
+            if model == "gpt-5.4-low-reasoning" or model == "gpt-5.4-medium-reasoning" or model == "gpt-5.4-high-reasoning" or model == "gpt-5.4-xhigh-reasoning":
+                model = "gpt-5.4"
             resp_obj = client.responses.create(
-                model=self.model_type.value,
+                model=model,
                 input=kwargs["messages"],
-                reasoning={"effort": "none"},
-                text={"verbosity": "low"},
+                reasoning={"effort": reasoning_effort},
+                text={},
                 max_output_tokens=num_max_completion_tokens,
             )
             resp_dict = resp_obj.model_dump()
             response = self.responses_to_chatcompletions_dict(resp_dict)
+            print(response)
 
         else:
             chat_cfg = dict(self.model_config_dict)
@@ -214,7 +235,8 @@ class ModelFactory:
         default_model_type = ModelType.GPT_4
         if model_type in {
             ModelType.GPT_3_5_TURBO, ModelType.GPT_4, ModelType.GPT_4_32k, ModelType.GPT_4o, ModelType.GPT_4o1, 
-            ModelType.GPT_5o2,
+            ModelType.GPT_5o2, ModelType.GPT_5o2_low_reasoning, ModelType.GPT_5o2_medium_reasoning, ModelType.GPT_5o2_high_reasoning,
+            ModelType.GPT_5o4, ModelType.GPT_5o4_low_reasoning, ModelType.GPT_5o4_medium_reasoning, ModelType.GPT_5o4_high_reasoning, ModelType.GPT_5o4_xhigh_reasoning,
             None
         }:
             model_class = OpenAIModel

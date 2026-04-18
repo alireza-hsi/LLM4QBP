@@ -1,0 +1,1525 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<ns0:definitions xmlns:ns0="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:ns2="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:ns3="http://www.omg.org/spec/DD/20100524/DC" xmlns:ns4="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn">
+  <ns0:process id="Process_1" name="Stroke Process" isExecutable="true">
+    <ns0:startEvent id="StartEvent_1" name="Start">
+      <ns0:outgoing>Flow_1</ns0:outgoing>
+    </ns0:startEvent>
+    <ns0:endEvent id="EndEvent_1" name="End">
+      <ns0:incoming>Flow_169</ns0:incoming>
+    </ns0:endEvent>
+    <ns0:task id="a1_1" name="assess airway (Role: ED or acute care clinician; Objects: airway status)">
+      <ns0:incoming>Flow_1</ns0:incoming>
+      <ns0:outgoing>Flow_2</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a1_2" name="assess breathing (Role: ED or acute care clinician; Objects: breathing status)">
+      <ns0:incoming>Flow_2</ns0:incoming>
+      <ns0:outgoing>Flow_3</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a1_3" name="assess circulation (Role: ED or acute care clinician; Objects: circulatory status)">
+      <ns0:incoming>Flow_3</ns0:incoming>
+      <ns0:outgoing>Flow_4</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a2_1" name="assess focal neurological deficits (Role: stroke clinician; Objects: neurological findings)">
+      <ns0:incoming>Flow_4</ns0:incoming>
+      <ns0:outgoing>Flow_5</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a2_2" name="assign stroke severity score on a standardized stroke scale (Role: stroke clinician; Objects: NIHSS or CNS score)">
+      <ns0:incoming>Flow_5</ns0:incoming>
+      <ns0:outgoing>Flow_152</ns0:outgoing>
+    </ns0:task>
+    <ns0:parallelGateway id="g1" name="Parallel Gateway">
+      <ns0:incoming>Flow_152</ns0:incoming>
+      <ns0:outgoing>Flow_146</ns0:outgoing>
+      <ns0:outgoing>Flow_147</ns0:outgoing>
+      <ns0:outgoing>Flow_148</ns0:outgoing>
+    </ns0:parallelGateway>
+    <ns0:task id="a3_1" name="determine last known well or symptom onset time (Role: stroke clinician; Objects: stroke onset history)">
+      <ns0:incoming>Flow_7</ns0:incoming>
+      <ns0:outgoing>Flow_8</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a3_2" name="assess whether acute neurological symptoms are potentially disabling (Role: stroke clinician; Objects: symptom severity)">
+      <ns0:incoming>Flow_8</ns0:incoming>
+      <ns0:outgoing>Flow_104</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g2" name="Exclusive Gateway">
+      <ns0:incoming>Flow_104</ns0:incoming>
+      <ns0:outgoing>Flow_98</ns0:outgoing>
+      <ns0:outgoing>Flow_100</ns0:outgoing>
+      <ns0:outgoing>Flow_102</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:exclusiveGateway id="g2_1" name="Exclusive Gateway">
+      <ns0:incoming>Flow_14</ns0:incoming>
+      <ns0:outgoing>Flow_10</ns0:outgoing>
+      <ns0:outgoing>Flow_12</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a4_1" name="perform rapid non-contrast CT in less than 25 minutes from door time (Role: imaging team; Objects: non-contrast CT of the brain)">
+      <ns0:incoming>Flow_10</ns0:incoming>
+      <ns0:outgoing>Flow_11</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a4_2" name="perform rapid MRI in less than 25 minutes from door time when feasible (Role: imaging team; Objects: MRI of the brain)">
+      <ns0:incoming>Flow_12</ns0:incoming>
+      <ns0:outgoing>Flow_13</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g2_1Join" name="Exclusive Merge">
+      <ns0:incoming>Flow_11</ns0:incoming>
+      <ns0:incoming>Flow_13</ns0:incoming>
+      <ns0:outgoing>Flow_15</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a4_3" name="perform CTA without delaying rapid stroke assessment (Role: imaging team; Objects: CTA of the head and neck)">
+      <ns0:incoming>Flow_15</ns0:incoming>
+      <ns0:outgoing>Flow_16</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a5" name="interpret brain imaging immediately (Role: health care provider with brain imaging expertise; Objects: CT/CTA and/or MRI of the brain)">
+      <ns0:incoming>Flow_16</ns0:incoming>
+      <ns0:outgoing>Flow_44</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g4" name="Exclusive Gateway">
+      <ns0:incoming>Flow_44</ns0:incoming>
+      <ns0:outgoing>Flow_40</ns0:outgoing>
+      <ns0:outgoing>Flow_42</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a10" name="treat intracerebral hemorrhage as a medical emergency and evaluate the patient immediately (Role: stroke physician; Objects: ICH patient)">
+      <ns0:incoming>Flow_18</ns0:incoming>
+      <ns0:outgoing>Flow_19</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a11_1" name="ask about anticoagulant therapy (Role: stroke physician; Objects: anticoagulant history)">
+      <ns0:incoming>Flow_19</ns0:incoming>
+      <ns0:outgoing>Flow_20</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a11_2" name="review platelet count, PTT, and INR results (Role: stroke physician; Objects: platelet count, PTT, INR)">
+      <ns0:incoming>Flow_20</ns0:incoming>
+      <ns0:outgoing>Flow_25</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g5" name="Exclusive Gateway">
+      <ns0:incoming>Flow_25</ns0:incoming>
+      <ns0:outgoing>Flow_21</ns0:outgoing>
+      <ns0:outgoing>Flow_23</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a12" name="perform CTA or MRA as soon as possible (Role: imaging team; Objects: CTA or MRA)">
+      <ns0:incoming>Flow_21</ns0:incoming>
+      <ns0:outgoing>Flow_22</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a13" name="continue immediate ICH management (Role: stroke physician; Objects: ICH assessment findings)">
+      <ns0:incoming>Flow_23</ns0:incoming>
+      <ns0:outgoing>Flow_24</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g5Join" name="Exclusive Merge">
+      <ns0:incoming>Flow_22</ns0:incoming>
+      <ns0:incoming>Flow_24</ns0:incoming>
+      <ns0:outgoing>Flow_41</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a14" name="continue assessment for ischemic stroke or TIA based on imaging findings (Role: stroke clinician; Objects: non-ICH brain imaging results)">
+      <ns0:incoming>Flow_27</ns0:incoming>
+      <ns0:outgoing>Flow_39</ns0:outgoing>
+    </ns0:task>
+    <ns0:inclusiveGateway id="g3" name="Inclusive Gateway">
+      <ns0:incoming>Flow_39</ns0:incoming>
+      <ns0:outgoing>Flow_35</ns0:outgoing>
+      <ns0:outgoing>Flow_37</ns0:outgoing>
+    </ns0:inclusiveGateway>
+    <ns0:task id="a6" name="consider advanced CT imaging (Role: imaging team; Objects: CT, multiphase CTA, Perfusion CT)">
+      <ns0:incoming>Flow_35</ns0:incoming>
+      <ns0:outgoing>Flow_36</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a7_1" name="confirm clinical and imaging eligibility for endovascular therapy (Role: stroke physician; Objects: EVT eligibility criteria)">
+      <ns0:incoming>Flow_29</ns0:incoming>
+      <ns0:outgoing>Flow_34</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g3_1" name="Exclusive Gateway">
+      <ns0:incoming>Flow_34</ns0:incoming>
+      <ns0:outgoing>Flow_30</ns0:outgoing>
+      <ns0:outgoing>Flow_32</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a7_2" name="activate on-site endovascular therapy pathway (Role: stroke physician; Objects: EVT team and treatment plan)">
+      <ns0:incoming>Flow_30</ns0:incoming>
+      <ns0:outgoing>Flow_31</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a7_3" name="contact EVT centre and arrange treatment and transport decision (Role: stroke physician; Objects: EVT referral, transport plan)">
+      <ns0:incoming>Flow_32</ns0:incoming>
+      <ns0:outgoing>Flow_33</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g3_1Join" name="Exclusive Merge">
+      <ns0:incoming>Flow_31</ns0:incoming>
+      <ns0:incoming>Flow_33</ns0:incoming>
+      <ns0:outgoing>Flow_38</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:inclusiveGateway id="g3Join" name="Inclusive Merge">
+      <ns0:incoming>Flow_36</ns0:incoming>
+      <ns0:incoming>Flow_38</ns0:incoming>
+      <ns0:outgoing>Flow_43</ns0:outgoing>
+    </ns0:inclusiveGateway>
+    <ns0:exclusiveGateway id="g4Join" name="Exclusive Merge">
+      <ns0:incoming>Flow_41</ns0:incoming>
+      <ns0:incoming>Flow_43</ns0:incoming>
+      <ns0:outgoing>Flow_99</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:exclusiveGateway id="g2_2" name="Exclusive Gateway">
+      <ns0:incoming>Flow_50</ns0:incoming>
+      <ns0:outgoing>Flow_46</ns0:outgoing>
+      <ns0:outgoing>Flow_48</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a8_new_1" name="perform rapid non-contrast CT in less than 25 minutes from door time (Role: imaging team; Objects: non-contrast CT of the brain)">
+      <ns0:incoming>Flow_46</ns0:incoming>
+      <ns0:outgoing>Flow_47</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a8_new_2" name="perform rapid MRI in less than 25 minutes from door time when feasible (Role: imaging team; Objects: MRI of the brain)">
+      <ns0:incoming>Flow_48</ns0:incoming>
+      <ns0:outgoing>Flow_49</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g2_2Join" name="Exclusive Merge">
+      <ns0:incoming>Flow_47</ns0:incoming>
+      <ns0:incoming>Flow_49</ns0:incoming>
+      <ns0:outgoing>Flow_51</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a8_new_3" name="perform CTA without delaying rapid stroke assessment (Role: imaging team; Objects: CTA of the head and neck)">
+      <ns0:incoming>Flow_51</ns0:incoming>
+      <ns0:outgoing>Flow_52</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a9_new" name="interpret brain imaging immediately (Role: health care provider with brain imaging expertise; Objects: CT/CTA and/or MRI of the brain)">
+      <ns0:incoming>Flow_52</ns0:incoming>
+      <ns0:outgoing>Flow_80</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g4_2" name="Exclusive Gateway">
+      <ns0:incoming>Flow_80</ns0:incoming>
+      <ns0:outgoing>Flow_76</ns0:outgoing>
+      <ns0:outgoing>Flow_78</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a10_2" name="treat intracerebral hemorrhage as a medical emergency and evaluate the patient immediately (Role: stroke physician; Objects: ICH patient)">
+      <ns0:incoming>Flow_54</ns0:incoming>
+      <ns0:outgoing>Flow_55</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a11_5" name="ask about anticoagulant therapy (Role: stroke physician; Objects: anticoagulant history)">
+      <ns0:incoming>Flow_55</ns0:incoming>
+      <ns0:outgoing>Flow_56</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a11_6" name="review platelet count, PTT, and INR results (Role: stroke physician; Objects: platelet count, PTT, INR)">
+      <ns0:incoming>Flow_56</ns0:incoming>
+      <ns0:outgoing>Flow_61</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g5_2" name="Exclusive Gateway">
+      <ns0:incoming>Flow_61</ns0:incoming>
+      <ns0:outgoing>Flow_57</ns0:outgoing>
+      <ns0:outgoing>Flow_59</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a12_2" name="perform CTA or MRA as soon as possible (Role: imaging team; Objects: CTA or MRA)">
+      <ns0:incoming>Flow_57</ns0:incoming>
+      <ns0:outgoing>Flow_58</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a13_2" name="continue immediate ICH management (Role: stroke physician; Objects: ICH assessment findings)">
+      <ns0:incoming>Flow_59</ns0:incoming>
+      <ns0:outgoing>Flow_60</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g5_2Join" name="Exclusive Merge">
+      <ns0:incoming>Flow_58</ns0:incoming>
+      <ns0:incoming>Flow_60</ns0:incoming>
+      <ns0:outgoing>Flow_77</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a14_2" name="continue assessment for ischemic stroke or TIA based on imaging findings (Role: stroke clinician; Objects: non-ICH brain imaging results)">
+      <ns0:incoming>Flow_63</ns0:incoming>
+      <ns0:outgoing>Flow_75</ns0:outgoing>
+    </ns0:task>
+    <ns0:inclusiveGateway id="g3_2" name="Inclusive Gateway">
+      <ns0:incoming>Flow_75</ns0:incoming>
+      <ns0:outgoing>Flow_71</ns0:outgoing>
+      <ns0:outgoing>Flow_73</ns0:outgoing>
+    </ns0:inclusiveGateway>
+    <ns0:task id="a6_2" name="consider advanced CT imaging (Role: imaging team; Objects: CT, multiphase CTA, Perfusion CT)">
+      <ns0:incoming>Flow_71</ns0:incoming>
+      <ns0:outgoing>Flow_72</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a7_4" name="confirm clinical and imaging eligibility for endovascular therapy (Role: stroke physician; Objects: EVT eligibility criteria)">
+      <ns0:incoming>Flow_65</ns0:incoming>
+      <ns0:outgoing>Flow_70</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g3_3" name="Exclusive Gateway">
+      <ns0:incoming>Flow_70</ns0:incoming>
+      <ns0:outgoing>Flow_66</ns0:outgoing>
+      <ns0:outgoing>Flow_68</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a7_5" name="activate on-site endovascular therapy pathway (Role: stroke physician; Objects: EVT team and treatment plan)">
+      <ns0:incoming>Flow_66</ns0:incoming>
+      <ns0:outgoing>Flow_67</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a7_6" name="contact EVT centre and arrange treatment and transport decision (Role: stroke physician; Objects: EVT referral, transport plan)">
+      <ns0:incoming>Flow_68</ns0:incoming>
+      <ns0:outgoing>Flow_69</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g3_3Join" name="Exclusive Merge">
+      <ns0:incoming>Flow_67</ns0:incoming>
+      <ns0:incoming>Flow_69</ns0:incoming>
+      <ns0:outgoing>Flow_74</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:inclusiveGateway id="g3_2Join" name="Inclusive Merge">
+      <ns0:incoming>Flow_72</ns0:incoming>
+      <ns0:incoming>Flow_74</ns0:incoming>
+      <ns0:outgoing>Flow_79</ns0:outgoing>
+    </ns0:inclusiveGateway>
+    <ns0:exclusiveGateway id="g4_2Join" name="Exclusive Merge">
+      <ns0:incoming>Flow_77</ns0:incoming>
+      <ns0:incoming>Flow_79</ns0:incoming>
+      <ns0:outgoing>Flow_101</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a8" name="perform urgent brain imaging as clinically indicated (Role: imaging team; Objects: non-contrast CT or MRI)">
+      <ns0:incoming>Flow_82</ns0:incoming>
+      <ns0:outgoing>Flow_83</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a9" name="interpret brain imaging immediately (Role: health care provider with brain imaging expertise; Objects: CT and/or MRI of the brain)">
+      <ns0:incoming>Flow_83</ns0:incoming>
+      <ns0:outgoing>Flow_97</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g4_1" name="Exclusive Gateway">
+      <ns0:incoming>Flow_97</ns0:incoming>
+      <ns0:outgoing>Flow_93</ns0:outgoing>
+      <ns0:outgoing>Flow_95</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a10_1" name="treat intracerebral hemorrhage as a medical emergency and evaluate the patient immediately (Role: stroke physician; Objects: ICH patient)">
+      <ns0:incoming>Flow_85</ns0:incoming>
+      <ns0:outgoing>Flow_86</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a11_3" name="ask about anticoagulant therapy (Role: stroke physician; Objects: anticoagulant history)">
+      <ns0:incoming>Flow_86</ns0:incoming>
+      <ns0:outgoing>Flow_87</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a11_4" name="review platelet count, PTT, and INR results (Role: stroke physician; Objects: platelet count, PTT, INR)">
+      <ns0:incoming>Flow_87</ns0:incoming>
+      <ns0:outgoing>Flow_92</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g5_1" name="Exclusive Gateway">
+      <ns0:incoming>Flow_92</ns0:incoming>
+      <ns0:outgoing>Flow_88</ns0:outgoing>
+      <ns0:outgoing>Flow_90</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a12_1" name="perform CTA or MRA as soon as possible (Role: imaging team; Objects: CTA or MRA)">
+      <ns0:incoming>Flow_88</ns0:incoming>
+      <ns0:outgoing>Flow_89</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a13_1" name="continue immediate ICH management (Role: stroke physician; Objects: ICH assessment findings)">
+      <ns0:incoming>Flow_90</ns0:incoming>
+      <ns0:outgoing>Flow_91</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g5_1Join" name="Exclusive Merge">
+      <ns0:incoming>Flow_89</ns0:incoming>
+      <ns0:incoming>Flow_91</ns0:incoming>
+      <ns0:outgoing>Flow_94</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a14_1" name="continue assessment for ischemic stroke or TIA based on imaging findings (Role: stroke clinician; Objects: non-ICH brain imaging results)">
+      <ns0:incoming>Flow_95</ns0:incoming>
+      <ns0:outgoing>Flow_96</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g4_1Join" name="Exclusive Merge">
+      <ns0:incoming>Flow_94</ns0:incoming>
+      <ns0:incoming>Flow_96</ns0:incoming>
+      <ns0:outgoing>Flow_103</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:exclusiveGateway id="g2Join" name="Exclusive Merge">
+      <ns0:incoming>Flow_99</ns0:incoming>
+      <ns0:incoming>Flow_101</ns0:incoming>
+      <ns0:incoming>Flow_103</ns0:incoming>
+      <ns0:outgoing>Flow_109</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:exclusiveGateway id="g6" name="Exclusive Gateway">
+      <ns0:incoming>Flow_109</ns0:incoming>
+      <ns0:outgoing>Flow_105</ns0:outgoing>
+      <ns0:outgoing>Flow_107</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a15" name="perform vascular imaging of the brain and neck arteries as soon as possible (Role: imaging team; Objects: brain vascular imaging, neck artery imaging)">
+      <ns0:incoming>Flow_105</ns0:incoming>
+      <ns0:outgoing>Flow_106</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a16" name="continue diagnosis-specific early assessment pathway when beyond-48-hour vascular imaging is not required (Role: stroke clinician; Objects: current diagnostic findings)">
+      <ns0:incoming>Flow_107</ns0:incoming>
+      <ns0:outgoing>Flow_108</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g6Join" name="Exclusive Merge">
+      <ns0:incoming>Flow_106</ns0:incoming>
+      <ns0:incoming>Flow_108</ns0:incoming>
+      <ns0:outgoing>Flow_149</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a17" name="make the patient NPO initially (Role: nursing staff; Objects: oral intake restriction)">
+      <ns0:incoming>Flow_111</ns0:incoming>
+      <ns0:outgoing>Flow_137</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g7" name="Exclusive Gateway">
+      <ns0:incoming>Flow_137</ns0:incoming>
+      <ns0:outgoing>Flow_133</ns0:outgoing>
+      <ns0:outgoing>Flow_135</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a18" name="screen swallowing ability as part of the initial assessment and before oral medication, fluid, or food (Role: nursing staff; Objects: simple valid reliable bedside swallowing screening protocol)">
+      <ns0:incoming>Flow_113</ns0:incoming>
+      <ns0:outgoing>Flow_121</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g8" name="Exclusive Gateway">
+      <ns0:incoming>Flow_121</ns0:incoming>
+      <ns0:outgoing>Flow_117</ns0:outgoing>
+      <ns0:outgoing>Flow_119</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a20_1" name="perform full clinical swallowing assessment (Role: speech-language pathologist or appropriately trained specialist; Objects: swallowing function)">
+      <ns0:incoming>Flow_115</ns0:incoming>
+      <ns0:outgoing>Flow_116</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a20_2" name="advise on swallowing ability and required consistency of diet and fluids (Role: speech-language pathologist or appropriately trained specialist; Objects: diet consistency, fluid consistency)">
+      <ns0:incoming>Flow_116</ns0:incoming>
+      <ns0:outgoing>Flow_118</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a21" name="continue oral intake decisions according to swallowing screening results (Role: stroke clinician; Objects: medication, fluid, and food plan)">
+      <ns0:incoming>Flow_119</ns0:incoming>
+      <ns0:outgoing>Flow_120</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g8Join" name="Exclusive Merge">
+      <ns0:incoming>Flow_118</ns0:incoming>
+      <ns0:incoming>Flow_120</ns0:incoming>
+      <ns0:outgoing>Flow_134</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a19" name="maintain NPO and monitor closely until swallowing screening is clinically appropriate (Role: nursing staff; Objects: swallowing assessment plan, level of alertness)">
+      <ns0:incoming>Flow_123</ns0:incoming>
+      <ns0:outgoing>Flow_124</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a19_1" name="screen swallowing ability when clinically appropriate and before oral medication, fluid, or food (Role: nursing staff; Objects: simple valid reliable bedside swallowing screening protocol)">
+      <ns0:incoming>Flow_124</ns0:incoming>
+      <ns0:outgoing>Flow_132</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g8_1" name="Exclusive Gateway">
+      <ns0:incoming>Flow_132</ns0:incoming>
+      <ns0:outgoing>Flow_128</ns0:outgoing>
+      <ns0:outgoing>Flow_130</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a20_3" name="perform full clinical swallowing assessment (Role: speech-language pathologist or appropriately trained specialist; Objects: swallowing function)">
+      <ns0:incoming>Flow_126</ns0:incoming>
+      <ns0:outgoing>Flow_127</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a20_4" name="advise on swallowing ability and required consistency of diet and fluids (Role: speech-language pathologist or appropriately trained specialist; Objects: diet consistency, fluid consistency)">
+      <ns0:incoming>Flow_127</ns0:incoming>
+      <ns0:outgoing>Flow_129</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a21_1" name="continue oral intake decisions according to swallowing screening results (Role: stroke clinician; Objects: medication, fluid, and food plan)">
+      <ns0:incoming>Flow_130</ns0:incoming>
+      <ns0:outgoing>Flow_131</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g8_1Join" name="Exclusive Merge">
+      <ns0:incoming>Flow_129</ns0:incoming>
+      <ns0:incoming>Flow_131</ns0:incoming>
+      <ns0:outgoing>Flow_136</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:exclusiveGateway id="g7Join" name="Exclusive Merge">
+      <ns0:incoming>Flow_134</ns0:incoming>
+      <ns0:incoming>Flow_136</ns0:incoming>
+      <ns0:outgoing>Flow_150</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a22" name="perform ECG without delaying acute treatment (Role: clinical staff; Objects: ECG to detect atrial fibrillation and other acute arrhythmias)">
+      <ns0:incoming>Flow_139</ns0:incoming>
+      <ns0:outgoing>Flow_140</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a23" name="obtain blood work (Role: clinical staff; Objects: CBC, electrolytes, creatinine, glucose, INR, partial thromboplastin time)">
+      <ns0:incoming>Flow_140</ns0:incoming>
+      <ns0:outgoing>Flow_145</ns0:outgoing>
+    </ns0:task>
+    <ns0:inclusiveGateway id="g9" name="Inclusive Gateway">
+      <ns0:incoming>Flow_145</ns0:incoming>
+      <ns0:outgoing>Flow_141</ns0:outgoing>
+      <ns0:outgoing>Flow_143</ns0:outgoing>
+    </ns0:inclusiveGateway>
+    <ns0:task id="a24" name="obtain troponin test (Role: clinical staff; Objects: troponin sample)">
+      <ns0:incoming>Flow_141</ns0:incoming>
+      <ns0:outgoing>Flow_142</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a25" name="perform chest x-ray without delaying assessment for thrombolysis (Role: radiology staff; Objects: chest x-ray)">
+      <ns0:incoming>Flow_143</ns0:incoming>
+      <ns0:outgoing>Flow_144</ns0:outgoing>
+    </ns0:task>
+    <ns0:inclusiveGateway id="g9Join" name="Inclusive Merge">
+      <ns0:incoming>Flow_142</ns0:incoming>
+      <ns0:incoming>Flow_144</ns0:incoming>
+      <ns0:outgoing>Flow_151</ns0:outgoing>
+    </ns0:inclusiveGateway>
+    <ns0:parallelGateway id="g1Join" name="Parallel Merge">
+      <ns0:incoming>Flow_149</ns0:incoming>
+      <ns0:incoming>Flow_150</ns0:incoming>
+      <ns0:incoming>Flow_151</ns0:incoming>
+      <ns0:outgoing>Flow_168</ns0:outgoing>
+    </ns0:parallelGateway>
+    <ns0:exclusiveGateway id="g10" name="Exclusive Gateway">
+      <ns0:incoming>Flow_168</ns0:incoming>
+      <ns0:outgoing>Flow_164</ns0:outgoing>
+      <ns0:outgoing>Flow_166</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:exclusiveGateway id="g10_1" name="Exclusive Gateway">
+      <ns0:incoming>Flow_158</ns0:incoming>
+      <ns0:outgoing>Flow_154</ns0:outgoing>
+      <ns0:outgoing>Flow_156</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a27" name="monitor closely within the first 24 hours and screen swallowing ability when clinically appropriate (Role: nursing staff; Objects: swallowing status, level of alertness)">
+      <ns0:incoming>Flow_154</ns0:incoming>
+      <ns0:outgoing>Flow_155</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a28" name="continue dysphagia precautions and inpatient swallowing care plan as indicated (Role: nursing staff; Objects: swallowing screening status, swallowing care plan)">
+      <ns0:incoming>Flow_156</ns0:incoming>
+      <ns0:outgoing>Flow_157</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g10_1Join" name="Exclusive Merge">
+      <ns0:incoming>Flow_155</ns0:incoming>
+      <ns0:incoming>Flow_157</ns0:incoming>
+      <ns0:outgoing>Flow_159</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:task id="a26_1" name="initiate cross-continuum secondary prevention assessments (Role: stroke team; Objects: secondary prevention assessment plan from Modules 5 and 10)">
+      <ns0:incoming>Flow_159</ns0:incoming>
+      <ns0:outgoing>Flow_160</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a26_2" name="start inpatient secondary prevention therapies and handover plan (Role: stroke team; Objects: secondary prevention therapies and continuity plan)">
+      <ns0:incoming>Flow_160</ns0:incoming>
+      <ns0:outgoing>Flow_165</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a26_3" name="arrange discharge secondary prevention assessments and referrals (Role: stroke team; Objects: secondary prevention referrals and follow-up plan from Modules 5 and 10)">
+      <ns0:incoming>Flow_162</ns0:incoming>
+      <ns0:outgoing>Flow_163</ns0:outgoing>
+    </ns0:task>
+    <ns0:task id="a26_4" name="provide discharge secondary prevention therapies (Role: stroke team; Objects: secondary prevention medications, education, and instructions)">
+      <ns0:incoming>Flow_163</ns0:incoming>
+      <ns0:outgoing>Flow_167</ns0:outgoing>
+    </ns0:task>
+    <ns0:exclusiveGateway id="g10Join" name="Exclusive Merge">
+      <ns0:incoming>Flow_165</ns0:incoming>
+      <ns0:incoming>Flow_167</ns0:incoming>
+      <ns0:outgoing>Flow_169</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="a1_1" />
+    <ns0:sequenceFlow id="Flow_2" sourceRef="a1_1" targetRef="a1_2" />
+    <ns0:sequenceFlow id="Flow_3" sourceRef="a1_2" targetRef="a1_3" />
+    <ns0:sequenceFlow id="Flow_4" sourceRef="a1_3" targetRef="a2_1" />
+    <ns0:sequenceFlow id="Flow_5" sourceRef="a2_1" targetRef="a2_2" />
+    <ns0:sequenceFlow id="Flow_8" sourceRef="a3_1" targetRef="a3_2" />
+    <ns0:sequenceFlow id="Flow_10" name="non-contrast CT is selected as the initial brain imaging modality" sourceRef="g2_1" targetRef="a4_1">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">non-contrast CT is selected as the initial brain imaging modality</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_11" sourceRef="a4_1" targetRef="g2_1Join" />
+    <ns0:sequenceFlow id="Flow_12" name="MRI is selected as the initial brain imaging modality" sourceRef="g2_1" targetRef="a4_2">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">MRI is selected as the initial brain imaging modality</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_13" sourceRef="a4_2" targetRef="g2_1Join" />
+    <ns0:sequenceFlow id="Flow_15" sourceRef="g2_1Join" targetRef="a4_3" />
+    <ns0:sequenceFlow id="Flow_16" sourceRef="a4_3" targetRef="a5" />
+    <ns0:sequenceFlow id="Flow_19" sourceRef="a10" targetRef="a11_1" />
+    <ns0:sequenceFlow id="Flow_20" sourceRef="a11_1" targetRef="a11_2" />
+    <ns0:sequenceFlow id="Flow_21" name="patient is a select acute ICH case needing additional vascular imaging" sourceRef="g5" targetRef="a12">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">patient is a select acute ICH case needing additional vascular imaging</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_22" sourceRef="a12" targetRef="g5Join" />
+    <ns0:sequenceFlow id="Flow_23" name="additional vascular imaging for ICH is not selected" sourceRef="g5" targetRef="a13">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">additional vascular imaging for ICH is not selected</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_24" sourceRef="a13" targetRef="g5Join" />
+    <ns0:sequenceFlow id="Flow_25" sourceRef="a11_2" targetRef="g5" />
+    <ns0:sequenceFlow id="Flow_30" name="EVT can be provided at the current site" sourceRef="g3_1" targetRef="a7_2">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">EVT can be provided at the current site</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_31" sourceRef="a7_2" targetRef="g3_1Join" />
+    <ns0:sequenceFlow id="Flow_32" name="EVT requires referral or transfer to an EVT centre" sourceRef="g3_1" targetRef="a7_3">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">EVT requires referral or transfer to an EVT centre</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_33" sourceRef="a7_3" targetRef="g3_1Join" />
+    <ns0:sequenceFlow id="Flow_34" sourceRef="a7_1" targetRef="g3_1" />
+    <ns0:sequenceFlow id="Flow_35" name="acute ischemic stroke is clinically eligible for acute stroke treatments" sourceRef="g3" targetRef="a6">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">acute ischemic stroke is clinically eligible for acute stroke treatments</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_36" sourceRef="a6" targetRef="g3Join" />
+    <ns0:sequenceFlow id="Flow_38" sourceRef="g3_1Join" targetRef="g3Join" />
+    <ns0:sequenceFlow id="Flow_39" sourceRef="a14" targetRef="g3" />
+    <ns0:sequenceFlow id="Flow_41" sourceRef="g5Join" targetRef="g4Join" />
+    <ns0:sequenceFlow id="Flow_43" sourceRef="g3Join" targetRef="g4Join" />
+    <ns0:sequenceFlow id="Flow_44" sourceRef="a5" targetRef="g4" />
+    <ns0:sequenceFlow id="Flow_46" name="non-contrast CT is selected as the initial brain imaging modality" sourceRef="g2_2" targetRef="a8_new_1">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">non-contrast CT is selected as the initial brain imaging modality</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_47" sourceRef="a8_new_1" targetRef="g2_2Join" />
+    <ns0:sequenceFlow id="Flow_48" name="MRI is selected as the initial brain imaging modality" sourceRef="g2_2" targetRef="a8_new_2">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">MRI is selected as the initial brain imaging modality</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_49" sourceRef="a8_new_2" targetRef="g2_2Join" />
+    <ns0:sequenceFlow id="Flow_51" sourceRef="g2_2Join" targetRef="a8_new_3" />
+    <ns0:sequenceFlow id="Flow_52" sourceRef="a8_new_3" targetRef="a9_new" />
+    <ns0:sequenceFlow id="Flow_55" sourceRef="a10_2" targetRef="a11_5" />
+    <ns0:sequenceFlow id="Flow_56" sourceRef="a11_5" targetRef="a11_6" />
+    <ns0:sequenceFlow id="Flow_57" name="patient is a select acute ICH case needing additional vascular imaging" sourceRef="g5_2" targetRef="a12_2">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">patient is a select acute ICH case needing additional vascular imaging</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_58" sourceRef="a12_2" targetRef="g5_2Join" />
+    <ns0:sequenceFlow id="Flow_59" name="additional vascular imaging for ICH is not selected" sourceRef="g5_2" targetRef="a13_2">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">additional vascular imaging for ICH is not selected</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_60" sourceRef="a13_2" targetRef="g5_2Join" />
+    <ns0:sequenceFlow id="Flow_61" sourceRef="a11_6" targetRef="g5_2" />
+    <ns0:sequenceFlow id="Flow_66" name="EVT can be provided at the current site" sourceRef="g3_3" targetRef="a7_5">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">EVT can be provided at the current site</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_67" sourceRef="a7_5" targetRef="g3_3Join" />
+    <ns0:sequenceFlow id="Flow_68" name="EVT requires referral or transfer to an EVT centre" sourceRef="g3_3" targetRef="a7_6">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">EVT requires referral or transfer to an EVT centre</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_69" sourceRef="a7_6" targetRef="g3_3Join" />
+    <ns0:sequenceFlow id="Flow_70" sourceRef="a7_4" targetRef="g3_3" />
+    <ns0:sequenceFlow id="Flow_71" name="acute ischemic stroke is clinically eligible for acute stroke treatments" sourceRef="g3_2" targetRef="a6_2">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">acute ischemic stroke is clinically eligible for acute stroke treatments</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_72" sourceRef="a6_2" targetRef="g3_2Join" />
+    <ns0:sequenceFlow id="Flow_74" sourceRef="g3_3Join" targetRef="g3_2Join" />
+    <ns0:sequenceFlow id="Flow_75" sourceRef="a14_2" targetRef="g3_2" />
+    <ns0:sequenceFlow id="Flow_77" sourceRef="g5_2Join" targetRef="g4_2Join" />
+    <ns0:sequenceFlow id="Flow_79" sourceRef="g3_2Join" targetRef="g4_2Join" />
+    <ns0:sequenceFlow id="Flow_80" sourceRef="a9_new" targetRef="g4_2" />
+    <ns0:sequenceFlow id="Flow_83" sourceRef="a8" targetRef="a9" />
+    <ns0:sequenceFlow id="Flow_86" sourceRef="a10_1" targetRef="a11_3" />
+    <ns0:sequenceFlow id="Flow_87" sourceRef="a11_3" targetRef="a11_4" />
+    <ns0:sequenceFlow id="Flow_88" name="patient is a select acute ICH case needing additional vascular imaging" sourceRef="g5_1" targetRef="a12_1">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">patient is a select acute ICH case needing additional vascular imaging</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_89" sourceRef="a12_1" targetRef="g5_1Join" />
+    <ns0:sequenceFlow id="Flow_90" name="additional vascular imaging for ICH is not selected" sourceRef="g5_1" targetRef="a13_1">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">additional vascular imaging for ICH is not selected</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_91" sourceRef="a13_1" targetRef="g5_1Join" />
+    <ns0:sequenceFlow id="Flow_92" sourceRef="a11_4" targetRef="g5_1" />
+    <ns0:sequenceFlow id="Flow_94" sourceRef="g5_1Join" targetRef="g4_1Join" />
+    <ns0:sequenceFlow id="Flow_95" name="brain imaging does not show intracerebral hemorrhage" sourceRef="g4_1" targetRef="a14_1">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">brain imaging does not show intracerebral hemorrhage</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_96" sourceRef="a14_1" targetRef="g4_1Join" />
+    <ns0:sequenceFlow id="Flow_97" sourceRef="a9" targetRef="g4_1" />
+    <ns0:sequenceFlow id="Flow_99" sourceRef="g4Join" targetRef="g2Join" />
+    <ns0:sequenceFlow id="Flow_101" sourceRef="g4_2Join" targetRef="g2Join" />
+    <ns0:sequenceFlow id="Flow_103" sourceRef="g4_1Join" targetRef="g2Join" />
+    <ns0:sequenceFlow id="Flow_104" sourceRef="a3_2" targetRef="g2" />
+    <ns0:sequenceFlow id="Flow_105" name="patient has TIA or ischemic stroke presenting beyond 48 hours" sourceRef="g6" targetRef="a15">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">patient has TIA or ischemic stroke presenting beyond 48 hours</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_106" sourceRef="a15" targetRef="g6Join" />
+    <ns0:sequenceFlow id="Flow_107" name="patient does not have TIA or ischemic stroke presenting beyond 48 hours" sourceRef="g6" targetRef="a16">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">patient does not have TIA or ischemic stroke presenting beyond 48 hours</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_108" sourceRef="a16" targetRef="g6Join" />
+    <ns0:sequenceFlow id="Flow_109" sourceRef="g2Join" targetRef="g6" />
+    <ns0:sequenceFlow id="Flow_116" sourceRef="a20_1" targetRef="a20_2" />
+    <ns0:sequenceFlow id="Flow_118" sourceRef="a20_2" targetRef="g8Join" />
+    <ns0:sequenceFlow id="Flow_119" name="patient does not present with features indicating dysphagia or pulmonary aspiration" sourceRef="g8" targetRef="a21">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">patient does not present with features indicating dysphagia or pulmonary aspiration</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_120" sourceRef="a21" targetRef="g8Join" />
+    <ns0:sequenceFlow id="Flow_121" sourceRef="a18" targetRef="g8" />
+    <ns0:sequenceFlow id="Flow_124" sourceRef="a19" targetRef="a19_1" />
+    <ns0:sequenceFlow id="Flow_127" sourceRef="a20_3" targetRef="a20_4" />
+    <ns0:sequenceFlow id="Flow_129" sourceRef="a20_4" targetRef="g8_1Join" />
+    <ns0:sequenceFlow id="Flow_130" name="patient does not present with features indicating dysphagia or pulmonary aspiration" sourceRef="g8_1" targetRef="a21_1">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">patient does not present with features indicating dysphagia or pulmonary aspiration</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_131" sourceRef="a21_1" targetRef="g8_1Join" />
+    <ns0:sequenceFlow id="Flow_132" sourceRef="a19_1" targetRef="g8_1" />
+    <ns0:sequenceFlow id="Flow_134" sourceRef="g8Join" targetRef="g7Join" />
+    <ns0:sequenceFlow id="Flow_136" sourceRef="g8_1Join" targetRef="g7Join" />
+    <ns0:sequenceFlow id="Flow_137" sourceRef="a17" targetRef="g7" />
+    <ns0:sequenceFlow id="Flow_140" sourceRef="a22" targetRef="a23" />
+    <ns0:sequenceFlow id="Flow_141" name="troponin testing is clinically indicated" sourceRef="g9" targetRef="a24">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">troponin testing is clinically indicated</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_142" sourceRef="a24" targetRef="g9Join" />
+    <ns0:sequenceFlow id="Flow_143" name="chest x-ray is clinically required" sourceRef="g9" targetRef="a25">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">chest x-ray is clinically required</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_144" sourceRef="a25" targetRef="g9Join" />
+    <ns0:sequenceFlow id="Flow_145" sourceRef="a23" targetRef="g9" />
+    <ns0:sequenceFlow id="Flow_149" sourceRef="g6Join" targetRef="g1Join" />
+    <ns0:sequenceFlow id="Flow_150" sourceRef="g7Join" targetRef="g1Join" />
+    <ns0:sequenceFlow id="Flow_151" sourceRef="g9Join" targetRef="g1Join" />
+    <ns0:sequenceFlow id="Flow_152" sourceRef="a2_2" targetRef="g1" />
+    <ns0:sequenceFlow id="Flow_154" name="patient was not alert within the first 24 hours" sourceRef="g10_1" targetRef="a27">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">patient was not alert within the first 24 hours</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_155" sourceRef="a27" targetRef="g10_1Join" />
+    <ns0:sequenceFlow id="Flow_156" name="patient was alert or swallowing screening has already been completed" sourceRef="g10_1" targetRef="a28">
+      <ns0:conditionExpression xsi:type="bpmn:tFormalExpression">patient was alert or swallowing screening has already been completed</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="Flow_157" sourceRef="a28" targetRef="g10_1Join" />
+    <ns0:sequenceFlow id="Flow_159" sourceRef="g10_1Join" targetRef="a26_1" />
+    <ns0:sequenceFlow id="Flow_160" sourceRef="a26_1" targetRef="a26_2" />
+    <ns0:sequenceFlow id="Flow_163" sourceRef="a26_3" targetRef="a26_4" />
+    <ns0:sequenceFlow id="Flow_165" sourceRef="a26_2" targetRef="g10Join" />
+    <ns0:sequenceFlow id="Flow_167" sourceRef="a26_4" targetRef="g10Join" />
+    <ns0:sequenceFlow id="Flow_168" sourceRef="g1Join" targetRef="g10" />
+    <ns0:sequenceFlow id="Flow_169" sourceRef="g10Join" targetRef="EndEvent_1" />
+  <ns0:sequenceFlow id="merged_Flow_146_Flow_7" sourceRef="g1" targetRef="a3_1" /><ns0:sequenceFlow id="merged_Flow_98_Flow_14" sourceRef="g2" targetRef="g2_1" name="patient presents within the acute stroke treatment time window"><ns0:conditionExpression xsi:type="bpmn:tFormalExpression">patient presents within the acute stroke treatment time window</ns0:conditionExpression></ns0:sequenceFlow><ns0:sequenceFlow id="merged_Flow_40_Flow_18" sourceRef="g4" targetRef="a10" name="brain imaging shows intracerebral hemorrhage"><ns0:conditionExpression xsi:type="bpmn:tFormalExpression">brain imaging shows intracerebral hemorrhage</ns0:conditionExpression></ns0:sequenceFlow><ns0:sequenceFlow id="merged_Flow_42_Flow_27" sourceRef="g4" targetRef="a14" name="brain imaging does not show intracerebral hemorrhage"><ns0:conditionExpression xsi:type="bpmn:tFormalExpression">brain imaging does not show intracerebral hemorrhage</ns0:conditionExpression></ns0:sequenceFlow><ns0:sequenceFlow id="merged_Flow_37_Flow_29" sourceRef="g3" targetRef="a7_1" name="potentially disabling symptoms began within 6.0 hours of onset or treatment can be initiated within a 12-hour window and clinical and imaging criteria are met"><ns0:conditionExpression xsi:type="bpmn:tFormalExpression">potentially disabling symptoms began within 6.0 hours of onset or treatment can be initiated within a 12-hour window and clinical and imaging criteria are met</ns0:conditionExpression></ns0:sequenceFlow><ns0:sequenceFlow id="merged_Flow_100_Flow_50" sourceRef="g2" targetRef="g2_2" name="time window is not established but acute treatment eligibility is still possible"><ns0:conditionExpression xsi:type="bpmn:tFormalExpression">time window is not established but acute treatment eligibility is still possible</ns0:conditionExpression></ns0:sequenceFlow><ns0:sequenceFlow id="merged_Flow_76_Flow_54" sourceRef="g4_2" targetRef="a10_2" name="brain imaging shows intracerebral hemorrhage"><ns0:conditionExpression xsi:type="bpmn:tFormalExpression">brain imaging shows intracerebral hemorrhage</ns0:conditionExpression></ns0:sequenceFlow><ns0:sequenceFlow id="merged_Flow_78_Flow_63" sourceRef="g4_2" targetRef="a14_2" name="brain imaging does not show intracerebral hemorrhage"><ns0:conditionExpression xsi:type="bpmn:tFormalExpression">brain imaging does not show intracerebral hemorrhage</ns0:conditionExpression></ns0:sequenceFlow><ns0:sequenceFlow id="merged_Flow_73_Flow_65" sourceRef="g3_2" targetRef="a7_4" name="potentially disabling symptoms began within 6.0 hours of onset or treatment can be initiated within a 12-hour window and clinical and imaging criteria are met"><ns0:conditionExpression xsi:type="bpmn:tFormalExpression">potentially disabling symptoms began within 6.0 hours of onset or treatment can be initiated within a 12-hour window and clinical and imaging criteria are met</ns0:conditionExpression></ns0:sequenceFlow><ns0:sequenceFlow id="merged_Flow_102_Flow_82" sourceRef="g2" targetRef="a8" name="patient is clearly beyond the acute stroke treatment time window"><ns0:conditionExpression xsi:type="bpmn:tFormalExpression">patient is clearly beyond the acute stroke treatment time window</ns0:conditionExpression></ns0:sequenceFlow><ns0:sequenceFlow id="merged_Flow_93_Flow_85" sourceRef="g4_1" targetRef="a10_1" name="brain imaging shows intracerebral hemorrhage"><ns0:conditionExpression xsi:type="bpmn:tFormalExpression">brain imaging shows intracerebral hemorrhage</ns0:conditionExpression></ns0:sequenceFlow><ns0:sequenceFlow id="merged_Flow_147_Flow_111" sourceRef="g1" targetRef="a17" /><ns0:sequenceFlow id="merged_Flow_133_Flow_113" sourceRef="g7" targetRef="a18" name="patient is alert for swallowing assessment"><ns0:conditionExpression xsi:type="bpmn:tFormalExpression">patient is alert for swallowing assessment</ns0:conditionExpression></ns0:sequenceFlow><ns0:sequenceFlow id="merged_Flow_117_Flow_115" sourceRef="g8" targetRef="a20_1" name="patient presents with features indicating dysphagia or pulmonary aspiration"><ns0:conditionExpression xsi:type="bpmn:tFormalExpression">patient presents with features indicating dysphagia or pulmonary aspiration</ns0:conditionExpression></ns0:sequenceFlow><ns0:sequenceFlow id="merged_Flow_135_Flow_123" sourceRef="g7" targetRef="a19" name="patient is not alert within the first 24 hours"><ns0:conditionExpression xsi:type="bpmn:tFormalExpression">patient is not alert within the first 24 hours</ns0:conditionExpression></ns0:sequenceFlow><ns0:sequenceFlow id="merged_Flow_128_Flow_126" sourceRef="g8_1" targetRef="a20_3" name="patient presents with features indicating dysphagia or pulmonary aspiration"><ns0:conditionExpression xsi:type="bpmn:tFormalExpression">patient presents with features indicating dysphagia or pulmonary aspiration</ns0:conditionExpression></ns0:sequenceFlow><ns0:sequenceFlow id="merged_Flow_148_Flow_139" sourceRef="g1" targetRef="a22" /><ns0:sequenceFlow id="merged_Flow_164_Flow_158" sourceRef="g10" targetRef="g10_1" name="patient is admitted to hospital"><ns0:conditionExpression xsi:type="bpmn:tFormalExpression">patient is admitted to hospital</ns0:conditionExpression></ns0:sequenceFlow><ns0:sequenceFlow id="merged_Flow_166_Flow_162" sourceRef="g10" targetRef="a26_3" name="patient is discharged from the ED"><ns0:conditionExpression xsi:type="bpmn:tFormalExpression">patient is discharged from the ED</ns0:conditionExpression></ns0:sequenceFlow></ns0:process>
+  <ns2:BPMNDiagram id="BPMNDiagram_Process_1">
+    <ns2:BPMNPlane id="BPMNPlane_Process_1" bpmnElement="Process_1">
+      <ns2:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <ns3:Bounds x="57" y="52" width="36" height="36" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a1_1_di" bpmnElement="a1_1">
+        <ns3:Bounds x="175" y="30" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a1_2_di" bpmnElement="a1_2">
+        <ns3:Bounds x="325" y="30" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a1_3_di" bpmnElement="a1_3">
+        <ns3:Bounds x="475" y="30" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a2_1_di" bpmnElement="a2_1">
+        <ns3:Bounds x="625" y="30" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a2_2_di" bpmnElement="a2_2">
+        <ns3:Bounds x="775" y="30" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g1_di" bpmnElement="g1">
+        <ns3:Bounds x="950" y="45" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a3_1_di" bpmnElement="a3_1">
+        <ns3:Bounds x="1225" y="30" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a3_2_di" bpmnElement="a3_2">
+        <ns3:Bounds x="1375" y="30" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g2_di" bpmnElement="g2" isMarkerVisible="true">
+        <ns3:Bounds x="1550" y="45" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g2_1_di" bpmnElement="g2_1" isMarkerVisible="true">
+        <ns3:Bounds x="1850" y="45" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a4_1_di" bpmnElement="a4_1">
+        <ns3:Bounds x="1975" y="30" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g2_1Join_di" bpmnElement="g2_1Join" isMarkerVisible="true">
+        <ns3:Bounds x="2150" y="45" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a4_3_di" bpmnElement="a4_3">
+        <ns3:Bounds x="2275" y="30" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a5_di" bpmnElement="a5">
+        <ns3:Bounds x="2425" y="30" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g4_di" bpmnElement="g4" isMarkerVisible="true">
+        <ns3:Bounds x="2600" y="45" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a10_di" bpmnElement="a10">
+        <ns3:Bounds x="2875" y="30" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a11_1_di" bpmnElement="a11_1">
+        <ns3:Bounds x="3025" y="30" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a11_2_di" bpmnElement="a11_2">
+        <ns3:Bounds x="3175" y="30" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g5_di" bpmnElement="g5" isMarkerVisible="true">
+        <ns3:Bounds x="3350" y="45" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a12_di" bpmnElement="a12">
+        <ns3:Bounds x="3475" y="30" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g5Join_di" bpmnElement="g5Join" isMarkerVisible="true">
+        <ns3:Bounds x="3650" y="45" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g4Join_di" bpmnElement="g4Join" isMarkerVisible="true">
+        <ns3:Bounds x="5000" y="45" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g2Join_di" bpmnElement="g2Join" isMarkerVisible="true">
+        <ns3:Bounds x="10400" y="45" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g6_di" bpmnElement="g6" isMarkerVisible="true">
+        <ns3:Bounds x="10550" y="45" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a15_di" bpmnElement="a15">
+        <ns3:Bounds x="10675" y="30" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g6Join_di" bpmnElement="g6Join" isMarkerVisible="true">
+        <ns3:Bounds x="10850" y="45" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g1Join_di" bpmnElement="g1Join">
+        <ns3:Bounds x="14150" y="45" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g10_di" bpmnElement="g10" isMarkerVisible="true">
+        <ns3:Bounds x="14300" y="45" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g10_1_di" bpmnElement="g10_1" isMarkerVisible="true">
+        <ns3:Bounds x="14600" y="45" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a27_di" bpmnElement="a27">
+        <ns3:Bounds x="14725" y="30" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g10_1Join_di" bpmnElement="g10_1Join" isMarkerVisible="true">
+        <ns3:Bounds x="14900" y="45" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a26_1_di" bpmnElement="a26_1">
+        <ns3:Bounds x="15025" y="30" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a26_2_di" bpmnElement="a26_2">
+        <ns3:Bounds x="15175" y="30" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g10Join_di" bpmnElement="g10Join" isMarkerVisible="true">
+        <ns3:Bounds x="15350" y="45" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
+        <ns3:Bounds x="15507" y="52" width="36" height="36" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a17_di" bpmnElement="a17">
+        <ns3:Bounds x="1225" y="170" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a4_2_di" bpmnElement="a4_2">
+        <ns3:Bounds x="2425" y="170" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a14_di" bpmnElement="a14">
+        <ns3:Bounds x="3325" y="170" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a13_di" bpmnElement="a13">
+        <ns3:Bounds x="4225" y="170" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g3_di" bpmnElement="g3">
+        <ns3:Bounds x="4400" y="185" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a6_di" bpmnElement="a6">
+        <ns3:Bounds x="4525" y="170" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g3Join_di" bpmnElement="g3Join">
+        <ns3:Bounds x="5300" y="185" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g2_2_di" bpmnElement="g2_2" isMarkerVisible="true">
+        <ns3:Bounds x="5600" y="185" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a8_new_1_di" bpmnElement="a8_new_1">
+        <ns3:Bounds x="5725" y="170" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g2_2Join_di" bpmnElement="g2_2Join" isMarkerVisible="true">
+        <ns3:Bounds x="5900" y="185" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a8_new_3_di" bpmnElement="a8_new_3">
+        <ns3:Bounds x="6025" y="170" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a9_new_di" bpmnElement="a9_new">
+        <ns3:Bounds x="6175" y="170" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g4_2_di" bpmnElement="g4_2" isMarkerVisible="true">
+        <ns3:Bounds x="6350" y="185" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a10_2_di" bpmnElement="a10_2">
+        <ns3:Bounds x="6625" y="170" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a11_5_di" bpmnElement="a11_5">
+        <ns3:Bounds x="6775" y="170" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a11_6_di" bpmnElement="a11_6">
+        <ns3:Bounds x="6925" y="170" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g5_2_di" bpmnElement="g5_2" isMarkerVisible="true">
+        <ns3:Bounds x="7100" y="185" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a12_2_di" bpmnElement="a12_2">
+        <ns3:Bounds x="7225" y="170" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g5_2Join_di" bpmnElement="g5_2Join" isMarkerVisible="true">
+        <ns3:Bounds x="7400" y="185" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g4_2Join_di" bpmnElement="g4_2Join" isMarkerVisible="true">
+        <ns3:Bounds x="8750" y="185" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a16_di" bpmnElement="a16">
+        <ns3:Bounds x="10975" y="170" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g7_di" bpmnElement="g7" isMarkerVisible="true">
+        <ns3:Bounds x="11150" y="185" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a18_di" bpmnElement="a18">
+        <ns3:Bounds x="11425" y="170" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g8_di" bpmnElement="g8" isMarkerVisible="true">
+        <ns3:Bounds x="11600" y="185" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a20_1_di" bpmnElement="a20_1">
+        <ns3:Bounds x="11875" y="170" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a20_2_di" bpmnElement="a20_2">
+        <ns3:Bounds x="12025" y="170" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g8Join_di" bpmnElement="g8Join" isMarkerVisible="true">
+        <ns3:Bounds x="12200" y="185" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g7Join_di" bpmnElement="g7Join" isMarkerVisible="true">
+        <ns3:Bounds x="13100" y="185" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a26_3_di" bpmnElement="a26_3">
+        <ns3:Bounds x="14575" y="170" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a26_4_di" bpmnElement="a26_4">
+        <ns3:Bounds x="14725" y="170" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a28_di" bpmnElement="a28">
+        <ns3:Bounds x="15175" y="170" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a22_di" bpmnElement="a22">
+        <ns3:Bounds x="1225" y="310" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a23_di" bpmnElement="a23">
+        <ns3:Bounds x="1375" y="310" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a8_di" bpmnElement="a8">
+        <ns3:Bounds x="2275" y="310" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a9_di" bpmnElement="a9">
+        <ns3:Bounds x="2425" y="310" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a7_1_di" bpmnElement="a7_1">
+        <ns3:Bounds x="5125" y="310" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g3_1_di" bpmnElement="g3_1" isMarkerVisible="true">
+        <ns3:Bounds x="5300" y="325" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a7_2_di" bpmnElement="a7_2">
+        <ns3:Bounds x="5425" y="310" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g3_1Join_di" bpmnElement="g3_1Join" isMarkerVisible="true">
+        <ns3:Bounds x="5600" y="325" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a8_new_2_di" bpmnElement="a8_new_2">
+        <ns3:Bounds x="6325" y="310" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a14_2_di" bpmnElement="a14_2">
+        <ns3:Bounds x="7225" y="310" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a13_2_di" bpmnElement="a13_2">
+        <ns3:Bounds x="8125" y="310" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g3_2_di" bpmnElement="g3_2">
+        <ns3:Bounds x="8300" y="325" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a6_2_di" bpmnElement="a6_2">
+        <ns3:Bounds x="8425" y="310" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g3_2Join_di" bpmnElement="g3_2Join">
+        <ns3:Bounds x="9200" y="325" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g4_1_di" bpmnElement="g4_1" isMarkerVisible="true">
+        <ns3:Bounds x="9500" y="325" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a10_1_di" bpmnElement="a10_1">
+        <ns3:Bounds x="9775" y="310" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a11_3_di" bpmnElement="a11_3">
+        <ns3:Bounds x="9925" y="310" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a11_4_di" bpmnElement="a11_4">
+        <ns3:Bounds x="10075" y="310" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g5_1_di" bpmnElement="g5_1" isMarkerVisible="true">
+        <ns3:Bounds x="10250" y="325" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a12_1_di" bpmnElement="a12_1">
+        <ns3:Bounds x="10375" y="310" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g5_1Join_di" bpmnElement="g5_1Join" isMarkerVisible="true">
+        <ns3:Bounds x="10550" y="325" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g4_1Join_di" bpmnElement="g4_1Join" isMarkerVisible="true">
+        <ns3:Bounds x="10700" y="325" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a19_di" bpmnElement="a19">
+        <ns3:Bounds x="11875" y="310" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a19_1_di" bpmnElement="a19_1">
+        <ns3:Bounds x="12025" y="310" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a21_di" bpmnElement="a21">
+        <ns3:Bounds x="12625" y="310" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g8_1_di" bpmnElement="g8_1" isMarkerVisible="true">
+        <ns3:Bounds x="12800" y="325" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a20_3_di" bpmnElement="a20_3">
+        <ns3:Bounds x="13075" y="310" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a20_4_di" bpmnElement="a20_4">
+        <ns3:Bounds x="13225" y="310" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g8_1Join_di" bpmnElement="g8_1Join" isMarkerVisible="true">
+        <ns3:Bounds x="13400" y="325" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g9_di" bpmnElement="g9">
+        <ns3:Bounds x="13700" y="325" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a24_di" bpmnElement="a24">
+        <ns3:Bounds x="13825" y="310" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g9Join_di" bpmnElement="g9Join">
+        <ns3:Bounds x="14000" y="325" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a7_3_di" bpmnElement="a7_3">
+        <ns3:Bounds x="4525" y="450" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a7_4_di" bpmnElement="a7_4">
+        <ns3:Bounds x="7675" y="450" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g3_3_di" bpmnElement="g3_3" isMarkerVisible="true">
+        <ns3:Bounds x="7850" y="465" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a7_5_di" bpmnElement="a7_5">
+        <ns3:Bounds x="7975" y="450" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="g3_3Join_di" bpmnElement="g3_3Join" isMarkerVisible="true">
+        <ns3:Bounds x="8150" y="465" width="50" height="50" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a14_1_di" bpmnElement="a14_1">
+        <ns3:Bounds x="9175" y="450" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a13_1_di" bpmnElement="a13_1">
+        <ns3:Bounds x="9925" y="450" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a21_1_di" bpmnElement="a21_1">
+        <ns3:Bounds x="12475" y="450" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a25_di" bpmnElement="a25">
+        <ns3:Bounds x="13825" y="450" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNShape id="a7_6_di" bpmnElement="a7_6">
+        <ns3:Bounds x="7975" y="590" width="100" height="80" />
+      </ns2:BPMNShape>
+      <ns2:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <ns4:waypoint x="93" y="70" />
+        <ns4:waypoint x="175" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <ns4:waypoint x="275" y="70" />
+        <ns4:waypoint x="325" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <ns4:waypoint x="425" y="70" />
+        <ns4:waypoint x="475" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4">
+        <ns4:waypoint x="575" y="70" />
+        <ns4:waypoint x="625" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5">
+        <ns4:waypoint x="725" y="70" />
+        <ns4:waypoint x="775" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_152_di" bpmnElement="Flow_152">
+        <ns4:waypoint x="875" y="70" />
+        <ns4:waypoint x="950" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_8_di" bpmnElement="Flow_8">
+        <ns4:waypoint x="1325" y="70" />
+        <ns4:waypoint x="1375" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_104_di" bpmnElement="Flow_104">
+        <ns4:waypoint x="1475" y="70" />
+        <ns4:waypoint x="1550" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_10_di" bpmnElement="Flow_10">
+        <ns4:waypoint x="1900" y="70" />
+        <ns4:waypoint x="1975" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_12_di" bpmnElement="Flow_12">
+        <ns4:waypoint x="1900" y="70" />
+        <ns4:waypoint x="1950" y="70" />
+        <ns4:waypoint x="1950" y="140" />
+        <ns4:waypoint x="2400" y="140" />
+        <ns4:waypoint x="2400" y="210" />
+        <ns4:waypoint x="2425" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_11_di" bpmnElement="Flow_11">
+        <ns4:waypoint x="2075" y="70" />
+        <ns4:waypoint x="2150" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_15_di" bpmnElement="Flow_15">
+        <ns4:waypoint x="2200" y="70" />
+        <ns4:waypoint x="2275" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_16_di" bpmnElement="Flow_16">
+        <ns4:waypoint x="2375" y="70" />
+        <ns4:waypoint x="2425" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_44_di" bpmnElement="Flow_44">
+        <ns4:waypoint x="2525" y="70" />
+        <ns4:waypoint x="2600" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_19_di" bpmnElement="Flow_19">
+        <ns4:waypoint x="2975" y="70" />
+        <ns4:waypoint x="3025" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_20_di" bpmnElement="Flow_20">
+        <ns4:waypoint x="3125" y="70" />
+        <ns4:waypoint x="3175" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_25_di" bpmnElement="Flow_25">
+        <ns4:waypoint x="3275" y="70" />
+        <ns4:waypoint x="3350" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_21_di" bpmnElement="Flow_21">
+        <ns4:waypoint x="3400" y="70" />
+        <ns4:waypoint x="3475" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_23_di" bpmnElement="Flow_23">
+        <ns4:waypoint x="3400" y="70" />
+        <ns4:waypoint x="3450" y="70" />
+        <ns4:waypoint x="3450" y="140" />
+        <ns4:waypoint x="4200" y="140" />
+        <ns4:waypoint x="4200" y="210" />
+        <ns4:waypoint x="4225" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_22_di" bpmnElement="Flow_22">
+        <ns4:waypoint x="3575" y="70" />
+        <ns4:waypoint x="3650" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_41_di" bpmnElement="Flow_41">
+        <ns4:waypoint x="3700" y="70" />
+        <ns4:waypoint x="5000" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_99_di" bpmnElement="Flow_99">
+        <ns4:waypoint x="5050" y="70" />
+        <ns4:waypoint x="10400" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_109_di" bpmnElement="Flow_109">
+        <ns4:waypoint x="10450" y="70" />
+        <ns4:waypoint x="10550" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_105_di" bpmnElement="Flow_105">
+        <ns4:waypoint x="10600" y="70" />
+        <ns4:waypoint x="10675" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_107_di" bpmnElement="Flow_107">
+        <ns4:waypoint x="10575" y="95" />
+        <ns4:waypoint x="10575" y="210" />
+        <ns4:waypoint x="10975" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_106_di" bpmnElement="Flow_106">
+        <ns4:waypoint x="10775" y="70" />
+        <ns4:waypoint x="10850" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_149_di" bpmnElement="Flow_149">
+        <ns4:waypoint x="10900" y="70" />
+        <ns4:waypoint x="14150" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_168_di" bpmnElement="Flow_168">
+        <ns4:waypoint x="14200" y="70" />
+        <ns4:waypoint x="14300" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_154_di" bpmnElement="Flow_154">
+        <ns4:waypoint x="14650" y="70" />
+        <ns4:waypoint x="14725" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_156_di" bpmnElement="Flow_156">
+        <ns4:waypoint x="14650" y="70" />
+        <ns4:waypoint x="14700" y="70" />
+        <ns4:waypoint x="14700" y="140" />
+        <ns4:waypoint x="15150" y="140" />
+        <ns4:waypoint x="15150" y="210" />
+        <ns4:waypoint x="15175" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_155_di" bpmnElement="Flow_155">
+        <ns4:waypoint x="14825" y="70" />
+        <ns4:waypoint x="14900" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_159_di" bpmnElement="Flow_159">
+        <ns4:waypoint x="14950" y="70" />
+        <ns4:waypoint x="15025" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_160_di" bpmnElement="Flow_160">
+        <ns4:waypoint x="15125" y="70" />
+        <ns4:waypoint x="15175" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_165_di" bpmnElement="Flow_165">
+        <ns4:waypoint x="15275" y="70" />
+        <ns4:waypoint x="15350" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_169_di" bpmnElement="Flow_169">
+        <ns4:waypoint x="15400" y="70" />
+        <ns4:waypoint x="15507" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_137_di" bpmnElement="Flow_137">
+        <ns4:waypoint x="1275" y="250" />
+        <ns4:waypoint x="1275" y="280" />
+        <ns4:waypoint x="11175" y="280" />
+        <ns4:waypoint x="11175" y="235" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_13_di" bpmnElement="Flow_13">
+        <ns4:waypoint x="2475" y="250" />
+        <ns4:waypoint x="2475" y="280" />
+        <ns4:waypoint x="2175" y="280" />
+        <ns4:waypoint x="2175" y="95" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_39_di" bpmnElement="Flow_39">
+        <ns4:waypoint x="3375" y="250" />
+        <ns4:waypoint x="3375" y="280" />
+        <ns4:waypoint x="4425" y="280" />
+        <ns4:waypoint x="4425" y="235" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_24_di" bpmnElement="Flow_24">
+        <ns4:waypoint x="4275" y="250" />
+        <ns4:waypoint x="4275" y="280" />
+        <ns4:waypoint x="3675" y="280" />
+        <ns4:waypoint x="3675" y="95" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_35_di" bpmnElement="Flow_35">
+        <ns4:waypoint x="4450" y="210" />
+        <ns4:waypoint x="4525" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_36_di" bpmnElement="Flow_36">
+        <ns4:waypoint x="4625" y="210" />
+        <ns4:waypoint x="5300" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_43_di" bpmnElement="Flow_43">
+        <ns4:waypoint x="5325" y="235" />
+        <ns4:waypoint x="5325" y="280" />
+        <ns4:waypoint x="5025" y="280" />
+        <ns4:waypoint x="5025" y="95" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_46_di" bpmnElement="Flow_46">
+        <ns4:waypoint x="5650" y="210" />
+        <ns4:waypoint x="5725" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_48_di" bpmnElement="Flow_48">
+        <ns4:waypoint x="5650" y="210" />
+        <ns4:waypoint x="5700" y="210" />
+        <ns4:waypoint x="5700" y="280" />
+        <ns4:waypoint x="6300" y="280" />
+        <ns4:waypoint x="6300" y="350" />
+        <ns4:waypoint x="6325" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_47_di" bpmnElement="Flow_47">
+        <ns4:waypoint x="5825" y="210" />
+        <ns4:waypoint x="5900" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_51_di" bpmnElement="Flow_51">
+        <ns4:waypoint x="5950" y="210" />
+        <ns4:waypoint x="6025" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_52_di" bpmnElement="Flow_52">
+        <ns4:waypoint x="6125" y="210" />
+        <ns4:waypoint x="6175" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_80_di" bpmnElement="Flow_80">
+        <ns4:waypoint x="6275" y="210" />
+        <ns4:waypoint x="6350" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_55_di" bpmnElement="Flow_55">
+        <ns4:waypoint x="6725" y="210" />
+        <ns4:waypoint x="6775" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_56_di" bpmnElement="Flow_56">
+        <ns4:waypoint x="6875" y="210" />
+        <ns4:waypoint x="6925" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_61_di" bpmnElement="Flow_61">
+        <ns4:waypoint x="7025" y="210" />
+        <ns4:waypoint x="7100" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_57_di" bpmnElement="Flow_57">
+        <ns4:waypoint x="7150" y="210" />
+        <ns4:waypoint x="7225" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_59_di" bpmnElement="Flow_59">
+        <ns4:waypoint x="7150" y="210" />
+        <ns4:waypoint x="7200" y="210" />
+        <ns4:waypoint x="7200" y="280" />
+        <ns4:waypoint x="8100" y="280" />
+        <ns4:waypoint x="8100" y="350" />
+        <ns4:waypoint x="8125" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_58_di" bpmnElement="Flow_58">
+        <ns4:waypoint x="7325" y="210" />
+        <ns4:waypoint x="7400" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_77_di" bpmnElement="Flow_77">
+        <ns4:waypoint x="7450" y="210" />
+        <ns4:waypoint x="8750" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_101_di" bpmnElement="Flow_101">
+        <ns4:waypoint x="8800" y="210" />
+        <ns4:waypoint x="10425" y="210" />
+        <ns4:waypoint x="10425" y="95" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_108_di" bpmnElement="Flow_108">
+        <ns4:waypoint x="11025" y="250" />
+        <ns4:waypoint x="11025" y="280" />
+        <ns4:waypoint x="10875" y="280" />
+        <ns4:waypoint x="10875" y="95" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_121_di" bpmnElement="Flow_121">
+        <ns4:waypoint x="11525" y="210" />
+        <ns4:waypoint x="11600" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_119_di" bpmnElement="Flow_119">
+        <ns4:waypoint x="11650" y="210" />
+        <ns4:waypoint x="11700" y="210" />
+        <ns4:waypoint x="11700" y="280" />
+        <ns4:waypoint x="12600" y="280" />
+        <ns4:waypoint x="12600" y="350" />
+        <ns4:waypoint x="12625" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_116_di" bpmnElement="Flow_116">
+        <ns4:waypoint x="11975" y="210" />
+        <ns4:waypoint x="12025" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_118_di" bpmnElement="Flow_118">
+        <ns4:waypoint x="12125" y="210" />
+        <ns4:waypoint x="12200" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_134_di" bpmnElement="Flow_134">
+        <ns4:waypoint x="12250" y="210" />
+        <ns4:waypoint x="13100" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_150_di" bpmnElement="Flow_150">
+        <ns4:waypoint x="13150" y="210" />
+        <ns4:waypoint x="14175" y="210" />
+        <ns4:waypoint x="14175" y="95" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_163_di" bpmnElement="Flow_163">
+        <ns4:waypoint x="14675" y="210" />
+        <ns4:waypoint x="14725" y="210" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_167_di" bpmnElement="Flow_167">
+        <ns4:waypoint x="14825" y="210" />
+        <ns4:waypoint x="14850" y="210" />
+        <ns4:waypoint x="14850" y="140" />
+        <ns4:waypoint x="15300" y="140" />
+        <ns4:waypoint x="15300" y="70" />
+        <ns4:waypoint x="15350" y="70" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_157_di" bpmnElement="Flow_157">
+        <ns4:waypoint x="15225" y="250" />
+        <ns4:waypoint x="15225" y="280" />
+        <ns4:waypoint x="14925" y="280" />
+        <ns4:waypoint x="14925" y="95" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_140_di" bpmnElement="Flow_140">
+        <ns4:waypoint x="1325" y="350" />
+        <ns4:waypoint x="1375" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_145_di" bpmnElement="Flow_145">
+        <ns4:waypoint x="1425" y="390" />
+        <ns4:waypoint x="1425" y="420" />
+        <ns4:waypoint x="13725" y="420" />
+        <ns4:waypoint x="13725" y="375" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_83_di" bpmnElement="Flow_83">
+        <ns4:waypoint x="2375" y="350" />
+        <ns4:waypoint x="2425" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_97_di" bpmnElement="Flow_97">
+        <ns4:waypoint x="2475" y="390" />
+        <ns4:waypoint x="2475" y="420" />
+        <ns4:waypoint x="9525" y="420" />
+        <ns4:waypoint x="9525" y="375" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_34_di" bpmnElement="Flow_34">
+        <ns4:waypoint x="5225" y="350" />
+        <ns4:waypoint x="5300" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_30_di" bpmnElement="Flow_30">
+        <ns4:waypoint x="5350" y="350" />
+        <ns4:waypoint x="5425" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_32_di" bpmnElement="Flow_32">
+        <ns4:waypoint x="5350" y="350" />
+        <ns4:waypoint x="5400" y="350" />
+        <ns4:waypoint x="5400" y="420" />
+        <ns4:waypoint x="4500" y="420" />
+        <ns4:waypoint x="4500" y="490" />
+        <ns4:waypoint x="4525" y="490" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_31_di" bpmnElement="Flow_31">
+        <ns4:waypoint x="5525" y="350" />
+        <ns4:waypoint x="5600" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_38_di" bpmnElement="Flow_38">
+        <ns4:waypoint x="5625" y="375" />
+        <ns4:waypoint x="5625" y="420" />
+        <ns4:waypoint x="5325" y="420" />
+        <ns4:waypoint x="5325" y="235" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_49_di" bpmnElement="Flow_49">
+        <ns4:waypoint x="6375" y="390" />
+        <ns4:waypoint x="6375" y="420" />
+        <ns4:waypoint x="5925" y="420" />
+        <ns4:waypoint x="5925" y="235" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_75_di" bpmnElement="Flow_75">
+        <ns4:waypoint x="7275" y="390" />
+        <ns4:waypoint x="7275" y="420" />
+        <ns4:waypoint x="8325" y="420" />
+        <ns4:waypoint x="8325" y="375" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_60_di" bpmnElement="Flow_60">
+        <ns4:waypoint x="8175" y="390" />
+        <ns4:waypoint x="8175" y="420" />
+        <ns4:waypoint x="7425" y="420" />
+        <ns4:waypoint x="7425" y="235" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_71_di" bpmnElement="Flow_71">
+        <ns4:waypoint x="8350" y="350" />
+        <ns4:waypoint x="8425" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_72_di" bpmnElement="Flow_72">
+        <ns4:waypoint x="8525" y="350" />
+        <ns4:waypoint x="9200" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_79_di" bpmnElement="Flow_79">
+        <ns4:waypoint x="9225" y="375" />
+        <ns4:waypoint x="9225" y="420" />
+        <ns4:waypoint x="8775" y="420" />
+        <ns4:waypoint x="8775" y="235" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_95_di" bpmnElement="Flow_95">
+        <ns4:waypoint x="9550" y="350" />
+        <ns4:waypoint x="9600" y="350" />
+        <ns4:waypoint x="9600" y="420" />
+        <ns4:waypoint x="9150" y="420" />
+        <ns4:waypoint x="9150" y="490" />
+        <ns4:waypoint x="9175" y="490" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_86_di" bpmnElement="Flow_86">
+        <ns4:waypoint x="9875" y="350" />
+        <ns4:waypoint x="9925" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_87_di" bpmnElement="Flow_87">
+        <ns4:waypoint x="10025" y="350" />
+        <ns4:waypoint x="10075" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_92_di" bpmnElement="Flow_92">
+        <ns4:waypoint x="10175" y="350" />
+        <ns4:waypoint x="10250" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_88_di" bpmnElement="Flow_88">
+        <ns4:waypoint x="10300" y="350" />
+        <ns4:waypoint x="10375" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_90_di" bpmnElement="Flow_90">
+        <ns4:waypoint x="10300" y="350" />
+        <ns4:waypoint x="10350" y="350" />
+        <ns4:waypoint x="10350" y="420" />
+        <ns4:waypoint x="9900" y="420" />
+        <ns4:waypoint x="9900" y="490" />
+        <ns4:waypoint x="9925" y="490" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_89_di" bpmnElement="Flow_89">
+        <ns4:waypoint x="10475" y="350" />
+        <ns4:waypoint x="10550" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_94_di" bpmnElement="Flow_94">
+        <ns4:waypoint x="10600" y="350" />
+        <ns4:waypoint x="10700" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_103_di" bpmnElement="Flow_103">
+        <ns4:waypoint x="10725" y="375" />
+        <ns4:waypoint x="10725" y="420" />
+        <ns4:waypoint x="10425" y="420" />
+        <ns4:waypoint x="10425" y="95" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_124_di" bpmnElement="Flow_124">
+        <ns4:waypoint x="11975" y="350" />
+        <ns4:waypoint x="12025" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_132_di" bpmnElement="Flow_132">
+        <ns4:waypoint x="12075" y="390" />
+        <ns4:waypoint x="12075" y="420" />
+        <ns4:waypoint x="12825" y="420" />
+        <ns4:waypoint x="12825" y="375" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_120_di" bpmnElement="Flow_120">
+        <ns4:waypoint x="12675" y="390" />
+        <ns4:waypoint x="12675" y="420" />
+        <ns4:waypoint x="12225" y="420" />
+        <ns4:waypoint x="12225" y="235" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_130_di" bpmnElement="Flow_130">
+        <ns4:waypoint x="12850" y="350" />
+        <ns4:waypoint x="12900" y="350" />
+        <ns4:waypoint x="12900" y="420" />
+        <ns4:waypoint x="12450" y="420" />
+        <ns4:waypoint x="12450" y="490" />
+        <ns4:waypoint x="12475" y="490" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_127_di" bpmnElement="Flow_127">
+        <ns4:waypoint x="13175" y="350" />
+        <ns4:waypoint x="13225" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_129_di" bpmnElement="Flow_129">
+        <ns4:waypoint x="13325" y="350" />
+        <ns4:waypoint x="13400" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_136_di" bpmnElement="Flow_136">
+        <ns4:waypoint x="13425" y="375" />
+        <ns4:waypoint x="13425" y="420" />
+        <ns4:waypoint x="13125" y="420" />
+        <ns4:waypoint x="13125" y="235" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_141_di" bpmnElement="Flow_141">
+        <ns4:waypoint x="13750" y="350" />
+        <ns4:waypoint x="13825" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_143_di" bpmnElement="Flow_143">
+        <ns4:waypoint x="13725" y="375" />
+        <ns4:waypoint x="13725" y="490" />
+        <ns4:waypoint x="13825" y="490" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_142_di" bpmnElement="Flow_142">
+        <ns4:waypoint x="13925" y="350" />
+        <ns4:waypoint x="14000" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_151_di" bpmnElement="Flow_151">
+        <ns4:waypoint x="14050" y="350" />
+        <ns4:waypoint x="14175" y="350" />
+        <ns4:waypoint x="14175" y="95" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_33_di" bpmnElement="Flow_33">
+        <ns4:waypoint x="4625" y="490" />
+        <ns4:waypoint x="5625" y="490" />
+        <ns4:waypoint x="5625" y="375" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_70_di" bpmnElement="Flow_70">
+        <ns4:waypoint x="7775" y="490" />
+        <ns4:waypoint x="7850" y="490" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_66_di" bpmnElement="Flow_66">
+        <ns4:waypoint x="7900" y="490" />
+        <ns4:waypoint x="7975" y="490" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_68_di" bpmnElement="Flow_68">
+        <ns4:waypoint x="7875" y="515" />
+        <ns4:waypoint x="7875" y="630" />
+        <ns4:waypoint x="7975" y="630" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_67_di" bpmnElement="Flow_67">
+        <ns4:waypoint x="8075" y="490" />
+        <ns4:waypoint x="8150" y="490" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_74_di" bpmnElement="Flow_74">
+        <ns4:waypoint x="8200" y="490" />
+        <ns4:waypoint x="8250" y="490" />
+        <ns4:waypoint x="8250" y="420" />
+        <ns4:waypoint x="9150" y="420" />
+        <ns4:waypoint x="9150" y="350" />
+        <ns4:waypoint x="9200" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_96_di" bpmnElement="Flow_96">
+        <ns4:waypoint x="9275" y="490" />
+        <ns4:waypoint x="9300" y="490" />
+        <ns4:waypoint x="9300" y="420" />
+        <ns4:waypoint x="10650" y="420" />
+        <ns4:waypoint x="10650" y="350" />
+        <ns4:waypoint x="10700" y="350" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_91_di" bpmnElement="Flow_91">
+        <ns4:waypoint x="10025" y="490" />
+        <ns4:waypoint x="10575" y="490" />
+        <ns4:waypoint x="10575" y="375" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_131_di" bpmnElement="Flow_131">
+        <ns4:waypoint x="12575" y="490" />
+        <ns4:waypoint x="13425" y="490" />
+        <ns4:waypoint x="13425" y="375" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_144_di" bpmnElement="Flow_144">
+        <ns4:waypoint x="13925" y="490" />
+        <ns4:waypoint x="14025" y="490" />
+        <ns4:waypoint x="14025" y="375" />
+      </ns2:BPMNEdge>
+      <ns2:BPMNEdge id="Flow_69_di" bpmnElement="Flow_69">
+        <ns4:waypoint x="8075" y="630" />
+        <ns4:waypoint x="8175" y="630" />
+        <ns4:waypoint x="8175" y="515" />
+      </ns2:BPMNEdge>
+    <ns2:BPMNEdge id="edge_merged_Flow_146_Flow_7" bpmnElement="merged_Flow_146_Flow_7"><ns4:waypoint x="1000" y="70" /><ns4:waypoint x="1225" y="70" /></ns2:BPMNEdge><ns2:BPMNEdge id="edge_merged_Flow_98_Flow_14" bpmnElement="merged_Flow_98_Flow_14"><ns4:waypoint x="1600" y="70" /><ns4:waypoint x="1850" y="70" /></ns2:BPMNEdge><ns2:BPMNEdge id="edge_merged_Flow_40_Flow_18" bpmnElement="merged_Flow_40_Flow_18"><ns4:waypoint x="2650" y="70" /><ns4:waypoint x="2875" y="70" /></ns2:BPMNEdge><ns2:BPMNEdge id="edge_merged_Flow_42_Flow_27" bpmnElement="merged_Flow_42_Flow_27"><ns4:waypoint x="2625" y="95" /><ns4:waypoint x="3325" y="210" /></ns2:BPMNEdge><ns2:BPMNEdge id="edge_merged_Flow_37_Flow_29" bpmnElement="merged_Flow_37_Flow_29"><ns4:waypoint x="4425" y="235" /><ns4:waypoint x="5125" y="350" /></ns2:BPMNEdge><ns2:BPMNEdge id="edge_merged_Flow_100_Flow_50" bpmnElement="merged_Flow_100_Flow_50"><ns4:waypoint x="1575" y="95" /><ns4:waypoint x="5625" y="235" /></ns2:BPMNEdge><ns2:BPMNEdge id="edge_merged_Flow_76_Flow_54" bpmnElement="merged_Flow_76_Flow_54"><ns4:waypoint x="6400" y="210" /><ns4:waypoint x="6625" y="210" /></ns2:BPMNEdge><ns2:BPMNEdge id="edge_merged_Flow_78_Flow_63" bpmnElement="merged_Flow_78_Flow_63"><ns4:waypoint x="6400" y="210" /><ns4:waypoint x="7225" y="350" /></ns2:BPMNEdge><ns2:BPMNEdge id="edge_merged_Flow_73_Flow_65" bpmnElement="merged_Flow_73_Flow_65"><ns4:waypoint x="8350" y="350" /><ns4:waypoint x="7675" y="490" /></ns2:BPMNEdge><ns2:BPMNEdge id="edge_merged_Flow_102_Flow_82" bpmnElement="merged_Flow_102_Flow_82"><ns4:waypoint x="1575" y="95" /><ns4:waypoint x="2275" y="350" /></ns2:BPMNEdge><ns2:BPMNEdge id="edge_merged_Flow_93_Flow_85" bpmnElement="merged_Flow_93_Flow_85"><ns4:waypoint x="9550" y="350" /><ns4:waypoint x="9775" y="350" /></ns2:BPMNEdge><ns2:BPMNEdge id="edge_merged_Flow_147_Flow_111" bpmnElement="merged_Flow_147_Flow_111"><ns4:waypoint x="975" y="95" /><ns4:waypoint x="1225" y="210" /></ns2:BPMNEdge><ns2:BPMNEdge id="edge_merged_Flow_133_Flow_113" bpmnElement="merged_Flow_133_Flow_113"><ns4:waypoint x="11200" y="210" /><ns4:waypoint x="11425" y="210" /></ns2:BPMNEdge><ns2:BPMNEdge id="edge_merged_Flow_117_Flow_115" bpmnElement="merged_Flow_117_Flow_115"><ns4:waypoint x="11650" y="210" /><ns4:waypoint x="11875" y="210" /></ns2:BPMNEdge><ns2:BPMNEdge id="edge_merged_Flow_135_Flow_123" bpmnElement="merged_Flow_135_Flow_123"><ns4:waypoint x="11175" y="235" /><ns4:waypoint x="11875" y="350" /></ns2:BPMNEdge><ns2:BPMNEdge id="edge_merged_Flow_128_Flow_126" bpmnElement="merged_Flow_128_Flow_126"><ns4:waypoint x="12850" y="350" /><ns4:waypoint x="13075" y="350" /></ns2:BPMNEdge><ns2:BPMNEdge id="edge_merged_Flow_148_Flow_139" bpmnElement="merged_Flow_148_Flow_139"><ns4:waypoint x="975" y="95" /><ns4:waypoint x="1225" y="350" /></ns2:BPMNEdge><ns2:BPMNEdge id="edge_merged_Flow_164_Flow_158" bpmnElement="merged_Flow_164_Flow_158"><ns4:waypoint x="14350" y="70" /><ns4:waypoint x="14600" y="70" /></ns2:BPMNEdge><ns2:BPMNEdge id="edge_merged_Flow_166_Flow_162" bpmnElement="merged_Flow_166_Flow_162"><ns4:waypoint x="14325" y="95" /><ns4:waypoint x="14575" y="210" /></ns2:BPMNEdge></ns2:BPMNPlane>
+  </ns2:BPMNDiagram>
+</ns0:definitions>

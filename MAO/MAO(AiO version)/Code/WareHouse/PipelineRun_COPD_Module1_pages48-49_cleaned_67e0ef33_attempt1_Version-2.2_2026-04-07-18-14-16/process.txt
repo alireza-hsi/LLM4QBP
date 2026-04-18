@@ -1,0 +1,120 @@
+<process>
+  <activity role='medical staff' action='Receive patient with suspected COPD exacerbation' objects='patient' id='activity1'/>
+  <parallelGateway id='parallelgateway-vitalsigns'>
+    <branch id='branch-vs1'>
+      <activity role='medical staff' action='Assess for hypoventilation' objects='patient' id='activity-vs1'/>
+    </branch>
+    <branch id='branch-vs2'>
+      <activity role='medical staff' action='Check level of consciousness/cognition' objects='patient' id='activity-vs2'/>
+    </branch>
+    <branch id='branch-vs3'>
+      <activity role='medical staff' action='Check blood-oxygen saturation level via pulse oximetry' objects='pulse oximeter, patient' id='activity-vs3'/>
+    </branch>
+    <branch id='branch-vs4'>
+      <activity role='medical staff' action='Assess whether patient has purulent sputum' objects='patient' id='activity-vs4'/>
+    </branch>
+  </parallelGateway>
+  <parallelGateway id='parallelgateway-assessment'>
+    <branch id='branch-assess1'>
+      <activity role='medical staff' action='Perform physical examination' objects='patient' id='activity-assess1'/>
+    </branch>
+    <branch id='branch-assess2'>
+      <activity role='medical staff' action='Check patient history' objects='patient records' id='activity-assess2'/>
+    </branch>
+    <branch id='branch-assess3'>
+      <activity role='medical staff' action='Document and reconcile current medications' objects='patient medication list' id='activity-assess3'/>
+    </branch>
+    <branch id='branch-assess4'>
+      <exclusiveGateway id='exclusivegateway-chestxray'>
+        <branch condition='Patient able to leave ED' id='branch-cxr1'>
+          <activity role='medical staff' action='Perform chest x-ray (posteroanterior and lateral)' objects='x-ray machine, patient' id='activity-cxr1'/>
+        </branch>
+        <branch condition='Patient too unwell to leave ED' id='branch-cxr2'>
+          <activity role='medical staff' action='Perform portable chest x-ray' objects='portable x-ray, patient' id='activity-cxr2'/>
+        </branch>
+        <branch condition='Concern for pneumothorax' id='branch-cxr3'>
+          <activity role='medical staff' action='Perform expiratory view chest x-ray' objects='x-ray machine, patient' id='activity-cxr3'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch-assess5'>
+      <activity role='medical staff' action='Collect blood sample (single sample for all analyses)' objects='patient, blood collection kit' id='activity-blood1'/>
+      <parallelGateway id='parallelgateway-bloodwork'>
+        <branch id='branch-bw1'>
+          <activity role='medical staff' action='Analyze CBC' objects='blood sample, lab' id='activity-bw1'/>
+        </branch>
+        <branch id='branch-bw2'>
+          <activity role='medical staff' action='Analyze electrolytes' objects='blood sample, lab' id='activity-bw2'/>
+        </branch>
+        <branch id='branch-bw3'>
+          <activity role='medical staff' action='Analyze creatinine' objects='blood sample, lab' id='activity-bw3'/>
+        </branch>
+        <branch id='branch-bw4'>
+          <activity role='medical staff' action='Analyze BUN if available' objects='blood sample, lab' id='activity-bw4'/>
+        </branch>
+      </parallelGateway>
+    </branch>
+    <branch id='branch-assess6'>
+      <activity role='medical staff' action='Perform electrocardiogram (ECG) for arrhythmias, ischemia, RV strain' objects='ECG machine, patient' id='activity-ecg1'/>
+    </branch>
+    <branch id='branch-assess7'>
+      <exclusiveGateway id='exclusivegateway-abg'>
+        <branch condition='Low oxygen saturation and/or suspected acute respiratory failure' id='branch-abg1'>
+          <activity role='medical staff' action='Check arterial blood gases' objects='arterial blood sample' id='activity-abg1'/>
+        </branch>
+        <branch condition='Otherwise' id='branch-abg2'>
+          <activity role='medical staff' action='Skip arterial blood gases' objects='' id='activity-abg2'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch-assess8'>
+      <exclusiveGateway id='exclusivegateway-bloodculture'>
+        <branch condition='Pneumonia or suspected sepsis' id='branch-bc1'>
+          <activity role='medical staff' action='Draw blood cultures' objects='blood samples' id='activity-bc1'/>
+        </branch>
+        <branch condition='Otherwise' id='branch-bc2'>
+          <activity role='medical staff' action='Skip blood cultures' objects='' id='activity-bc2'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch-assess9'>
+      <exclusiveGateway id='exclusivegateway-cardiacmarkers'>
+        <branch condition='Suspected cardiac disorder' id='branch-cm1'>
+          <activity role='medical staff' action='Examine cardiac markers' objects='blood samples' id='activity-cm1'/>
+        </branch>
+        <branch condition='Otherwise' id='branch-cm2'>
+          <activity role='medical staff' action='Skip cardiac markers' objects='' id='activity-cm2'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch-assess10'>
+      <activity role='medical staff' action='Identify patient wishes regarding goals of care and code status' objects='patient, family, records' id='activity-goals1'/>
+    </branch>
+    <branch id='branch-assess11'>
+      <exclusiveGateway id='exclusivegateway-spirometry'>
+        <branch condition='No prior objective documentation of COPD via spirometry and patient stabilized' id='branch-spirometry1'>
+          <activity role='medical staff' action='Perform spirometry after stabilization' objects='spirometer, patient' id='activity-spirometry1'/>
+        </branch>
+        <branch condition='Otherwise' id='branch-spirometry2'>
+          <activity role='medical staff' action='Skip spirometry at initial assessment' objects='' id='activity-spirometry2'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch-assess12'>
+      <activity role='medical staff' action='Perform other diagnostic interventions as appropriate to rule out other diagnoses/comorbidities' objects='diagnostic tools, patient' id='activity-otherdiag1'/>
+    </branch>
+  </parallelGateway>
+  <activity role='medical staff' action='Review NICE/GOLD criteria' objects='patient, assessment results' id='activity-review1'/>
+  <activity role='medical staff' action='Apply clinical judgment considering local resources' objects='patient, assessment results, local resources' id='activity-judgment1'/>
+  <exclusiveGateway id='exclusivegateway-admission'>
+    <branch condition='Admission indicated' id='branch-admit1'>
+      <activity role='medical staff' action='Trial immediate resuscitation and re-evaluate for admission' objects='patient, resuscitation equipment' id='activity-resus1'/>
+      <activity role='medical staff' action='Admit patient to appropriate level of care' objects='patient, admission documentation' id='activity-admit1'/>
+    </branch>
+    <branch condition='Admission not indicated' id='branch-admit2'>
+      <activity role='medical staff' action='Discharge or refer patient for outpatient management' objects='patient, discharge instructions' id='activity-discharge1'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='hospital administration' action='Review and benchmark COPD admission rates quarterly' objects='admission data, provincial benchmarks' id='activity-admin1'/>
+  <activity role='emergency room staff' action='Use admission checklist including non-COPD concerns (pain, anxiety, comorbidities)' objects='admission checklist, patient' id='activity-checklist1'/>
+</process>

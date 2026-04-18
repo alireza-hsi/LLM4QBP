@@ -1,0 +1,220 @@
+<process>
+  <activity role='triage nurse' action='register' objects='patient with suspected stroke presenting to the ED, outpatient clinic, or acute care admission' id='activity1_1'/>
+  <activity role='triage nurse' action='assign and activate' objects='urgent stroke triage priority and local stroke protocol or stroke alert' id='activity1_2'/>
+  <activity role='ED team' action='assess' objects='airway' id='activity2_1'/>
+  <activity role='ED team' action='assess' objects='breathing' id='activity2_2'/>
+  <activity role='ED team' action='assess' objects='circulation' id='activity2_3'/>
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1'>
+      <activity role='stroke clinician' action='assess' objects='focal neurological deficits' id='activity3_1'/>
+      <activity role='stroke clinician' action='score' objects='stroke severity on NIHSS or CNS standardized stroke scale' id='activity3_2'/>
+    </branch>
+    <branch id='branch2'>
+      <activity role='ED team' action='obtain' objects='CBC, electrolytes, creatinine, glucose, INR, and partial thromboplastin time' id='activity4'/>
+      <exclusiveGateway id='exclusivegateway1_1'>
+        <branch condition='troponin is clinically indicated' id='branch5_1'>
+          <activity role='ED team' action='obtain' objects='troponin test' id='activity5'/>
+        </branch>
+        <branch condition='troponin is not clinically indicated' id='branch6_1'>
+          <activity role='ED team' action='omit' objects='troponin test because it is not clinically indicated' id='activity5_1'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch3'>
+      <activity role='ED team' action='perform' objects='ECG to detect atrial fibrillation and other acute arrhythmias without delaying acute treatment' id='activity6'/>
+      <exclusiveGateway id='exclusivegateway1'>
+        <branch condition='chest x ray is ordered' id='branch7'>
+          <activity role='radiology team' action='perform' objects='chest x ray without delaying assessment for thrombolysis' id='activity7'/>
+        </branch>
+        <branch condition='chest x ray is not ordered' id='branch8'>
+          <activity role='ED team' action='omit' objects='chest x ray to avoid delaying assessment for thrombolysis' id='activity8'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch4'>
+      <activity role='stroke clinician' action='establish' objects='symptom onset or last known well time' id='activity9_1'/>
+      <activity role='stroke clinician' action='determine' objects='whether the patient presents within the acute stroke treatment time window' id='activity9_2'/>
+    </branch>
+  </parallelGateway>
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='patient presents within the acute stroke treatment time window' id='branch9'>
+      <exclusiveGateway id='exclusivegateway3'>
+        <branch condition='rapid non contrast CT pathway is selected' id='branch11'>
+          <activity role='radiology team' action='perform' objects='rapid non contrast CT of the brain and CTA with door to CT and CTA less than 25 minutes' id='activity10'/>
+        </branch>
+        <branch condition='rapid MRI pathway is selected' id='branch12'>
+          <activity role='radiology team' action='perform' objects='rapid MRI of the brain and CTA with door to imaging and CTA less than 25 minutes' id='activity11'/>
+        </branch>
+      </exclusiveGateway>
+      <activity role='stroke expert or radiology expert' action='interpret immediately' objects='CT, CTA, and or MRI brain imaging' id='activity12_1'/>
+      <activity role='stroke expert or radiology expert' action='communicate' objects='imaging findings to the treating stroke team' id='activity12_2'/>
+      <exclusiveGateway id='exclusivegateway4'>
+        <branch condition='acute ischemic stroke clinically eligible for acute stroke treatments' id='branch13'>
+          <exclusiveGateway id='exclusivegateway13_1'>
+            <branch condition='advanced imaging is pursued using CT and multiphase CTA' id='branch13_1'>
+              <activity role='radiology team' action='perform' objects='advanced CT imaging with CT and multiphase CTA' id='activity13_1'/>
+            </branch>
+            <branch condition='advanced imaging is pursued using Perfusion CT' id='branch13_2'>
+              <activity role='radiology team' action='perform' objects='advanced CT imaging with Perfusion CT' id='activity13_2'/>
+            </branch>
+            <branch condition='advanced imaging is not pursued based on protocol or clinical judgment' id='branch13_3'>
+              <activity role='stroke clinician' action='defer' objects='advanced CT imaging' id='activity13_3'/>
+            </branch>
+          </exclusiveGateway>
+          <exclusiveGateway id='exclusivegateway5'>
+            <branch condition='patient has potentially disabling acute neurological symptoms within 6.0 hours of symptom onset or treatment can be initiated within 12 hours and clinical and imaging criteria are met' id='branch16'>
+              <activity role='stroke team' action='contact and review' objects='closest EVT centre through CritiCall Ontario and clinical and imaging criteria' id='activity14_1'/>
+              <activity role='stroke team' action='determine and initiate' objects='EVT access plan including direct transfer or drip and ship process' id='activity14_2'/>
+            </branch>
+            <branch condition='EVT timing window or clinical and imaging criteria are not met' id='branch17'>
+              <activity role='stroke team' action='do not pursue' objects='endovascular therapy' id='activity15'/>
+            </branch>
+          </exclusiveGateway>
+          <activity role='nursing staff' action='make' objects='patient NPO initially' id='activity16'/>
+          <inclusiveGateway id='inclusivegateway2'>
+            <branch condition='patient is alert and bedside swallowing screening is clinically appropriate' id='branch18'>
+              <activity role='nursing staff' action='screen swallowing using' objects='a simple valid reliable bedside testing protocol before oral medication, fluid, or food' id='activity17'/>
+            </branch>
+            <branch condition='patient is not alert within the first 24 hours' id='branch19'>
+              <activity role='nursing staff' action='monitor closely and screen swallowing when' objects='clinically appropriate within the first 24 hours' id='activity18'/>
+            </branch>
+            <branch condition='patient presents with features indicating dysphagia or pulmonary aspiration' id='branch20'>
+              <activity role='speech language pathologist or appropriately trained specialist' action='perform full clinical assessment of' objects='swallowing ability and advise required consistency of diet and fluids' id='activity19'/>
+            </branch>
+          </inclusiveGateway>
+          <activity role='stroke team' action='provide' objects='appropriate cross continuum secondary prevention assessments and therapies whether the patient is admitted or discharged from the ED' id='activity20'/>
+        </branch>
+        <branch condition='acute ICH is identified' id='branch14'>
+          <activity role='stroke physician' action='treat as a medical emergency and evaluate immediately' objects='patient with ICH' id='activity21'/>
+          <parallelGateway id='parallelgateway22_1'>
+            <branch id='branch22_1'>
+              <activity role='stroke team' action='obtain' objects='history of current anticoagulant therapy' id='activity22_1'/>
+            </branch>
+            <branch id='branch22_2'>
+              <activity role='stroke team' action='confirm or obtain urgently' objects='platelet count, PTT, and INR' id='activity22_2'/>
+            </branch>
+          </parallelGateway>
+          <exclusiveGateway id='exclusivegateway6'>
+            <branch condition='patient is selected for additional vascular imaging' id='branch21'>
+              <activity role='radiology team' action='perform as soon as possible' objects='CTA or MRA' id='activity23'/>
+            </branch>
+            <branch condition='patient is not selected for additional vascular imaging' id='branch22'>
+              <activity role='stroke physician' action='omit' objects='CTA or MRA based on selection criteria' id='activity24'/>
+            </branch>
+          </exclusiveGateway>
+          <activity role='nursing staff' action='make' objects='patient NPO initially' id='activity25'/>
+          <inclusiveGateway id='inclusivegateway3'>
+            <branch condition='patient is alert and bedside swallowing screening is clinically appropriate' id='branch23'>
+              <activity role='nursing staff' action='screen swallowing using' objects='a simple valid reliable bedside testing protocol before oral medication, fluid, or food' id='activity26'/>
+            </branch>
+            <branch condition='patient is not alert within the first 24 hours' id='branch24'>
+              <activity role='nursing staff' action='monitor closely and screen swallowing when' objects='clinically appropriate within the first 24 hours' id='activity27'/>
+            </branch>
+            <branch condition='patient presents with features indicating dysphagia or pulmonary aspiration' id='branch25'>
+              <activity role='speech language pathologist or appropriately trained specialist' action='perform full clinical assessment of' objects='swallowing ability and advise required consistency of diet and fluids' id='activity28'/>
+            </branch>
+          </inclusiveGateway>
+          <activity role='stroke team' action='provide' objects='appropriate cross continuum secondary prevention assessments and therapies whether the patient is admitted or discharged from the ED' id='activity29'/>
+        </branch>
+        <branch condition='acute stroke diagnosis other than clinically eligible ischemic stroke or ICH' id='branch15'>
+          <activity role='nursing staff' action='make' objects='patient NPO initially' id='activity30_1'/>
+          <inclusiveGateway id='inclusivegateway5'>
+            <branch condition='patient is alert and bedside swallowing screening is clinically appropriate' id='branch15_1'>
+              <activity role='nursing staff' action='screen swallowing using' objects='a simple valid reliable bedside testing protocol before oral medication, fluid, or food' id='activity30_2'/>
+            </branch>
+            <branch condition='patient is not alert within the first 24 hours' id='branch15_2'>
+              <activity role='nursing staff' action='monitor closely and screen swallowing when' objects='clinically appropriate within the first 24 hours' id='activity30_3'/>
+            </branch>
+            <branch condition='patient presents with features indicating dysphagia or pulmonary aspiration' id='branch15_3'>
+              <activity role='speech language pathologist or appropriately trained specialist' action='perform full clinical assessment of' objects='swallowing ability and advise required consistency of diet and fluids' id='activity30_4'/>
+            </branch>
+          </inclusiveGateway>
+          <activity role='stroke team' action='provide' objects='appropriate cross continuum secondary prevention assessments and therapies whether the patient is admitted or discharged from the ED' id='activity30'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch condition='patient presents outside the acute stroke treatment time window' id='branch10'>
+      <activity role='radiology team' action='perform' objects='brain imaging as clinically indicated to distinguish ischemic stroke, TIA mimic, or ICH' id='activity50_1'/>
+      <activity role='stroke expert or radiology expert' action='interpret immediately' objects='brain imaging findings and confirm diagnosis' id='activity50_2'/>
+      <exclusiveGateway id='exclusivegateway8'>
+        <branch condition='diagnosis is TIA or ischemic stroke and presentation is beyond 48 hours' id='branch31'>
+          <activity role='stroke team' action='perform as soon as possible' objects='vascular imaging of the brain and neck arteries' id='activity31'/>
+          <exclusiveGateway id='exclusivegateway7'>
+            <branch condition='diagnosis is ischemic stroke' id='branch26'>
+              <activity role='nursing staff' action='make' objects='patient NPO initially' id='activity32'/>
+              <inclusiveGateway id='inclusivegateway4'>
+                <branch condition='patient is alert and bedside swallowing screening is clinically appropriate' id='branch28'>
+                  <activity role='nursing staff' action='screen swallowing using' objects='a simple valid reliable bedside testing protocol before oral medication, fluid, or food' id='activity33'/>
+                </branch>
+                <branch condition='patient is not alert within the first 24 hours' id='branch29'>
+                  <activity role='nursing staff' action='monitor closely and screen swallowing when' objects='clinically appropriate within the first 24 hours' id='activity34'/>
+                </branch>
+                <branch condition='patient presents with features indicating dysphagia or pulmonary aspiration' id='branch30'>
+                  <activity role='speech language pathologist or appropriately trained specialist' action='perform full clinical assessment of' objects='swallowing ability and advise required consistency of diet and fluids' id='activity35'/>
+                </branch>
+              </inclusiveGateway>
+              <activity role='stroke team' action='provide' objects='appropriate cross continuum secondary prevention assessments and therapies whether the patient is admitted or discharged from the ED' id='activity36'/>
+            </branch>
+            <branch condition='diagnosis is TIA' id='branch27'>
+              <activity role='stroke team' action='provide' objects='appropriate cross continuum secondary prevention assessments and therapies whether the patient is admitted or discharged from the ED' id='activity37'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch condition='acute ICH is identified' id='branch32'>
+          <activity role='stroke physician' action='treat as a medical emergency and evaluate immediately' objects='patient with ICH' id='activity38'/>
+          <parallelGateway id='parallelgateway38_1'>
+            <branch id='branch33'>
+              <activity role='stroke team' action='obtain' objects='history of current anticoagulant therapy' id='activity39'/>
+            </branch>
+            <branch id='branch34'>
+              <activity role='stroke team' action='confirm or obtain urgently' objects='platelet count, PTT, and INR' id='activity40'/>
+            </branch>
+          </parallelGateway>
+          <exclusiveGateway id='exclusivegateway8_2'>
+            <branch condition='patient is selected for additional vascular imaging' id='branch35'>
+              <activity role='radiology team' action='perform as soon as possible' objects='CTA or MRA' id='activity41'/>
+            </branch>
+            <branch condition='patient is not selected for additional vascular imaging' id='branch36'>
+              <activity role='stroke physician' action='omit' objects='CTA or MRA based on selection criteria' id='activity42'/>
+            </branch>
+          </exclusiveGateway>
+          <activity role='nursing staff' action='make' objects='patient NPO initially' id='activity43'/>
+          <inclusiveGateway id='inclusivegateway6'>
+            <branch condition='patient is alert and bedside swallowing screening is clinically appropriate' id='branch37'>
+              <activity role='nursing staff' action='screen swallowing using' objects='a simple valid reliable bedside testing protocol before oral medication, fluid, or food' id='activity44'/>
+            </branch>
+            <branch condition='patient is not alert within the first 24 hours' id='branch38'>
+              <activity role='nursing staff' action='monitor closely and screen swallowing when' objects='clinically appropriate within the first 24 hours' id='activity45'/>
+            </branch>
+            <branch condition='patient presents with features indicating dysphagia or pulmonary aspiration' id='branch39'>
+              <activity role='speech language pathologist or appropriately trained specialist' action='perform full clinical assessment of' objects='swallowing ability and advise required consistency of diet and fluids' id='activity46'/>
+            </branch>
+          </inclusiveGateway>
+          <activity role='stroke team' action='provide' objects='appropriate cross continuum secondary prevention assessments and therapies whether the patient is admitted or discharged from the ED' id='activity47'/>
+        </branch>
+        <branch condition='diagnosis is not acute ICH and patient does not present beyond 48 hours with TIA or ischemic stroke' id='branch40'>
+          <exclusiveGateway id='exclusivegateway9'>
+            <branch condition='diagnosis is TIA within more than acute stroke treatment time window and up to 48 hours' id='branch41'>
+              <activity role='stroke team' action='provide' objects='appropriate cross continuum secondary prevention assessments and therapies whether the patient is admitted or discharged from the ED' id='activity48'/>
+            </branch>
+            <branch condition='diagnosis is ischemic stroke within more than acute stroke treatment time window and up to 48 hours or other stroke diagnosis is identified' id='branch42'>
+              <activity role='nursing staff' action='make' objects='patient NPO initially' id='activity49_1'/>
+              <inclusiveGateway id='inclusivegateway7'>
+                <branch condition='patient is alert and bedside swallowing screening is clinically appropriate' id='branch43'>
+                  <activity role='nursing staff' action='screen swallowing using' objects='a simple valid reliable bedside testing protocol before oral medication, fluid, or food' id='activity49_2'/>
+                </branch>
+                <branch condition='patient is not alert within the first 24 hours' id='branch44'>
+                  <activity role='nursing staff' action='monitor closely and screen swallowing when' objects='clinically appropriate within the first 24 hours' id='activity49_3'/>
+                </branch>
+                <branch condition='patient presents with features indicating dysphagia or pulmonary aspiration' id='branch45'>
+                  <activity role='speech language pathologist or appropriately trained specialist' action='perform full clinical assessment of' objects='swallowing ability and advise required consistency of diet and fluids' id='activity49_4'/>
+                </branch>
+              </inclusiveGateway>
+              <activity role='stroke team' action='provide' objects='appropriate cross continuum secondary prevention assessments and therapies whether the patient is admitted or discharged from the ED' id='activity49'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </exclusiveGateway>
+</process>

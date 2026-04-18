@@ -1,0 +1,126 @@
+<process>
+  <activity role='triage nurse or receiving clinician' action='identify suspected stroke presentation in the ED, outpatient clinic, or direct acute care admission' objects='suspected stroke patient' id='activity1.1'/>
+  <activity role='triage nurse or receiving clinician' action='activate early stroke assessment pathway' objects='suspected stroke patient' id='activity1.2'/>
+  <parallelGateway id='parallelgateway1.1'>
+    <branch id='branch1.1'>
+      <activity role='acute care team' action='assess airway' objects='airway status' id='activity2.1'/>
+    </branch>
+    <branch id='branch1.2'>
+      <activity role='acute care team' action='assess breathing' objects='breathing status' id='activity2.2'/>
+    </branch>
+    <branch id='branch1.3'>
+      <activity role='acute care team' action='assess circulation' objects='circulation status' id='activity2.3'/>
+    </branch>
+  </parallelGateway>
+  <activity role='clinician' action='perform neurological examination and assess stroke severity on a standardized stroke scale' objects='focal neurological deficits, NIHSS or CNS for stroke' id='activity3'/>
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1'>
+      <activity role='stroke team' action='make patient NPO initially' objects='oral medication, fluid, food' id='activity4'/>
+      <activity role='nurse or trained clinician' action='screen swallowing ability during initial assessment and before initiating oral medication, fluid, or food using a simple valid reliable bedside testing protocol' objects='swallowing ability' id='activity5'/>
+      <exclusiveGateway id='exclusivegateway1'>
+        <branch condition='patient is not alert within the first 24 hours' id='branch2'>
+          <activity role='clinical team' action='monitor closely within the first 24 hours and screen swallowing ability when clinically appropriate' objects='alertness status, swallowing ability' id='activity6'/>
+        </branch>
+        <branch condition='patient is alert within the first 24 hours' id='branch3'>
+          <activity role='clinical team' action='continue standard swallowing precautions' objects='NPO status until screening completed' id='activity7'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exclusivegateway2'>
+        <branch condition='features indicate dysphagia or pulmonary aspiration' id='branch4'>
+          <activity role='speech-language pathologist or appropriately trained specialist' action='perform full clinical assessment of swallowing ability and advise required diet and fluid consistency' objects='swallowing ability, diet consistency, fluid consistency' id='activity8'/>
+        </branch>
+        <branch condition='no features indicate dysphagia or pulmonary aspiration' id='branch5'>
+          <activity role='clinical team' action='proceed according to bedside swallowing screen result' objects='swallowing screen result' id='activity9'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch6'>
+      <activity role='clinical team' action='obtain ECG without delaying acute treatment' objects='atrial fibrillation and other acute arrhythmias' id='activity10'/>
+    </branch>
+    <branch id='branch7'>
+      <parallelGateway id='parallelgateway1.2'>
+        <branch id='branch7.1'>
+          <activity role='laboratory team' action='perform urgent core blood work' objects='CBC, electrolytes, creatinine, glucose, INR, partial thromboplastin time' id='activity11.1'/>
+        </branch>
+        <branch id='branch7.2'>
+          <exclusiveGateway id='exclusivegateway1.1'>
+            <branch condition='troponin test is clinically indicated' id='branch7.2.1'>
+              <activity role='laboratory team' action='perform troponin test' objects='troponin level' id='activity11.2'/>
+            </branch>
+            <branch condition='troponin test is not clinically indicated' id='branch7.2.2'>
+              <activity role='laboratory team' action='continue without troponin testing' objects='laboratory workup' id='activity11.3'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </parallelGateway>
+    </branch>
+    <branch id='branch8'>
+      <activity role='clinical team' action='avoid delaying thrombolysis assessment for chest x-ray' objects='chest x-ray' id='activity12'/>
+    </branch>
+  </parallelGateway>
+  <exclusiveGateway id='exclusivegateway3'>
+    <branch condition='patient presents within acute stroke treatment time window' id='branch9'>
+      <parallelGateway id='parallelgateway1.3'>
+        <branch id='branch9.1'>
+          <exclusiveGateway id='exclusivegateway1.2'>
+            <branch condition='non-contrast CT is selected for rapid brain imaging' id='branch9.1.1'>
+              <activity role='imaging team' action='perform rapid brain imaging with door to imaging in less than 25 minutes' objects='non-contrast CT' id='activity13.1'/>
+            </branch>
+            <branch condition='MRI is selected for rapid brain imaging' id='branch9.1.2'>
+              <activity role='imaging team' action='perform rapid brain imaging with door to imaging in less than 25 minutes' objects='MRI' id='activity13.2'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch id='branch9.2'>
+          <activity role='imaging team' action='perform rapid vascular imaging with door to imaging in less than 25 minutes' objects='CTA' id='activity13.3'/>
+        </branch>
+      </parallelGateway>
+      <inclusiveGateway id='inclusivegateway1'>
+        <branch condition='acute ischemic stroke is clinically eligible for acute stroke treatments' id='branch10'>
+          <activity role='imaging team' action='consider advanced CT imaging for acute treatment decision-making' objects='CT and multiphase CTA or Perfusion CT' id='activity15'/>
+        </branch>
+        <branch condition='acute ischemic stroke is not clinically eligible for advanced CT imaging for acute stroke treatments' id='branch11'>
+          <activity role='clinical team' action='continue with available initial imaging for treatment decision-making' objects='initial CT, CTA, or MRI findings' id='activity15.1'/>
+        </branch>
+      </inclusiveGateway>
+      <activity role='stroke physician expert or radiology expert' action='interpret brain imaging immediately' objects='CT, CTA, MRI of the brain, and any advanced CT imaging' id='activity14'/>
+      <exclusiveGateway id='exclusivegateway4'>
+        <branch condition='intracerebral hemorrhage is identified or strongly suspected' id='branch13'>
+          <activity role='stroke physician with expertise in stroke management' action='treat ICH as a medical emergency and evaluate immediately' objects='acute ICH patient' id='activity18'/>
+          <activity role='clinical team' action='ask about anticoagulant therapy and measure coagulation-related tests' objects='anticoagulant therapy history, platelet count, PTT, INR' id='activity19'/>
+          <exclusiveGateway id='exclusivegateway5'>
+            <branch condition='selected ICH patient requires further vascular evaluation' id='branch14'>
+              <activity role='imaging team' action='perform vascular imaging as soon as possible' objects='CTA or MRA' id='activity20'/>
+            </branch>
+            <branch condition='selected ICH patient does not require further vascular evaluation' id='branch15'>
+              <activity role='clinical team' action='continue emergency ICH management without additional CTA or MRA' objects='ICH management plan' id='activity21'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch condition='TIA or ischemic stroke pathway applies' id='branch16'>
+          <exclusiveGateway id='exclusivegateway3.1'>
+            <branch condition='potentially disabling acute neurological symptoms suggest acute stroke within 6.0 hours of symptom onset or treatment can be initiated within a 12-hour window and clinical and imaging criteria are met' id='branch11.1'>
+              <activity role='stroke team' action='confirm EVT eligibility based on clinical and imaging criteria' objects='clinical criteria, imaging criteria, EVT eligibility' id='activity16.1'/>
+              <activity role='stroke team' action='initiate EVT access or transfer communication' objects='CritiCall Ontario contact, EVT centre communication, transfer or drip-and-ship plan' id='activity16.2'/>
+            </branch>
+            <branch condition='EVT criteria are not met based on clinical and imaging findings' id='branch11.2'>
+              <activity role='stroke team' action='continue with non-EVT acute stroke treatment decision-making' objects='clinical findings, imaging findings, acute stroke treatment plan' id='activity16.3'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch condition='patient presents outside acute stroke treatment time window' id='branch12'>
+      <activity role='clinical team' action='continue non-hyperacute stroke assessment pathway' objects='suspected stroke patient outside acute treatment window' id='activity17'/>
+      <exclusiveGateway id='exclusivegateway6'>
+        <branch condition='presentation is beyond 48 hours with TIA or ischemic stroke' id='branch17'>
+          <activity role='imaging team' action='perform vascular imaging as soon as possible' objects='brain arteries and neck arteries' id='activity22'/>
+        </branch>
+        <branch condition='presentation is within 48 hours or another ischemic stroke pathway already applies' id='branch18'>
+          <activity role='clinical team' action='continue ischemic stroke assessment and treatment pathway based on current findings' objects='ischemic stroke or TIA findings' id='activity23'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </exclusiveGateway>
+  <activity role='clinical team' action='provide appropriate cross-continuum secondary prevention assessments and therapies' objects='secondary prevention assessments and therapies, Modules 5 and 10' id='activity24'/>
+</process>

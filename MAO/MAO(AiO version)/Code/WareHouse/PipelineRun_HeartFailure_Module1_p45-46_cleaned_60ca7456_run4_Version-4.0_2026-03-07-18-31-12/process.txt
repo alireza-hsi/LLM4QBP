@@ -1,0 +1,72 @@
+<process>
+  <activity role='Ontario hospitals' action='develop and consistently apply risk-stratification tools that can be used for multiple conditions (including HF)' objects='risk-stratification tools' id='activity1'/>
+
+  <parallelGateway id='parallelgateway1_modified'>
+    <branch id='branch1_mod'>
+      <activity role='clinicians' action='order and collect bloodwork panel' objects='serum creatinine, electrolytes, troponin, complete blood count' id='activity_bloodwork1'/>
+      <activity role='healthcare expert' action='interpret bloodwork results' objects='bloodwork results' id='activity_bloodwork_interpret1'/>
+    </branch>
+    <branch id='branch4_mod'>
+      <activity role='clinicians' action='perform electrocardiogram' objects='electrocardiogram' id='activity5'/>
+      <activity role='healthcare expert' action='interpret electrocardiogram' objects='electrocardiogram results' id='activity_ecg_interpret1'/>
+    </branch>
+    <branch id='branch5_mod'>
+      <activity role='clinicians' action='perform chest x-ray examination (if required; should not delay assessment)' objects='chest x-ray examination' id='activity6_mod'/>
+      <activity role='healthcare expert' action='interpret chest x-ray (if performed)' objects='chest x-ray results' id='activity_cxr_interpret1_mod'/>
+    </branch>
+    <branch id='branch6_mod'>
+      <exclusiveGateway id='exclusivegateway1'>
+        <branch condition='no recent echocardiogram is available' id='branch7'>
+          <activity role='clinicians' action='perform an echocardiogram' objects='echocardiogram' id='activity7'/>
+          <activity role='healthcare expert' action='interpret echocardiogram' objects='echocardiogram results' id='activity_echo_interpret1'/>
+        </branch>
+        <branch condition='a recent echocardiogram is available' id='branch8'>
+          <activity role='clinicians' action='use a recent echocardiogram' objects='recent echocardiogram' id='activity8'/>
+          <activity role='healthcare expert' action='interpret recent echocardiogram' objects='recent echocardiogram findings' id='activity_recent_echo_interpret1'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch9_mod'>
+      <activity role='clinicians' action='frequently measure heart rate, blood pressure, and oxygen saturation until patient is stabilized' objects='heart rate, blood pressure, oxygen saturation' id='activity9'/>
+    </branch>
+  </parallelGateway>
+
+  <activity role='clinicians' action='calculate an acute heart failure risk score (for example, the EHMRG)' objects='EHMRG risk score' id='activity10_1'/>
+  <activity role='clinicians' action='assist with clinical decision-making' objects='' id='activity10_2'/>
+  <activity role='clinicians' action='predict the 7-day mortality risk of HF patients' objects='7-day mortality risk' id='activity10_3'/>
+
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='low-risk (e.g., EHMRG quintiles 1 and 2) AND responded to initial treatment in the ED AND no other considerations' id='branch10'>
+      <exclusiveGateway id='exclusivegateway3'>
+        <branch condition='treated in the ED' id='branch11'>
+          <activity role='clinicians' action='treat patient in the ED and discharge home without requiring inpatient admission' objects='' id='activity11'/>
+        </branch>
+        <branch condition='treated in outpatient settings' id='branch12'>
+          <activity role='clinicians' action='treat patient in outpatient settings and discharge home without requiring inpatient admission' objects='' id='activity12'/>
+        </branch>
+      </exclusiveGateway>
+      <activity role='primary care provider' action='conduct a follow-up visit within days of discharge from the ED' objects='follow-up visit' id='activity13'/>
+    </branch>
+
+    <branch condition='higher-risk (e.g., EHMRG quintiles 3-5)' id='branch13'>
+      <exclusiveGateway id='exclusivegateway4_modified'>
+        <branch condition='high-intensity criteria present (requires ventilation and/or admission to an intensive care unit with higher nurse-to-patient staffing)' id='branch20'>
+          <inclusiveGateway id='inclusivegateway_high_intensity_actions'>
+            <branch condition='requires ventilation (noninvasive)' id='branch_hi_vent_niv'>
+              <activity role='clinicians' action='provide noninvasive ventilation' objects='ventilation' id='activity15'/>
+            </branch>
+            <branch condition='requires ventilation (invasive)' id='branch_hi_vent_inv'>
+              <activity role='clinicians' action='provide invasive ventilation' objects='ventilation' id='activity16'/>
+            </branch>
+            <branch condition='requires ICU admission with higher nurse-to-patient staffing' id='branch_hi_icu_admit'>
+              <activity role='hospital' action='admit patient to ICU (higher nurse-to-patient staffing)' objects='ICU admission and staffing level' id='activity17'/>
+            </branch>
+          </inclusiveGateway>
+        </branch>
+        <branch condition='otherwise (no high-intensity criteria)' id='branch21'>
+          <activity role='hospital' action='admit patient to inpatient care with normal nurse-to-patient staffing' objects='inpatient care' id='activity14'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </exclusiveGateway>
+</process>

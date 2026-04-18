@@ -1,0 +1,79 @@
+<process>
+  <activity role='emergency department clinician' action='assess presenting symptoms, hemodynamic status, and initial acuity using the standardized acute heart failure assessment process' objects='patient with suspected acute heart failure,standardized assessment criteria' id='activity1.1'/>
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1'>
+      <activity role='clinical staff' action='measure serum creatinine and electrolyte levels' objects='blood samples' id='activity2'/>
+    </branch>
+    <branch id='branch2'>
+      <activity role='clinical staff' action='measure troponin' objects='blood samples' id='activity3'/>
+    </branch>
+    <branch id='branch3'>
+      <activity role='clinical staff' action='perform complete blood count' objects='blood samples' id='activity4'/>
+    </branch>
+    <branch id='branch4'>
+      <activity role='clinical staff' action='perform electrocardiogram' objects='ECG' id='activity5'/>
+    </branch>
+    <branch id='branch5'>
+      <activity role='clinical staff' action='perform chest x-ray examination' objects='chest x-ray' id='activity6'/>
+    </branch>
+    <branch id='branch6'>
+      <exclusiveGateway id='exclusivegateway1'>
+        <branch condition='no recent echocardiogram is available' id='branch7'>
+          <activity role='clinical staff' action='perform echocardiogram' objects='echocardiogram' id='activity7'/>
+        </branch>
+        <branch condition='recent echocardiogram is available' id='branch8'>
+          <activity role='clinical staff' action='review recent echocardiogram' objects='recent echocardiogram results' id='activity8'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='branch9'>
+      <activity role='nursing staff' action='measure heart rate, blood pressure, and oxygen saturation frequently until the patient is stabilized' objects='vital signs and oxygen saturation readings' id='activity9'/>
+    </branch>
+    <branch id='branch10'>
+      <activity role='emergency department clinician' action='administer initial furosemide in the ED and assess responsiveness to diuresis' objects='furosemide,response to diuresis' id='activity10'/>
+    </branch>
+  </parallelGateway>
+  <activity role='emergency department clinician' action='assess bedside high-risk clinical markers' objects='respiratory distress,hypoxemia,severity of pulmonary edema,hemodynamic status,arrhythmias' id='activity11.1'/>
+  <activity role='emergency department clinician' action='review investigation-based high-risk markers and response to ED diuresis' objects='troponin result,response to furosemide administered in ED' id='activity11.2'/>
+  <activity role='emergency department clinician' action='compile the clinical and investigation variables required for the acute heart failure risk score' objects='risk score variables,clinical findings,investigation results' id='activity12.1'/>
+  <activity role='emergency department clinician' action='calculate and record the EHMRG or equivalent acute heart failure risk score' objects='EHMRG or equivalent acute heart failure risk score' id='activity12.2'/>
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='high intensity: ventilation is required and/or ICU admission is required based on high-risk markers or instability' id='branch11'>
+      <exclusiveGateway id='exclusivegateway4'>
+        <branch condition='noninvasive ventilation is required' id='branch12'>
+          <activity role='critical care team' action='initiate noninvasive ventilation' objects='noninvasive ventilation support' id='activity13'/>
+        </branch>
+        <branch condition='invasive ventilation is required' id='branch13'>
+          <activity role='critical care team' action='initiate invasive ventilation' objects='invasive ventilation support' id='activity14'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exclusivegateway5'>
+        <branch condition='ICU admission is required' id='branch14'>
+          <activity role='admitting team' action='admit patient to intensive care unit with higher nurse-to-patient staffing' objects='ICU bed' id='activity15'/>
+        </branch>
+        <branch condition='ICU admission is not required immediately' id='branch19'>
+          <activity role='hospital team' action='continue high-acuity monitoring and treatment while reassessing level-of-care needs' objects='acute heart failure treatment plan,monitoring resources' id='activity22'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exclusivegateway3'>
+        <branch condition='required higher level care is available locally' id='branch15'>
+          <activity role='hospital team' action='continue high-intensity acute heart failure management at current hospital' objects='critical care resources' id='activity16'/>
+        </branch>
+        <branch condition='required higher level care is not available locally' id='branch16'>
+          <activity role='hospital team' action='transfer patient to a higher level provider through the hospital transfer pathway' objects='transfer mechanism,higher level provider' id='activity17'/>
+        </branch>
+      </exclusiveGateway>
+      <activity role='emergency department clinician' action='document the final risk-stratification category and disposition decision to guide admission, discharge, or transfer' objects='final risk-stratification record,disposition decision' id='activity1.2a'/>
+    </branch>
+    <branch condition='low intensity: EHMRG quintile 1 or 2, patient responded to initial treatment in the ED, and there are no other considerations preventing discharge home' id='branch17'>
+      <activity role='emergency department clinician' action='provide discharge instructions and return precautions' objects='discharge instructions,return precautions' id='activity19.1'/>
+      <activity role='emergency department clinician' action='complete discharge documentation and communicate the follow-up plan' objects='discharge documentation,follow-up plan' id='activity19.2'/>
+      <activity role='emergency department clinician' action='arrange follow-up visit with primary care provider within days of discharge from the ED' objects='follow-up appointment' id='activity20'/>
+      <activity role='emergency department clinician' action='document the final risk-stratification category and disposition decision to guide admission, discharge, or transfer' objects='final risk-stratification record,disposition decision' id='activity1.2b'/>
+    </branch>
+    <branch condition='average intensity: inpatient admission is required with normal nurse-to-patient staffing' id='branch18'>
+      <activity role='admitting team' action='admit patient to inpatient care with normal nurse-to-patient staffing' objects='inpatient bed' id='activity21'/>
+      <activity role='emergency department clinician' action='document the final risk-stratification category and disposition decision to guide admission, discharge, or transfer' objects='final risk-stratification record,disposition decision' id='activity1.2c'/>
+    </branch>
+  </exclusiveGateway>
+</process>

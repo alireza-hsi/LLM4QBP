@@ -1,0 +1,48 @@
+<process>
+  <activity role='emergency department clinician' action='Initiate standardized risk assessment/stratification using validated tool' objects='risk-stratification tool' id='activity1'/>
+  <activity role='emergency department clinician' action='Order initial investigations' objects='serum creatinine, electrolyte levels, troponin, complete blood count, electrocardiogram, chest x-ray' id='activity2-1'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='No recent echocardiogram available' id='branch2'>
+      <activity role='emergency department clinician' action='Order and review echocardiogram' objects='echocardiogram' id='activity3'/>
+    </branch>
+    <branch condition='Recent echocardiogram available' id='branch3'>
+      <activity role='emergency department clinician' action='Skip echocardiogram order' objects='' id='activity4'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='emergency department clinician' action='Review initial investigation results' objects='investigation results' id='activity2-2'/>
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch4-1'>
+      <activity role='nursing staff' action='Frequently measure and record heart rate, blood pressure, and oxygen saturation until patient is stabilized' objects='monitoring equipment' id='activity5'/>
+    </branch>
+    <branch id='branch4-2'>
+      <activity role='emergency department clinician' action='Administer diuretic (e.g., furosemide)' objects='furosemide' id='activity6-1'/>
+      <activity role='emergency department clinician' action='Assess clinical response to diuretic' objects='clinical response' id='activity6-2'/>
+    </branch>
+  </parallelGateway>
+  <activity role='emergency department clinician' action='Calculate acute heart failure risk score (e.g., EHMRG) to predict 7-day mortality risk' objects='EHMRG risk score tool' id='activity7'/>
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='Low-risk (EHMRG quintiles 1-2) AND responded to initial ED treatment AND no other considerations (e.g., advanced directives, severe dementia, etc.)' id='branch5'>
+      <parallelGateway id='parallelgateway2'>
+        <branch id='branch5-1'>
+          <activity role='emergency department clinician' action='Provide discharge instructions to patient' objects='discharge instructions' id='activity8-1'/>
+        </branch>
+        <branch id='branch5-2'>
+          <activity role='emergency department clinician' action='Complete discharge documentation' objects='discharge paperwork' id='activity8-2'/>
+        </branch>
+      </parallelGateway>
+      <activity role='emergency department clinician' action='Arrange follow-up visit with primary care provider within days of discharge' objects='follow-up appointment' id='activity9'/>
+    </branch>
+    <branch condition='Average-risk (EHMRG quintiles 3-5) OR high-risk markers present OR other considerations preclude discharge' id='branch6'>
+      <exclusiveGateway id='exclusivegateway3'>
+        <branch condition='Requires ventilation and/or ICU admission (high intensity)' id='branch7'>
+          <activity role='emergency department clinician' action='Admit patient to intensive care unit with higher nurse-to-patient staffing' objects='ICU admission order' id='activity10'/>
+        </branch>
+        <branch condition='Requires inpatient care with normal nurse-to-patient staffing (average intensity)' id='branch8'>
+          <activity role='emergency department clinician' action='Admit patient to inpatient care' objects='inpatient admission order' id='activity11'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </exclusiveGateway>
+  <activity role='hospital administration' action='Ensure use of standardized risk stratification assessment tool or process for all ED presentations' objects='risk stratification policy' id='activity12'/>
+  <activity role='hospital administration' action='Maintain pathway or mechanism to transfer patients to higher level provider as needed' objects='transfer protocol' id='activity13'/>
+</process>

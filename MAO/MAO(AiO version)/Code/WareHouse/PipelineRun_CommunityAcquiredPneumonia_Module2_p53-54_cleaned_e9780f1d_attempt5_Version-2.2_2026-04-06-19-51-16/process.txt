@@ -1,0 +1,84 @@
+<process>
+  <activity role='medical staff' action='Assess patient presenting with symptoms of community-acquired pneumonia (CAP) in ED, inpatient ward, or ICU' objects='patient' id='activity1'/>
+  <activity role='medical staff' action='Measure oxygen saturation' objects='patient' id='activity2'/>
+  <activity role='medical staff' action='Order chest x-ray' objects='patient, chest x-ray' id='activity3-1'/>
+  <activity role='medical staff' action='Do not order CT scan for CAP diagnosis' objects='patient' id='activity6'/>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='Patient has sepsis' id='branch1'>
+      <activity role='medical staff' action='Initiate antibiotics before chest x-ray results' objects='patient, antibiotics' id='activity4'/>
+    </branch>
+    <branch condition='Patient does not have sepsis' id='branch2'>
+      <activity role='medical staff' action='Wait for chest x-ray results before initiating antibiotics' objects='patient, chest x-ray results' id='activity5'/>
+      <activity role='medical staff' action='Interpret chest x-ray results' objects='chest x-ray results' id='activity3-2'/>
+    </branch>
+  </exclusiveGateway>
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='Patient admitted to hospital' id='branch3'>
+      <activity role='medical staff' action='Order routine blood work: CBC, electrolytes, and renal function tests' objects='patient, blood work' id='activity7'/>
+      <exclusiveGateway id='exclusivegateway3'>
+        <branch condition='Patient meets >2 CRB-65 criteria' id='branch5-1'>
+          <activity role='medical staff' action='Consider ordering blood gases, lactate, liver enzyme and liver function tests' objects='patient, lab tests' id='activity8'/>
+        </branch>
+        <branch condition='Patient does not meet >2 CRB-65 criteria' id='branch5-2'>
+          <activity role='medical staff' action='Do not order additional CRB-65 related tests' objects='patient' id='activity9'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exclusivegateway4'>
+        <branch condition='Possible to obtain adequate sputum sample' id='branch6-1'>
+          <activity role='medical staff' action='Consider obtaining sputum culture' objects='patient, sputum sample' id='activity10'/>
+          <exclusiveGateway id='exclusivegateway5'>
+            <branch condition='Sputum culture obtained' id='branch7-1'>
+              <activity role='medical staff' action='Consider Gram staining of sputum sample' objects='sputum sample' id='activity11'/>
+            </branch>
+            <branch condition='Sputum culture not obtained' id='branch7-2'>
+              <activity role='medical staff' action='Skip Gram staining' objects='' id='activity12'/>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch condition='Not possible to obtain adequate sputum sample' id='branch6-2'>
+          <activity role='medical staff' action='Skip sputum culture and Gram stain' objects='' id='activity13'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exclusivegateway6'>
+        <branch condition='Patient meets >2 SIRS criteria or requires ICU admission' id='branch8-1'>
+          <activity role='medical staff' action='Collect blood sample for culture' objects='patient, blood sample' id='activity14-1'/>
+          <activity role='medical staff' action='Send blood sample to laboratory' objects='blood sample, laboratory' id='activity14-2'/>
+        </branch>
+        <branch condition='Patient does not meet >2 SIRS criteria and does not require ICU admission' id='branch8-2'>
+          <activity role='medical staff' action='Do not order blood cultures' objects='patient' id='activity15'/>
+        </branch>
+      </exclusiveGateway>
+      <inclusiveGateway id='inclusivegateway1'>
+        <branch condition='Patient is high-severity' id='branch9-1'>
+          <activity role='medical staff' action='Collect urine sample' objects='patient, urine sample' id='activity16-1'/>
+          <activity role='medical staff' action='Send urine sample for antigen testing' objects='urine sample, laboratory' id='activity16-2'/>
+        </branch>
+        <branch condition='Enhanced surveillance directive for Legionella in inpatients' id='branch9-2'>
+          <activity role='medical staff' action='Collect urine sample' objects='patient, urine sample' id='activity17-1'/>
+          <activity role='medical staff' action='Send urine sample for antigen testing' objects='urine sample, laboratory' id='activity17-2'/>
+        </branch>
+        <branch condition='Patient not responding to drug therapy after 48–72 hours' id='branch9-3'>
+          <activity role='medical staff' action='Collect urine sample' objects='patient, urine sample' id='activity18-1'/>
+          <activity role='medical staff' action='Send urine sample for antigen testing' objects='urine sample, laboratory' id='activity18-2'/>
+        </branch>
+        <branch condition='Inpatient during peak season (mid-June to early October)' id='branch9-4'>
+          <activity role='medical staff' action='Collect urine sample' objects='patient, urine sample' id='activity19-1'/>
+          <activity role='medical staff' action='Send urine sample for antigen testing' objects='urine sample, laboratory' id='activity19-2'/>
+        </branch>
+      </inclusiveGateway>
+      <activity role='medical staff' action='Consider field evaluation to assess clinical utility of urine antigen testing' objects='urine antigen testing, field evaluation' id='activity20'/>
+      <exclusiveGateway id='exclusivegateway7'>
+        <branch condition='Patient is intubated (e.g., high severity)' id='branch10-1'>
+          <activity role='medical staff' action='Collect respiratory sample for PCR' objects='patient, respiratory sample' id='activity21-1'/>
+          <activity role='medical staff' action='Send sample for PCR testing' objects='respiratory sample, laboratory' id='activity21-2'/>
+        </branch>
+        <branch condition='Patient is not intubated' id='branch10-2'>
+          <activity role='medical staff' action='Do not order PCR for Legionella' objects='patient' id='activity22'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch condition='Patient not admitted to hospital' id='branch11'>
+      <activity role='medical staff' action='Continue outpatient management as per CAP protocol' objects='patient' id='activity23'/>
+    </branch>
+  </exclusiveGateway>
+</process>

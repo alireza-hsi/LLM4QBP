@@ -1,0 +1,113 @@
+<process>
+  <activity role='ED team' action='review patient presentation, symptoms, history, and immediate clinical status when the patient presents to the emergency department' objects='patient presentation data and initial clinical findings' id='activity3_1'/>
+  <activity role='ED team' action='apply the standardized acute heart failure risk-stratification tool to assign preliminary risk' objects='standardized risk-stratification tool and patient assessment data' id='activity3_2'/>
+  <activity role='ED nurse' action='initiate frequent measurement of heart rate, blood pressure, and oxygen saturation during ongoing assessment and treatment' objects='vital signs and oxygen saturation readings' id='activity12'/>
+  <parallelGateway id='parallelgateway1'>
+    <branch id='branch1'>
+      <activity role='ED clinician' action='order and review serum creatinine and electrolyte levels' objects='blood samples and laboratory results' id='activity4'/>
+      <activity role='ED clinician' action='order and review troponin measurements' objects='blood samples and troponin results' id='activity5'/>
+      <activity role='ED clinician' action='order and review complete blood count' objects='blood samples and complete blood count results' id='activity6'/>
+    </branch>
+    <branch id='branch2'>
+      <activity role='ED clinician' action='perform electrocardiogram' objects='electrocardiogram tracing' id='activity7'/>
+    </branch>
+    <branch id='branch3'>
+      <activity role='ED clinician' action='obtain chest x-ray examination' objects='chest x-ray images and report' id='activity8'/>
+    </branch>
+    <branch id='branch6'>
+      <activity role='ED physician' action='provide initial emergency department treatment including furosemide-based diuresis' objects='initial treatment and furosemide therapy' id='activity13_1'/>
+      <activity role='ED physician' action='reassess urine output, symptoms, and hemodynamic response to determine responsiveness to diuresis' objects='diuretic response findings' id='activity13_2'/>
+    </branch>
+    <branch id='branch7'>
+      <activity role='ED clinician' action='assess respiratory distress, hypoxemia, severity of pulmonary edema, hemodynamic compromise, and significant arrhythmias' objects='clinical assessment findings' id='activity14'/>
+    </branch>
+  </parallelGateway>
+  <exclusiveGateway id='exclusivegateway2'>
+    <branch condition='one or more high-risk markers are present' id='branch10'>
+      <activity role='ED clinician' action='record that high-risk markers are present' objects='risk stratification findings' id='activity15'/>
+      <inclusiveGateway id='inclusivegateway1'>
+        <branch condition='respiratory distress is present' id='branch12'>
+          <activity role='ED clinician' action='document respiratory distress as a high-risk marker' objects='respiratory assessment findings' id='activity16'/>
+        </branch>
+        <branch condition='hypoxemia is present' id='branch13'>
+          <activity role='ED clinician' action='document hypoxemia as a high-risk marker' objects='oxygen saturation findings' id='activity17'/>
+        </branch>
+        <branch condition='severe pulmonary edema is present' id='branch14'>
+          <activity role='ED clinician' action='document severity of pulmonary edema as a high-risk marker' objects='pulmonary edema findings' id='activity18'/>
+        </branch>
+        <branch condition='response to furosemide administered in the emergency department is poor' id='branch15'>
+          <activity role='ED clinician' action='document poor response to furosemide administered in the emergency department as a high-risk marker' objects='diuretic response findings' id='activity19'/>
+        </branch>
+        <branch condition='hemodynamic compromise is present' id='branch16'>
+          <activity role='ED clinician' action='document hemodynamic compromise as a high-risk marker' objects='hemodynamic assessment findings' id='activity20'/>
+        </branch>
+        <branch condition='significant arrhythmias are present' id='branch17'>
+          <activity role='ED clinician' action='document significant arrhythmias as a high-risk marker' objects='electrocardiogram and rhythm findings' id='activity21'/>
+        </branch>
+        <branch condition='troponin is positive' id='branch18'>
+          <activity role='ED clinician' action='document positive troponin as a high-risk marker' objects='troponin results' id='activity22'/>
+        </branch>
+      </inclusiveGateway>
+    </branch>
+    <branch condition='no high-risk markers are present' id='branch11'>
+      <activity role='ED clinician' action='document absence of high-risk markers' objects='risk stratification findings' id='activity23'/>
+    </branch>
+  </exclusiveGateway>
+  <exclusiveGateway id='exclusivegateway3'>
+    <branch condition='high-intensity care is required because the patient needs noninvasive or invasive ventilation and or intensive care unit level care' id='branch19'>
+      <activity role='ED physician' action='activate the high-intensity acute heart failure pathway' objects='critical care referral and escalation plan' id='activity26'/>
+      <exclusiveGateway id='exclusivegateway4'>
+        <branch condition='higher-level provider capacity is available locally' id='branch22'>
+          <activity role='ED and critical care team' action='admit the patient to intensive care and provide noninvasive or invasive ventilation with higher nurse-to-patient staffing' objects='ICU admission, ventilation support, and critical care bed' id='activity27'/>
+        </branch>
+        <branch condition='higher-level provider capacity is not available locally' id='branch23'>
+          <activity role='ED team' action='transfer the patient to a higher level provider' objects='transfer pathway and patient handover information' id='activity28'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch condition='high-intensity care is not required' id='branch29'>
+      <activity role='ED clinician' action='compile the clinical and investigation variables required for the acute heart failure risk score' objects='clinical assessment findings, laboratory results, and investigation results' id='activity24_1'/>
+      <activity role='ED clinician' action='calculate and document an acute heart failure risk score such as EHMRG and predicted 7-day mortality risk' objects='EHMRG score and predicted 7-day mortality risk' id='activity24_2'/>
+      <activity role='ED clinician' action='review patient-specific factors that may affect discharge or admission decisions' objects='advanced directives, cognitive status, and expected impact of admission on life expectancy' id='activity25_1'/>
+      <exclusiveGateway id='exclusivegateway25_1'>
+        <branch condition='one or more additional disposition considerations are present' id='branch24'>
+          <inclusiveGateway id='inclusivegateway25_1'>
+            <branch condition='advanced directives affect the disposition decision' id='branch25'>
+              <activity role='ED clinician' action='document advanced directives and align the disposition plan with goals of care' objects='advanced directives and goals-of-care documentation' id='activity25_2'/>
+            </branch>
+            <branch condition='severe dementia affects the disposition decision' id='branch26'>
+              <activity role='ED clinician' action='document severe dementia as a factor affecting the disposition decision' objects='cognitive assessment findings' id='activity25_3'/>
+            </branch>
+            <branch condition='estimated impact of admission on life expectancy affects the disposition decision' id='branch27'>
+              <activity role='ED clinician' action='document the estimated impact of admission on life expectancy as a factor affecting the disposition decision' objects='prognostic assessment findings' id='activity25_4'/>
+            </branch>
+          </inclusiveGateway>
+        </branch>
+        <branch condition='no additional disposition considerations are present' id='branch28'>
+          <activity role='ED clinician' action='document that no additional disposition considerations are identified' objects='disposition assessment findings' id='activity25_5'/>
+        </branch>
+      </exclusiveGateway>
+      <activity role='ED clinician' action='check whether a recent echocardiogram is available after urgent escalation needs have been ruled out' objects='prior echocardiogram records' id='activity9'/>
+      <exclusiveGateway id='exclusivegateway1'>
+        <branch condition='no recent echocardiogram is available' id='branch8'>
+          <activity role='ED clinician' action='obtain echocardiogram' objects='echocardiogram' id='activity10'/>
+        </branch>
+        <branch condition='recent echocardiogram is available' id='branch9'>
+          <activity role='ED clinician' action='review recent echocardiogram' objects='recent echocardiogram results' id='activity11'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='exclusivegateway5'>
+        <branch condition='average-intensity care is required because the patient is higher-risk such as EHMRG quintiles 3 to 5' id='branch20'>
+          <activity role='ED physician' action='admit the patient to inpatient care with normal nurse-to-patient staffing' objects='inpatient admission order' id='activity29'/>
+        </branch>
+        <branch condition='low-intensity care is appropriate because the patient is low-risk such as EHMRG quintiles 1 and 2, has responded to initial treatment in the emergency department, and has no other considerations preventing discharge' id='branch21'>
+          <activity role='ED physician' action='manage the patient in the emergency department or outpatient setting and discharge the patient home without inpatient admission' objects='discharge plan' id='activity30'/>
+          <activity role='ED team' action='arrange a follow-up visit with the primary care provider within days of discharge from the emergency department' objects='follow-up appointment' id='activity31'/>
+        </branch>
+        <branch condition='the patient is low-risk but one or more additional disposition considerations are present' id='branch30'>
+          <activity role='ED physician' action='make an individualized disposition decision aligned with goals of care and clinical context' objects='individualized disposition plan' id='activity32'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </exclusiveGateway>
+</process>

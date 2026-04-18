@@ -1,0 +1,105 @@
+<process>
+  <exclusiveGateway id='exclusivegateway1'>
+    <branch condition='patient presents to the emergency department' id='branch1'>
+      <activity role='triage nurse' action='register suspected hip fracture patient' objects='patient record' id='activity2.1'/>
+      <activity role='triage nurse' action='triage suspected hip fracture patient' objects='triage assessment' id='activity2.2'/>
+    </branch>
+    <branch condition='patient presents to an outpatient clinic' id='branch2'>
+      <activity role='outpatient clinic staff' action='register suspected hip fracture patient' objects='patient record' id='activity3.1'/>
+      <activity role='outpatient clinic staff' action='triage suspected hip fracture patient using the same emergency assessment practices' objects='triage assessment' id='activity3.2'/>
+    </branch>
+    <branch condition='patient is directly admitted to the acute care setting' id='branch3'>
+      <activity role='admitting staff' action='register directly admitted suspected hip fracture patient' objects='patient record' id='activity4.1'/>
+      <activity role='admitting staff' action='triage suspected hip fracture patient using the same emergency assessment practices' objects='triage assessment' id='activity4.2'/>
+    </branch>
+  </exclusiveGateway>
+  <activity role='physician' action='see patient within 1 hour of arrival in 90% of cases' objects='patient' id='activity5'/>
+  <activity role='emergency physician' action='request orthopedic consultation for patient within 2 hours in 90% of cases' objects='orthopedic consultation request' id='activity6'/>
+  <activity role='orthopedic surgeon' action='consult on suspected hip fracture patient within 2 hours of arrival in 90% of cases' objects='patient' id='activity7'/>
+  <inclusiveGateway id='inclusivegateway1'>
+    <branch condition='anesthesiology consultation is needed' id='branch7'>
+      <activity role='emergency physician' action='notify anesthesiologist and obtain consultation as needed' objects='patient information' id='activity8'/>
+    </branch>
+    <branch condition='internal medicine consultation is needed' id='branch8'>
+      <activity role='emergency physician' action='notify internist and obtain consultation as needed' objects='patient information' id='activity9'/>
+    </branch>
+  </inclusiveGateway>
+  <parallelGateway id='parallelgateway2'>
+    <branch id='branch9'>
+      <activity role='clinical staff' action='assess and document reason for the fall' objects='fall history' id='activity10'/>
+      <activity role='clinical staff' action='assess and document other collateral injuries' objects='injury assessment' id='activity11'/>
+      <activity role='clinical staff' action='assess and document comorbid conditions' objects='medical history' id='activity12'/>
+      <activity role='clinical staff' action='assess and document current drug therapy including any anticoagulants' objects='medication history' id='activity13'/>
+    </branch>
+    <branch id='branch10'>
+      <activity role='nurse' action='assess and document fluid balance' objects='fluid balance record' id='activity14'/>
+      <activity role='nurse' action='assess and document hydration and nutrition' objects='hydration and nutrition assessment' id='activity15'/>
+      <activity role='nurse' action='assess and document pain' objects='pain assessment' id='activity16'/>
+      <activity role='nurse' action='measure and document temperature' objects='temperature record' id='activity17'/>
+      <activity role='nurse' action='assess and document continence' objects='continence assessment' id='activity18'/>
+      <activity role='nurse' action='assess and document pressure sore risk' objects='pressure sore risk assessment' id='activity19'/>
+    </branch>
+    <branch id='branch11'>
+      <activity role='diagnostic staff' action='perform appropriate blood work tests and document results while patient is in the ED' objects='blood work tests and results' id='activity20'/>
+      <activity role='diagnostic imaging staff' action='perform X-rays and document results while patient is in the ED' objects='X-rays and imaging report' id='activity21'/>
+    </branch>
+    <branch id='branch12'>
+      <activity role='clinical staff' action='assess and document pre-fracture functional ability and mobility' objects='pre-fracture function assessment' id='activity22'/>
+      <activity role='clinical staff' action='assess and document physical and functional level' objects='physical and functional assessment' id='activity23'/>
+      <exclusiveGateway id='exclusivegateway2'>
+        <branch condition='MMSE is selected as the validated screening tool' id='branch12.1'>
+          <activity role='clinical staff' action='screen mental state using MMSE and document result' objects='mental state screening result' id='activity24.1'/>
+        </branch>
+        <branch condition='MOCA is selected as the validated screening tool' id='branch12.2'>
+          <activity role='clinical staff' action='screen mental state using MOCA and document result' objects='mental state screening result' id='activity24.2'/>
+        </branch>
+        <branch condition='CAM is selected as the validated screening tool' id='branch12.3'>
+          <activity role='clinical staff' action='screen mental state using CAM and document result' objects='mental state screening result' id='activity24.3'/>
+        </branch>
+      </exclusiveGateway>
+      <activity role='clinical staff' action='assess and document social circumstances including caregiver status existing community supports and family involvement' objects='social assessment' id='activity25'/>
+    </branch>
+  </parallelGateway>
+  <parallelGateway id='parallelgateway3'>
+    <branch id='branch13'>
+      <activity role='pharmacist or designated clinician' action='collect best possible medication history using a standardized form' objects='standardized medication reconciliation form' id='activity26.1'/>
+      <activity role='pharmacist or designated clinician' action='verify and document medication reconciliation' objects='completed medication reconciliation form' id='activity26.2'/>
+    </branch>
+    <branch id='branch14'>
+      <activity role='ED staff' action='manage patient hydration within the ED' objects='hydration plan' id='activity27'/>
+      <activity role='ED staff' action='manage patient pain within the ED' objects='analgesia plan' id='activity28'/>
+      <activity role='ED staff' action='manage patient risk of delirium within the ED' objects='delirium prevention measures' id='activity29'/>
+      <activity role='ED staff' action='manage patient risk of pressure sores within the ED' objects='pressure sore prevention measures' id='activity30'/>
+    </branch>
+  </parallelGateway>
+  <exclusiveGateway id='exclusivegateway3'>
+    <branch condition='presenting hospital is a surgical hospital' id='branch15'>
+      <activity role='admitting team' action='issue inpatient admission order within 4 hours spent in the ED in 90% of cases' objects='admission order' id='activity31.1'/>
+      <activity role='admitting team' action='transfer patient to inpatient bed' objects='inpatient bed' id='activity31.2'/>
+    </branch>
+    <branch condition='presenting hospital is a non-surgical hospital' id='branch16'>
+      <parallelGateway id='parallelgateway4'>
+        <branch id='branch16.1'>
+          <activity role='non-surgical hospital team' action='monitor vital signs and medical stability while waiting for transfer' objects='stability monitoring record' id='activity32.1'/>
+        </branch>
+        <branch id='branch16.2'>
+          <activity role='non-surgical hospital team' action='continue supportive management while awaiting transfer' objects='stabilization measures' id='activity32.2'/>
+        </branch>
+      </parallelGateway>
+      <activity role='non-surgical hospital team' action='admit patient or complete formal transfer decision within 4 hours of the initial ED presentation in 90% of cases' objects='admission record or transfer decision' id='activity33'/>
+      <activity role='non-surgical hospital and regional network' action='activate formal transfer protocol to surgical hospital' objects='transfer protocol' id='activity33.1'/>
+      <activity role='non-surgical hospital and regional network' action='notify receiving surgical hospital and local stakeholders of planned transfer and repatriation pathway' objects='transfer and repatriation communication' id='activity33.2'/>
+      <parallelGateway id='parallelgateway5'>
+        <branch id='branch16.3'>
+          <activity role='transport coordination team' action='book transport for expeditious transfer' objects='transfer booking' id='activity34.1'/>
+        </branch>
+        <branch id='branch16.4'>
+          <activity role='transport coordination team' action='prepare transfer handover documentation' objects='transfer handover documentation' id='activity34.2'/>
+        </branch>
+      </parallelGateway>
+      <activity role='receiving surgical hospital' action='admit patient on arrival to the surgical hospital' objects='inpatient admission' id='activity35.2'/>
+      <activity role='surgical hospital team' action='perform surgery within 48 hours of the patient initial presentation even if first admitted to a non-surgical hospital' objects='operation' id='activity36'/>
+      <activity role='surgical hospital and local hospital' action='repatriate patient to the local hospital after surgery according to formal protocol' objects='repatriation transfer' id='activity37'/>
+    </branch>
+  </exclusiveGateway>
+</process>

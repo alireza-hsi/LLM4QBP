@@ -1,0 +1,159 @@
+<process>
+  <activity role='ED team' action='triage patient with suspected TIA or minor nondisabling stroke' objects='patient' id='a1_1'/>
+  <activity role='ED team' action='activate the priority treatment pathway for suspected TIA or minor nondisabling stroke' objects='patient' id='a1_2'/>
+  <parallelGateway id='pg1'>
+    <branch id='br1'>
+      <activity role='ED nurse' action='measure random blood glucose' objects='patient' id='a2'/>
+      <exclusiveGateway id='eg1'>
+        <branch condition='Hypoglycemia is present' id='br2'>
+          <activity role='ED clinician' action='correct hypoglycemia immediately' objects='hypoglycemia treatment' id='a3'/>
+        </branch>
+        <branch condition='First random glucose value is greater than 11 mmol per L' id='br3'>
+          <activity role='ED nurse' action='repeat blood glucose measurement' objects='blood glucose test' id='a4'/>
+        </branch>
+        <branch condition='No hypoglycemia and first random glucose value is 11 mmol per L or lower' id='br4'>
+          <activity role='ED nurse' action='document glucose result and continue observation' objects='patient record' id='a5'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='br5'>
+      <activity role='ED nurse' action='evaluate temperature as part of routine vital signs every 4 hours for first 48 hours' objects='patient temperature' id='a6'/>
+      <exclusiveGateway id='eg2'>
+        <branch condition='Temperature is greater than 37.5 C' id='br6'>
+          <parallelGateway id='pg2'>
+            <branch id='br7'>
+              <activity role='clinical staff' action='initiate temperature-reducing measures' objects='temperature management interventions' id='a7'/>
+            </branch>
+            <branch id='br8'>
+              <activity role='clinical staff' action='investigate potential infection' objects='clinical assessment and laboratory tests' id='a8'/>
+            </branch>
+            <branch id='br9'>
+              <inclusiveGateway id='ig1'>
+                <branch condition='Antipyretic therapy is required' id='br10'>
+                  <activity role='clinician' action='initiate antipyretic therapy' objects='antipyretic medication' id='a9'/>
+                </branch>
+                <branch condition='Antimicrobial therapy is required' id='br11'>
+                  <activity role='clinician' action='initiate antimicrobial therapy' objects='antimicrobial medication' id='a10'/>
+                </branch>
+              </inclusiveGateway>
+            </branch>
+          </parallelGateway>
+        </branch>
+        <branch condition='Temperature is 37.5 C or lower' id='br12'>
+          <activity role='ED nurse' action='continue routine temperature monitoring every 4 hours for first 48 hours' objects='vital signs chart' id='a11'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+    <branch id='br13'>
+      <parallelGateway id='pg_a12_1'>
+        <branch id='br_a12_1'>
+          <activity role='stroke clinician' action='assess neurological features and determine whether the presentation is TIA with high-risk features, TIA without high-risk features, or minor stroke' objects='neurological examination, symptom profile' id='a12_1'/>
+        </branch>
+        <branch id='br_a12_2'>
+          <activity role='stroke clinician' action='determine symptom onset time and whether medical attention was sought more than 48 hours after symptom onset' objects='onset history, presentation time' id='a12_2'/>
+        </branch>
+        <branch id='br_a12_3'>
+          <activity role='stroke clinician' action='review access to a specialized TIA or minor stroke clinic and assess contraindications to antiplatelet therapy, current antiplatelet use, and swallowing screening status' objects='care access information, medication history, swallowing screening result' id='a12_3'/>
+        </branch>
+      </parallelGateway>
+      <exclusiveGateway id='eg3'>
+        <branch condition='Fluctuating or crescendo hemibody motor weakness, sensory loss, or speech difficulty is present' id='br14'>
+          <activity role='ED physician' action='perform urgent ED reassessment of fluctuating or crescendo hemibody motor weakness, sensory loss, or speech difficulty' objects='neurological status' id='a13_1'/>
+          <activity role='ED physician' action='consider admission to hospital for inpatient stroke prevention evaluation' objects='admission assessment' id='a13_2'/>
+        </branch>
+        <branch condition='No fluctuating or crescendo hemibody symptoms are present' id='br15'>
+          <activity role='stroke clinician' action='continue risk-stratified TIA or minor stroke pathway' objects='patient assessment' id='a14'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='eg4'>
+        <branch condition='TIA with high-risk features or minor stroke and medical attention was sought more than 48 hours after symptom onset' id='br16'>
+          <activity role='stroke coordinator' action='refer patient to a specialized TIA or minor stroke clinic or an outpatient clinic with stroke-prevention services within 24 hours of initial presentation' objects='referral order' id='a15'/>
+          <activity role='stroke prevention clinic' action='arrange comprehensive evaluation and management including urgent brain CT scan and stroke-prevention assessment' objects='referred patient' id='a16'/>
+        </branch>
+        <branch condition='TIA with high-risk features or minor stroke and delays to accessing a specialized TIA or minor stroke clinic pose risks to patient health' id='br17'>
+          <activity role='ED physician' action='perform urgent evaluation at an appropriately resourced ED' objects='patient' id='a17'/>
+          <activity role='radiology team' action='obtain brain CT scan as soon as possible and no later than 24 hours after symptom onset' objects='brain CT scan' id='a18'/>
+          <activity role='ED physician' action='consider inpatient evaluation and management for stroke prevention' objects='admission decision' id='a20'/>
+        </branch>
+        <branch condition='TIA with high-risk features or minor stroke and a specialized TIA or minor stroke clinic is promptly accessible' id='br18'>
+          <activity role='specialized TIA clinic team' action='provide immediate care at a specialized TIA or minor stroke clinic' objects='patient' id='a22'/>
+          <activity role='radiology team' action='obtain brain CT scan as soon as possible and no later than 24 hours after symptom onset' objects='brain CT scan' id='a23'/>
+        </branch>
+        <branch condition='TIA without high-risk features' id='br19'>
+          <activity role='radiology team' action='obtain brain CT scan as soon as possible and no later than 24 hours after initial presentation' objects='brain CT scan' id='a26'/>
+          <activity role='stroke coordinator' action='refer patient to an outpatient clinic with stroke-prevention services for comprehensive evaluation and management within 1 month of symptom onset' objects='referral order' id='a28'/>
+        </branch>
+      </exclusiveGateway>
+      <activity role='stroke clinician' action='review brain imaging results after CT to determine whether intracranial hemorrhage has been excluded' objects='brain imaging result' id='a29_1'/>
+      <exclusiveGateway id='eg_a29_1'>
+        <branch condition='Intracranial hemorrhage is excluded' id='br_a29_4'>
+          <parallelGateway id='pg_a29_1'>
+            <branch id='br_a29_5'>
+              <activity role='stroke clinician' action='confirm current antiplatelet use at presentation' objects='medication history' id='a29_2'/>
+            </branch>
+            <branch id='br_a29_6'>
+              <activity role='stroke clinician' action='confirm swallowing screening status and need for oral, rectal, or gastric administration' objects='swallowing screening result' id='a29_3'/>
+            </branch>
+          </parallelGateway>
+          <exclusiveGateway id='eg5_contra'>
+            <branch condition='Antiplatelet therapy is contraindicated' id='br20'>
+              <activity role='stroke clinician' action='document antiplatelet contraindication and continue other tailored stroke-prevention treatments' objects='patient record, individualized prevention plan' id='a30'/>
+            </branch>
+            <branch condition='Antiplatelet therapy is not contraindicated' id='br29'>
+              <activity role='stroke clinician' action='select the specific antiplatelet regimen based on medication history and swallowing status' objects='brain imaging result, medication history, swallowing screening result' id='a29_4'/>
+              <exclusiveGateway id='eg5'>
+                <branch condition='Patient is already on an antiplatelet agent at presentation' id='br28'>
+                  <activity role='stroke clinician' action='document current antiplatelet therapy and continue tailored stroke-prevention treatment' objects='medication record, individualized prevention plan' id='a41'/>
+                </branch>
+                <branch condition='Patient is not on an antiplatelet agent and ASA is selected' id='br21'>
+                  <exclusiveGateway id='eg6'>
+                    <branch condition='Swallowing screening failed' id='br22'>
+                      <activity role='clinician' action='offer rectal or gastric ASA 160 mg loading dose as necessary' objects='ASA' id='a31'/>
+                      <activity role='clinician' action='continue ASA by rectal or gastric route as necessary and reassess swallowing status before switching to oral ASA maintenance' objects='ASA, swallowing status' id='a32_new'/>
+                    </branch>
+                    <branch condition='Swallowing screening passed' id='br23'>
+                      <activity role='clinician' action='start ASA 160 mg loading dose immediately' objects='ASA' id='a33'/>
+                      <activity role='clinician' action='continue enteric coated ASA 81 to 325 mg daily with most patients maintained on 81 mg per day' objects='enteric coated ASA' id='a34'/>
+                    </branch>
+                  </exclusiveGateway>
+                </branch>
+                <branch condition='Patient is not on an antiplatelet agent and clopidogrel is selected' id='br24'>
+                  <activity role='clinician' action='start clopidogrel 300 mg loading dose immediately' objects='clopidogrel' id='a35'/>
+                  <activity role='clinician' action='continue clopidogrel 75 mg per day' objects='clopidogrel' id='a36'/>
+                </branch>
+                <branch condition='Patient is not on an antiplatelet agent and extended-release dipyridamole plus ASA is selected' id='br25'>
+                  <exclusiveGateway id='eg7'>
+                    <branch condition='Swallowing screening failed' id='br26'>
+                      <activity role='clinician' action='offer rectal or gastric ASA 160 mg loading dose as necessary' objects='ASA' id='a37'/>
+                      <activity role='clinician' action='continue extended-release dipyridamole 200 mg and ASA 25 mg twice daily' objects='extended-release dipyridamole and ASA' id='a38'/>
+                    </branch>
+                    <branch condition='Swallowing screening passed' id='br27'>
+                      <activity role='clinician' action='load with ASA 160 mg first' objects='ASA' id='a39'/>
+                      <activity role='clinician' action='continue extended-release dipyridamole 200 mg and ASA 25 mg twice daily' objects='extended-release dipyridamole and ASA' id='a40'/>
+                    </branch>
+                  </exclusiveGateway>
+                </branch>
+              </exclusiveGateway>
+            </branch>
+          </exclusiveGateway>
+        </branch>
+        <branch condition='Intracranial hemorrhage is not excluded' id='br_a29_7'>
+          <activity role='stroke clinician' action='document intracranial hemorrhage as an antiplatelet contraindication and continue non-antiplatelet stroke management' objects='patient record, imaging result' id='a29_5'/>
+        </branch>
+      </exclusiveGateway>
+      <exclusiveGateway id='eg8'>
+        <branch condition='Patient followed the appropriately resourced ED pathway for high-risk TIA or minor stroke' id='br30'>
+          <activity role='stroke clinician' action='initiate other stroke-prevention treatments tailored to the patient' objects='individualized prevention plan' id='a21'/>
+        </branch>
+        <branch condition='Patient followed the specialized TIA or minor stroke clinic pathway for high-risk TIA or minor stroke' id='br31'>
+          <activity role='stroke clinician' action='initiate other stroke-prevention treatments tailored to the patient' objects='individualized prevention plan' id='a25'/>
+        </branch>
+        <branch condition='Patient followed another TIA or minor stroke pathway' id='br32'>
+          <activity role='stroke team' action='continue pathway-specific evaluation, referral, and prevention planning' objects='care plan' id='a43'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </parallelGateway>
+  <activity role='stroke team' action='complete cross-continuum secondary prevention assessment for the patient whether admitted or discharged' objects='secondary prevention assessment' id='a42_1'/>
+  <activity role='stroke team' action='provide secondary prevention therapies, education, and follow-up arrangements consistent with Modules 5 and 10' objects='secondary prevention plan, follow-up referral' id='a42_2'/>
+</process>

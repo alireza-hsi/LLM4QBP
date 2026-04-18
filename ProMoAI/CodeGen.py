@@ -9,9 +9,18 @@ MODEL_MAP = {
     "GPT_4o1_nano": "gpt-4.1-nano",
     "GPT_5o2": "gpt-5.2",
     "5o2": "gpt-5.2",
+    "GPT_5o2_low_reasoning": "gpt-5.2-low-reasoning",
+    "GPT_5o2_medium_reasoning": "gpt-5.2-medium-reasoning",
+    "GPT_5o2_high_reasoning": "gpt-5.2-high-reasoning",
+    "GPT_5o4": "gpt-5.4",
+    "5o4": "gpt-5.4",
+    "GPT_5o4_low_reasoning": "gpt-5.4-low-reasoning",
+    "GPT_5o4_medium_reasoning": "gpt-5.4-medium-reasoning",
+    "GPT_5o4_high_reasoning": "gpt-5.4-high-reasoning",
+    "GPT_5o4_xhigh_reasoning": "gpt-5.4-xhigh-reasoning",
 }
 
-reasoning_models = ["gpt-5.2"]
+reasoning_models = ["gpt-5.2", "gpt-5.2-low-reasoning", "gpt-5.2-medium-reasoning", "gpt-5.2-high-reasoning", "gpt-5.4", "gpt-5.4-low-reasoning", "gpt-5.4-medium-reasoning", "gpt-5.4-high-reasoning", "gpt-5.4-xhigh-reasoning"]
 def get_initial_messages(txt_path: str):
     """
     Read the clinical-guideline text and build the single initial user message.
@@ -274,12 +283,39 @@ def generate_code_from_messages(messages, openai_api_key=None, model="GPT_4o1"):
         )
 
     if api_model in reasoning_models:
+        if api_model == "gpt-5.2":
+            model = "gpt-5.2"
+            reasoning_effort = "none"
+        elif api_model == "gpt-5.2-low-reasoning":
+            reasoning_effort = "low"
+            model = "gpt-5.2"
+        elif api_model == "gpt-5.2-medium-reasoning":
+            reasoning_effort = "medium"
+            model = "gpt-5.2"
+        elif api_model == "gpt-5.2-high-reasoning":
+            reasoning_effort = "high"
+            model = "gpt-5.2"
+        elif api_model == "gpt-5.4":
+            reasoning_effort = "none"
+            model = "gpt-5.4"
+        elif api_model == "gpt-5.4-low-reasoning":
+            reasoning_effort = "low"
+            model = "gpt-5.4"
+        elif api_model == "gpt-5.4-medium-reasoning":
+            reasoning_effort = "medium"
+            model = "gpt-5.4"
+        elif api_model == "gpt-5.4-high-reasoning":
+            reasoning_effort = "high"
+            model = "gpt-5.4"
+        elif api_model == "gpt-5.4-xhigh-reasoning":
+            reasoning_effort = "xhigh"
+            model = "gpt-5.4"
             resp_obj = openai.responses.create(
-                model=api_model,
+                model=model,
                 input=messages,
-                reasoning={"effort": "none"},
-                text={"verbosity": "low"},
-                max_output_tokens=2000,
+                reasoning={"effort": reasoning_effort},
+                text={},
+                max_output_tokens=20000,
             )
             text = resp_obj.output[0].content[0].text
     else:

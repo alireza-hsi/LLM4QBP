@@ -1,0 +1,32 @@
+<process>
+  <activity role='emergency department clinician' action='Initiate acute heart failure episode of care' objects='patient presenting with suspected acute heart failure' id='activity1'/>
+  <activity role='emergency department clinician' action='Apply standardized risk-stratification tool for acute heart failure and other conditions' objects='risk-stratification tool' id='activity2'/>
+  <parallelGateway id='parallelgateway1-1'>
+    <branch id='branch1-1'>
+      <activity role='emergency department clinician' action='Order initial investigations (serum creatinine, electrolytes, troponin, CBC, ECG, chest x-ray, echocardiogram if no recent available)' objects='laboratory and imaging test orders' id='activity3-1'/>
+    </branch>
+    <branch id='branch2-1'>
+      <activity role='emergency department nurse' action='Frequently measure heart rate, blood pressure, and oxygen saturation until patient is stabilized' objects='vital sign monitoring equipment' id='activity4'/>
+    </branch>
+  </parallelGateway>
+  <activity role='emergency department clinician' action='Review results of investigations' objects='laboratory and imaging test results' id='activity3-2'/>
+  <activity role='emergency department clinician' action='Assess responsiveness to diuresis' objects='patient response to furosemide and other interventions' id='activity5'/>
+  <activity role='emergency department clinician' action='Calculate acute heart failure risk score (e.g., EHMRG) to predict 7-day mortality risk' objects='EHMRG risk score calculator' id='activity6'/>
+  <exclusiveGateway id='exclusivegateway1-1'>
+    <branch condition='Low-risk (EHMRG quintiles 1-2), responded to initial treatment, no other considerations' id='branch3-1'>
+      <activity role='emergency department clinician' action='Provide discharge instructions' objects='discharge instructions' id='activity7-1'/>
+      <activity role='emergency department clinician' action='Complete discharge documentation' objects='discharge paperwork' id='activity7-2'/>
+      <activity role='emergency department clinician' action='Arrange follow-up visit with primary care provider within days of discharge' objects='follow-up appointment' id='activity8'/>
+    </branch>
+    <branch condition='High-risk (EHMRG quintiles 3-5) OR high-risk markers present OR other considerations (e.g., advanced directives, severe dementia)' id='branch4-1'>
+      <exclusiveGateway id='exclusivegateway2-1'>
+        <branch condition='Requires ventilation and/or intensive care' id='branch5-1'>
+          <activity role='emergency department clinician' action='Admit patient to intensive care unit with higher nurse-to-patient staffing' objects='ICU admission order' id='activity9'/>
+        </branch>
+        <branch condition='Requires inpatient care with normal nurse-to-patient staffing' id='branch6-1'>
+          <activity role='emergency department clinician' action='Admit patient to inpatient care' objects='inpatient admission order' id='activity10'/>
+        </branch>
+      </exclusiveGateway>
+    </branch>
+  </exclusiveGateway>
+</process>
